@@ -57,34 +57,6 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Mailto link handling - no form processing needed
-// The mailto link will open the user's email client directly
-
-// Show success/error messages
-function showMessage(message, type) {
-    // Remove existing messages
-    const existingMessage = document.querySelector('.form-message');
-    if (existingMessage) {
-        existingMessage.remove();
-    }
-    
-    // Create new message
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `form-message ${type}-message`;
-    messageDiv.textContent = message;
-    
-    // Insert after form
-    const form = document.getElementById('contactForm');
-    form.parentNode.insertBefore(messageDiv, form.nextSibling);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        if (messageDiv.parentNode) {
-            messageDiv.remove();
-        }
-    }, 5000);
-}
-
 // Intersection Observer for animations
 const observerOptions = {
     threshold: 0.1,
@@ -149,16 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Parallax effect for hero section
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const hero = document.querySelector('.hero');
-    if (hero) {
-        const rate = scrolled * -0.5;
-        hero.style.transform = `translateY(${rate}px)`;
-    }
-});
-
 // Add loading animation to buttons
 document.querySelectorAll('.btn').forEach(btn => {
     btn.addEventListener('click', function(e) {
@@ -209,30 +171,6 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
-
-// Service card hover effects
-document.querySelectorAll('.service-card').forEach(card => {
-    card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-10px) scale(1.02)';
-    });
-    
-    card.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0) scale(1)';
-    });
-});
-
-// Testimonial card hover effects
-document.querySelectorAll('.testimonial-card').forEach(card => {
-    card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-5px)';
-        this.style.boxShadow = '0 20px 40px rgba(59, 130, 246, 0.2)';
-    });
-    
-    card.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = 'none';
-    });
-});
 
 // Emergency phone number click tracking
 document.querySelectorAll('a[href^="tel:"]').forEach(link => {
