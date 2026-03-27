@@ -15,7 +15,7 @@
         ? script.dataset.handoffApi
         : apiUrl;
     var primaryColor =
-      script && script.dataset && script.dataset.color ? script.dataset.color : "#c4511a";
+      script && script.dataset && script.dataset.color ? script.dataset.color : "#3b82f6";
     var welcomeMessage =
       script && script.dataset && script.dataset.welcome
         ? script.dataset.welcome
@@ -32,7 +32,7 @@
     var handoffSubmitted = false;
 
     function sanitizeColor(value) {
-      return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value) ? value : "#c4511a";
+      return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value) ? value : "#3b82f6";
     }
 
     primaryColor = sanitizeColor(primaryColor);
@@ -55,7 +55,7 @@
       ".bubble:hover{transform:translateY(-2px);box-shadow:0 26px 58px rgba(0,0,0,.44)}",
       ".panel{width:min(380px,calc(100vw - 24px));height:min(640px,calc(100vh - 32px));background:rgba(18,7,7,.94);border:1px solid rgba(255,255,255,.1);border-radius:22px;box-shadow:0 28px 80px rgba(0,0,0,.5);overflow:hidden;display:none;flex-direction:column;backdrop-filter:blur(18px)}",
       ".panel.open{display:flex;animation:slideIn .18s ease}",
-      ".header{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 14px;background:linear-gradient(180deg,rgba(196,81,26,.82),rgba(111,31,9,.94));color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}",
+      ".header{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 14px;background:linear-gradient(180deg,rgba(59,130,246,.88),rgba(29,78,216,.96));color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}",
       ".title{font-size:15px;font-weight:700;letter-spacing:.01em}",
       ".subtitle{font-size:12px;opacity:.92;margin-top:4px}",
       ".controls{display:flex;gap:8px}",
@@ -416,29 +416,9 @@
 
           if (result.value) {
             var chunk = decoder.decode(result.value, { stream: !done });
-            var parts = chunk.split("\n");
-
-            for (var i = 0; i < parts.length; i += 1) {
-              var line = parts[i].trim();
-
-              if (!line || line.indexOf("data: ") !== 0) {
-                continue;
-              }
-
-              var payload = line.slice(6);
-
-              if (payload === "[DONE]") {
-                continue;
-              }
-
-              try {
-                var parsed = JSON.parse(payload);
-                var token = parsed.token || "";
-                fullText += token;
-                streamBubble.innerHTML = formatMessageHtml(fullText);
-                scrollToBottom();
-              } catch (error) {}
-            }
+            fullText += chunk;
+            streamBubble.innerHTML = formatMessageHtml(fullText);
+            scrollToBottom();
           }
         }
 
