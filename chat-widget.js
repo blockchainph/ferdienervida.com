@@ -396,11 +396,14 @@
         });
 
         if (!response.ok || !response.body) {
-          var errorText = "Failed to fetch";
+          var errorText = "Something went wrong.";
           try {
-            errorText = await response.text();
+            var data = await response.json();
+            if (data && data.error) {
+              errorText = data.error;
+            }
           } catch (error) {}
-          throw new Error(errorText || "Failed to fetch");
+          throw new Error(errorText || "Something went wrong.");
         }
 
         var reader = response.body.getReader();
