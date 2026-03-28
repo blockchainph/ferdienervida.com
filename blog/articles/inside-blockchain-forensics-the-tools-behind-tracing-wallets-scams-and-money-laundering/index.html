@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inside Blockchain Forensics: The Tools Behind Tracing Wallets, Scams, and Money Laundering | Ferdie James Nervida</title>
+    <meta name="description" content="Recently, ZachXBT shared a great list of tools he uses for blockchain investigations and open source intelligence (OSINT) work. Here's my own working toolkit for tracing wallets, scams, laundering ops, and wallet attribution.">
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="article-template">
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo"><h2>FJN</h2></div>
+            <div class="nav-menu">
+                <a href="../../" class="nav-link">Home</a>
+                <a href="../../#essays" class="nav-link">Essays</a>
+                <a href="../../#about" class="nav-link">About</a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+                <a href="/" class="nav-link cta-button">Main Site</a>
+            </div>
+            <div class="hamburger"><span></span><span></span><span></span></div>
+        </div>
+    </nav>
+
+    <section class="article-shell">
+        <div class="container narrow-container">
+            <div class="article-backlink"><a href="../../">← Back to all essays</a></div>
+            <article class="blog-post article-page-card">
+<div class="post-meta">
+<span class="post-date">April 28, 2025</span>
+<span class="post-category">Blockchain Forensics</span>
+</div>
+<h3 class="post-title">Inside Blockchain Forensics: The Tools Behind Tracing Wallets, Scams, and Money Laundering</h3>
+<p class="post-excerpt">
+                    Recently, ZachXBT shared a great list of tools he uses for blockchain investigations and open source intelligence (OSINT) work. Here's my own working toolkit for tracing wallets, scams, laundering ops, and wallet attribution.
+                </p>
+<div class="post-content">
+<p>Recently, ZachXBT shared a great list of tools he uses for blockchain investigations and open source intelligence (OSINT) work. I've been following Zach's work for a long time and have huge respect for what he's built—setting the bar for independent, credible crypto investigations.</p>
+<p>When I looked at his list, I realized I use many of the same tools (if not the majority), plus a few more that I've added based on the types of cases I handle. So I thought I'd share my own working toolkit—both for those just starting out and for those already digging deeper into hacks, scams, laundering ops, and wallet attribution.</p>
+<p>This isn't a sponsored list or just theory. These are the tools I personally use in real investigations. Over the past few years, I also made sure to formally train myself to navigate them better:</p>
+<ul>
+<li><strong>Advanced Blockchain Investigations</strong> (AnChain.AI)<br/>
+<em>Skills developed: Digital Forensics · Blockchain Analysis · Open Source Intelligence</em></li>
+<li><strong>Advanced Smart Contract Investigations</strong> (AnChain.AI)<br/>
+<em>Skills developed: Smart Contract Investigation · Fraud Investigations · Anti-Money Laundering · Data Analysis · Blockchain Forensics</em></li>
+<li><strong>Cryptocurrency for Law Enforcement (Public Version)</strong> (U.S. Department of Homeland Security)</li>
+</ul>
+<p>Getting trained wasn't about collecting certificates—it sharpened the way I think, ask questions, connect subtle clues, and move beyond surface-level analysis.</p>
+<p>If you want a solid resource to deepen your knowledge, I highly recommend reading <strong>"Investigating Cryptocurrencies: Understanding, Extracting, and Analyzing Blockchain Evidence"</strong> by Nick Furneaux.</p>
+<p>It's one of the best foundational books out there if you're serious about blockchain investigations.</p>
+<p>At the end of the day, blockchain forensics and crypto OSINT aren't just about tracing wallets or making graphs—it's about the mission of uncovering the truth in spaces where bad actors believe they can operate unnoticed.</p>
+<p>I hope that by sharing these tools and experiences, more people get inspired to step into this kind of work. Because the more investigators we have, the stronger and safer the blockchain ecosystem becomes.</p>
+<h4>🛠️ Tools I Actually Use (and Recommend)</h4>
+<h5>🔍 Blockchain Tracking &amp; Labeling</h5>
+<ul>
+<li><strong>SCREEN (AnChain.AI)</strong> – Real-time risk screening on incoming addresses and transactions.</li>
+<li><strong>CISO (AnChain.AI)</strong> – Full forensic case management: deep dives, clustering, attribution.</li>
+<li><strong>Arkham</strong> – Multi-chain explorer with labeled entities, alert systems, and custom graphs.</li>
+<li><strong>MetaSleuth</strong> – Creates transaction graphs easily.</li>
+<li><strong>Phalcon</strong> – A tool that empowers you to decipher complex transactions, track fund flows, and uncover hidden patterns.</li>
+<li><strong>Mistrack Dashboard</strong> – Advanced custom dashboard for spotting suspicious flows across chains.</li>
+</ul>
+<h5>🕵️ OSINT &amp; Dark-web Lookups</h5>
+<ul>
+<li><strong>darkwebinformer</strong> – Darknet threat alerts and leak monitoring.</li>
+<li><strong>OSINT Industries</strong> – Lookup tool for emails, usernames, and phone numbers across breaches.</li>
+<li><strong>IntelX</strong> – Global archive for breaches, WHOIS, DNS records, and pastes.</li>
+</ul>
+<h5>🔧 Chrome Extensions &amp; Browser-Helpers</h5>
+<ul>
+<li><strong>MetaSuites</strong> – Enhances block explorers (like Etherscan) by adding extra information.</li>
+</ul>
+<h5>🔗 Bridges &amp; Explorer Aggregators</h5>
+<ul>
+<li><strong>Tor</strong> – For anonymous browsing, especially when exploring darknet forums.</li>
+</ul>
+<h5>📊 Analytics &amp; Dashboards</h5>
+<ul>
+<li><strong>Dune</strong> – Custom SQL dashboards for blockchain data queries and visualizations.</li>
+<li><strong>Mistrack Dashboard</strong> – (again, because pattern analysis often needs layering different views).</li>
+</ul>
+<h5>🌐 Archiving &amp; Historical Data</h5>
+<ul>
+<li><strong>Wayback Machine</strong> – Snapshot archives of websites for proof and references.</li>
+<li><strong>Archive Today</strong> – Instant webpage archiving for preserving evidence.</li>
+</ul>
+<h5>💬 Social Media and OSINT Tools</h5>
+<ul>
+<li><strong>Mugetsu</strong> – Twitter/X username history tracking and meme coin wallet monitoring.</li>
+<li><strong>TelegramDB Search Bot</strong> – Look up basic Telegram account info and group membership.</li>
+</ul>
+<h4>Final Thoughts</h4>
+<p>This field is growing — and so are the threats.</p>
+<p>The need for serious blockchain investigators, analysts, and forensic specialists has never been greater. Every new investigator strengthens the defenses of the Web3 ecosystem and makes it harder for malicious actors to hide.</p>
+<p>Learning the tools, sharpening your skills, and committing to the mission of uncovering the truth is no longer optional — it's necessary.</p>
+<p>The next wave of blockchain investigations is already starting. Those who prepare today will be the ones leading it tomorrow.</p>
+<div class="post-cta">
+<h4>Ready to Master These Forensic Tools?</h4>
+<p>This toolkit represents years of real-world experience in blockchain forensics. My comprehensive training programs and expert consultation services can help you develop the skills needed to become a world-class investigator.</p>
+<a class="cta-primary" href="/">Explore My Training Programs</a>
+</div>
+<!-- Comments Section -->
+
+</div>
+</article>
+        </div>
+    </section>
+
+    <footer class="footer">
+<div class="container">
+<div class="footer-content">
+<div class="footer-section">
+<h3>Ferdie James Nervida</h3>
+<p>Blockchain Forensics Expert</p>
+</div>
+<div class="footer-section">
+<h4>Connect</h4>
+<a href="/">Main Website</a>
+<a href="/book/">Email</a>
+</div>
+<div class="footer-section">
+<h4>Services</h4>
+<a href="/">Forensic Analysis</a>
+<a href="/">Expert Consultation</a>
+</div>
+</div>
+<div class="footer-bottom">
+<p>© 2025 Ferdie James Nervida. All rights reserved.</p>
+</div>
+</div>
+</footer>
+    <script src="../../script.js"></script>
+</body>
+</html>

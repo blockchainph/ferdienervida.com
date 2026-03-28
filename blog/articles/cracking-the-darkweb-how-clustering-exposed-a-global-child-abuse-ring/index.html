@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cracking the Darkweb: How Clustering Exposed a Global Child Abuse Ring | Ferdie James Nervida</title>
+    <meta name="description" content="In 2017, global investigators quietly launched a case that would unravel one of the darkest corners of the internet. Using only open-source blockchain data and forensic techniques like clustering, they traced payments and kicked down digital doors in 38 countries.">
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="article-template">
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo"><h2>FJN</h2></div>
+            <div class="nav-menu">
+                <a href="../../" class="nav-link">Home</a>
+                <a href="../../#essays" class="nav-link">Essays</a>
+                <a href="../../#about" class="nav-link">About</a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+                <a href="/" class="nav-link cta-button">Main Site</a>
+            </div>
+            <div class="hamburger"><span></span><span></span><span></span></div>
+        </div>
+    </nav>
+
+    <section class="article-shell">
+        <div class="container narrow-container">
+            <div class="article-backlink"><a href="../../">← Back to all essays</a></div>
+            <article class="blog-post article-page-card">
+<div class="post-meta">
+<span class="post-date">July 6, 2025</span>
+<span class="post-category">Blockchain Forensics</span>
+</div>
+<h3 class="post-title">Cracking the Darkweb: How Clustering Exposed a Global Child Abuse Ring</h3>
+<p class="post-excerpt">
+                    In 2017, global investigators quietly launched a case that would unravel one of the darkest corners of the internet. Using only open-source blockchain data and forensic techniques like clustering, they traced payments and kicked down digital doors in 38 countries.
+                </p>
+<div class="post-content">
+<p>In 2017, global investigators quietly launched a case that would unravel one of the darkest corners of the internet. Buried behind layers of Tor routing and pseudonymous Bitcoin payments, <em>Welcome to Video</em> was a child sexual abuse material (CSAM) marketplace operating out of South Korea. It didn't just trade illegal content; it industrialized it. Access came at the price of a few thousand satoshis, and buyers believed their transactions would disappear into the blockchain's fog.</p>
+<p>They were wrong.</p>
+<p>Using only open-source blockchain data and forensic techniques like <em>clustering</em>, investigators traced payments, linked wallets to names, and kicked down digital doors in 38 countries. In the end, 337 users were arrested (U.S. Department of Justice, 2019). Not with spyware. Not with surveillance. With math.</p>
+<h4>From Crime Scene to Pattern Recognition</h4>
+<p>The <em>Welcome to Video</em> case revealed that blockchain transactions, when analyzed correctly, can expose hidden criminal networks. But the question remained: how did investigators know where to look? This brings us to one of the most pivotal discoveries in blockchain analysis—a method born not in a government agency, but in academia.</p>
+<h4>The Myth of Anonymity Meets a Spreadsheet</h4>
+<p>Back in 2013, long before most of us had heard of Bitcoin, a doctoral student at UC San Diego asked a deceptively simple question: how many people are actually using this thing?</p>
+<p>What Sarah Meiklejohn found was chaos: 12 million addresses, nearly 16 million transactions, and no obvious way to tell which wallets belonged to whom. But she had a hunch. If Bitcoin was pseudonymous, not anonymous, then patterns had to exist. So she started digging, transforming the entire blockchain into a massive searchable spreadsheet and running queries like a digital archaeologist brushing sand off buried bones (Greenberg, 2022).</p>
+<p>That hunch became a breakthrough. Through behavioral patterns and transaction structures, she realized there was a way to collapse the illusion of anonymity. It started with a rule of thumb.</p>
+<h4>When Piggy Banks Talk</h4>
+<p>Investigators call it a <em>heuristic</em>, a pattern you can follow even when the data won't speak directly. One of the most effective is called the <em>common input ownership heuristic</em>. Here's how it works: if multiple Bitcoin addresses are used together to fund a transaction, odds are they're controlled by the same person. Think of it like someone paying for lunch using two different credit cards. You wouldn't assume they borrowed both from friends. You'd assume they're both his.</p>
+<p>But Bitcoin has another quirk. Andy Greenberg calls it the "piggy bank problem" in <em>Tracers in the Dark</em>. Every Bitcoin address is like a sealed piggy bank. If you want to pay someone 6 BTC from an address holding 10, you can't just scoop out what you need. You smash the whole thing. The 6 goes to your recipient. The leftover 4? That goes to a <em>change address</em>, a brand-new piggy bank that your wallet creates just for you (Greenberg, 2022).</p>
+<p>To anyone watching the blockchain, both outputs look the same. But with just a bit of logic, you can often tell which one is the payment and which one is the change. If one of the outputs is a brand-new address never seen before, there's a good chance it's the change address. And if it's the change address, it probably belongs to the sender too.</p>
+<p>Link the inputs. Spot the change. Group the addresses. That's clustering.</p>
+<h4>Peeling the Onion: Heuristics That Push Attribution Further</h4>
+<p>Here's why this matters: being able to tell payment and change outputs apart is fundamental to a successful blockchain investigation. In any UTXO-based transaction like Bitcoin, identifying which output is the actual payment and which one is the change is not just a technical detail; it can determine whether an investigation moves forward or ends up chasing its own tail. If an investigator misclassifies the change address as the recipient, the trail can go cold fast, wasting hours or even days tracing the wrong cluster. On the other hand, correctly identifying the real payment address puts the investigation on solid ground, revealing downstream flows and potential real-world identities. This distinction becomes a critical skill that separates seasoned investigators from those chasing dead ends.</p>
+<p>The common ownership heuristic gets you in the door. But once you're inside, things get murkier. Criminals aren't always sloppy, and Bitcoin doesn't hand over answers. It hides them in plain sight. That's why blockchain investigators don't just rely on one trick. They stack heuristics like tools in a forensics kit, each one sharpening the picture of who's actually behind a wallet.</p>
+<h5>Nominal Spend Heuristic</h5>
+<p>A lot of people think the smallest output in a Bitcoin transaction is the payment. But that's not always the case. Wallets are designed to find the most efficient way to spend the exact amount needed while keeping fees low. So instead of looking for the smallest number, investigators ask a better question: are all the inputs required to cover one specific output? If yes, then that output is likely the payment.</p>
+<p>For example, if the inputs add up to 3 BTC and the outputs are 0.5 BTC and 2.49 BTC, the 0.5 is likely the payment and 2.49 the change. But if the outputs are close in value—like 1.45 BTC and 1.55 BTC—it gets tricky. Switching to USD values sometimes helps clear things up. The goal isn't just to match numbers. It's to spot the intent behind the spend.</p>
+<p>This method isn't perfect. Wallet behavior can vary, and some transactions are crafted to mislead. But combined with other heuristics, it's a reliable starting point for figuring out who paid what, and to whom.</p>
+<h5>Change Address Type Heuristic</h5>
+<p>Not all Bitcoin addresses look the same. Legacy addresses start with "1," nested SegWit with "3," and native SegWit with "bc1." Most wallet software prefers consistency and sends change back to the same address type. If a transaction's outputs include one address that matches the input type and another that doesn't, there's a good chance the matching one is the change. This heuristic is documented in Meiklejohn et al.'s foundational work (Meiklejohn et al., 2013).</p>
+<h5>Multisig Heuristic</h5>
+<p>Multisig wallets require multiple keys to authorize a transaction, which adds an extra layer of security. These addresses have a distinct script type that makes them easily recognizable on-chain. When a transaction involves a multisig input or output alongside standard addresses, analysts can use that contrast to infer wallet structure or organizational control. If multiple transactions show consistent movement between a particular multisig and a standard address, it can help cluster them as being under the same entity's control.</p>
+<h5>Round Payment Heuristic</h5>
+<p>Humans are messy, but when we pay others, we like clean numbers like 0.1 BTC, 1.0 BTC, or 5.0 BTC. These round figures stick out on the blockchain. The less-precise outputs are often change. Round numbers suggest external payments, while uneven leftovers point to self-change.</p>
+<h5>Self-Change Heuristic</h5>
+<p>Despite warnings about address reuse, it still happens frequently, especially in older transactions or lazy wallets. When change is sent back to an address that's already appeared in the user's history, that's a huge clue. Meiklejohn's study identified this behavior and used it to tag massive address clusters across Silk Road, Mt. Gox, and other darknet markets (Meiklejohn et al., 2013). In forensic cases like <em>Welcome to Video</em>, this heuristic helped connect clusters when change addresses overlapped with previously used ones (Greenberg, 2022).</p>
+<h4>Don't Get Too Comfortable</h4>
+<p>These heuristics are sharp, but they're not gospel. They're patterns. Educated guesses. Good ones, but guesses nonetheless. All of them rely on predictable behavior, and criminals, when they're smart, stop being predictable.</p>
+<p>That's where CoinJoin comes in. CoinJoin breaks the rules. It takes multiple users, mashes their payments together in one transaction, and jumbles the inputs and outputs so the usual tricks don't work. It's like walking into a crime scene and finding everyone's fingerprints on every surface. Wallets like Wasabi and Samurai have made CoinJoin more accessible, and forensic tools struggle to untangle the aftermath without additional context or external identifiers.</p>
+<p>In the next post, we'll dig into CoinJoin, what it is, how it works, and why it remains the closest thing Bitcoin has to a true disappearing act—for now.</p>
+<div class="post-cta">
+<h4>Ready to Master Advanced Blockchain Forensics?</h4>
+<p>This real-world case study demonstrates the power of blockchain forensics in taking down global criminal networks. My advanced training programs teach these exact techniques used by law enforcement worldwide.</p>
+<a class="cta-primary" href="/">Master Forensic Techniques</a>
+</div>
+<div class="references">
+<h5>References</h5>
+<ul>
+<li>U.S. Department of Justice. (2019). <em>South Korean National and Hundreds of Others Charged Worldwide in Takedown of Largest Darknet Child Exploitation Market</em>. <a href="https://www.justice.gov/opa/pr/south-korean-national-and-hundreds-others-charged-worldwide-takdown-largest-darknet-child" target="_blank">https://www.justice.gov/opa/pr/south-korean-national-and-hundreds-others-charged-worldwide-takdown-largest-darknet-child</a></li>
+<li>Greenberg, A. (2022). <em>Tracers in the Dark: The Global Hunt for the Crime Lords of Cryptocurrency</em>. Doubleday.</li>
+<li>Meiklejohn, S., Pomarole, M., Jordan, G., Levchenko, K., McCoy, D., Voelker, G. M., &amp; Savage, S. (2013). <em>A Fistful of Bitcoins: Characterizing Payments Among Men with No Names</em>. <a href="https://cseweb.ucsd.edu/~smeiklejohn/files/imc13.pdf" target="_blank">https://cseweb.ucsd.edu/~smeiklejohn/files/imc13.pdf</a></li>
+</ul>
+</div>
+<!-- Comments Section -->
+
+</div>
+</article>
+        </div>
+    </section>
+
+    <footer class="footer">
+<div class="container">
+<div class="footer-content">
+<div class="footer-section">
+<h3>Ferdie James Nervida</h3>
+<p>Blockchain Forensics Expert</p>
+</div>
+<div class="footer-section">
+<h4>Connect</h4>
+<a href="/">Main Website</a>
+<a href="/book/">Email</a>
+</div>
+<div class="footer-section">
+<h4>Services</h4>
+<a href="/">Forensic Analysis</a>
+<a href="/">Expert Consultation</a>
+</div>
+</div>
+<div class="footer-bottom">
+<p>© 2025 Ferdie James Nervida. All rights reserved.</p>
+</div>
+</div>
+</footer>
+    <script src="../../script.js"></script>
+</body>
+</html>
