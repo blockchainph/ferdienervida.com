@@ -52,6 +52,7 @@ if (!articleCard || !postContent) {
         </div>
         <div class="engagement-actions">
           <button class="like-button" type="button" data-like-button>Like this piece</button>
+          <p class="comment-status" data-like-status aria-live="polite"></p>
         </div>
       </div>
       <div class="comments-panel" id="comments">
@@ -84,6 +85,7 @@ if (!articleCard || !postContent) {
 
     const likeCountNode = section.querySelector("[data-like-count]");
     const likeButton = section.querySelector("[data-like-button]");
+    const likeStatusNode = section.querySelector("[data-like-status]");
     const commentsList = section.querySelector("[data-comments-list]");
     const commentEmpty = section.querySelector("[data-comment-empty]");
     const commentCountNode = section.querySelector("[data-comment-count]");
@@ -108,6 +110,15 @@ if (!articleCard || !postContent) {
 
       statusNode.textContent = message;
       statusNode.classList.toggle("is-error", isError);
+    }
+
+    function setLikeStatus(message, isError = false) {
+      if (!likeStatusNode) {
+        return;
+      }
+
+      likeStatusNode.textContent = message;
+      likeStatusNode.classList.toggle("is-error", isError);
     }
 
     function updateCommentCount(count) {
@@ -152,8 +163,10 @@ if (!articleCard || !postContent) {
     }
 
     async function loadLikes() {
+      const localLiked = localStorage.getItem(likedStorageKey) === "true";
       const snapshot = await getDoc(likeDocRef);
-      const count = snapshot.exists() ? Number(snapshot.data().count || 0) : 0;
+      const baseCount = snapshot.exists() ? Number(snapshot.data().count || 0) : 0;
+      const count = localLiked && !snapshot.exists() ? 1 : baseCount;
       updateLikeCount(count);
       syncLikedState();
     }
@@ -217,8 +230,14 @@ if (!articleCard || !postContent) {
 
         localStorage.setItem(likedStorageKey, "true");
         updateLikeCount(nextCount);
+        setLikeStatus("Thanks. Your like was counted.");
       } catch (error) {
         console.error(error);
+        const currentText = likeCountNode?.textContent || "0 likes";
+        const currentCount = Number.parseInt(currentText, 10) || 0;
+        localStorage.setItem(likedStorageKey, "true");
+        updateLikeCount(currentCount + 1);
+        setLikeStatus("Liked on this device. Shared count is unavailable right now.", true);
       } finally {
         syncLikedState();
       }
