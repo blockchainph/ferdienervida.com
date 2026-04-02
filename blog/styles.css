@@ -1,33 +1,33 @@
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
-    --bg: #090909;
-    --panel: #111111;
-    --panel-strong: #161616;
-    --panel-soft: #0d0d0d;
-    --text: #f4f1eb;
-    --muted: #b6b0a7;
+    --bg: #07111f;
+    --panel: #0d1a2b;
+    --panel-strong: #12233a;
+    --panel-soft: #091423;
+    --text: #eef4ff;
+    --muted: #b7c5d9;
     --line: rgba(255, 255, 255, 0.12);
     --line-strong: rgba(255, 255, 255, 0.24);
-    --accent: #d7342a;
-    --accent-soft: rgba(215, 52, 42, 0.16);
-    --accent-strong: #f04b3f;
+    --accent: #2f7cf6;
+    --accent-soft: rgba(47, 124, 246, 0.16);
+    --accent-strong: #5d9cff;
     --max-width: 1180px;
     --narrow-width: 840px;
 }
 
 html[data-theme="light"] {
-    --bg: #f5f1ea;
-    --panel: #fcfaf6;
+    --bg: #f3f7fc;
+    --panel: #ffffff;
     --panel-strong: #ffffff;
-    --panel-soft: #efebe3;
-    --text: #171310;
-    --muted: #6b625b;
-    --line: rgba(23, 19, 16, 0.14);
-    --line-strong: rgba(23, 19, 16, 0.28);
-    --accent: #c52d23;
-    --accent-soft: rgba(197, 45, 35, 0.11);
-    --accent-strong: #d7342a;
+    --panel-soft: #edf3fb;
+    --text: #0b1624;
+    --muted: #5f7289;
+    --line: rgba(11, 22, 36, 0.12);
+    --line-strong: rgba(11, 22, 36, 0.22);
+    --accent: #2567d8;
+    --accent-soft: rgba(37, 103, 216, 0.1);
+    --accent-strong: #2f7cf6;
 }
 
 * {
@@ -70,14 +70,14 @@ img {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background: rgba(9, 9, 9, 0.94);
+    background: rgba(7, 17, 31, 0.94);
     backdrop-filter: blur(14px);
     border-top: 3px solid var(--accent);
     border-bottom: 1px solid var(--line);
 }
 
 html[data-theme="light"] .navbar {
-    background: rgba(245, 241, 234, 0.94);
+    background: rgba(243, 247, 252, 0.94);
 }
 
 .nav-container {
@@ -203,7 +203,7 @@ html[data-theme="light"] .navbar {
 .hero {
     padding: 72px 0 42px;
     background:
-        linear-gradient(180deg, rgba(215, 52, 42, 0.08), transparent 32%),
+        linear-gradient(180deg, rgba(47, 124, 246, 0.08), transparent 32%),
         var(--bg);
     border-bottom: 1px solid var(--line);
 }
@@ -216,6 +216,8 @@ html[data-theme="light"] .navbar {
 
 .hero-content {
     max-width: 880px;
+    margin: 0 auto;
+    text-align: center;
 }
 
 .hero-badge {
@@ -250,9 +252,11 @@ html[data-theme="light"] .navbar {
 }
 
 .hero-title {
-    font-size: clamp(3.6rem, 8vw, 7.2rem);
-    max-width: 11ch;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    max-width: 13ch;
     margin-bottom: 12px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .hero-subtitle,
@@ -267,8 +271,9 @@ html[data-theme="light"] .navbar {
 }
 
 .hero-subtitle {
-    max-width: 620px;
-    font-size: 1.05rem;
+    max-width: 560px;
+    font-size: 1rem;
+    margin: 0 auto;
 }
 
 .blog,
@@ -286,10 +291,11 @@ html[data-theme="light"] .navbar {
     padding: 0 0 18px;
     margin-bottom: 8px;
     border-bottom: 3px solid var(--accent);
+    text-align: center;
 }
 
 .section-header h2 {
-    font-size: clamp(2.6rem, 5vw, 4rem);
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
     margin-bottom: 6px;
 }
 
@@ -350,7 +356,7 @@ html[data-theme="light"] .navbar {
 }
 
 .article-card-title {
-    font-size: clamp(2.1rem, 4vw, 3.2rem);
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
 }
 
 .article-card-title a {
@@ -629,11 +635,11 @@ html[data-theme="light"] .post-content em {
 
 .footer {
     border-top: 1px solid var(--line);
-    background: #060606;
+    background: #06101d;
 }
 
 html[data-theme="light"] .footer {
-    background: #ece8df;
+    background: #eaf1f9;
 }
 
 .footer-content {
@@ -769,7 +775,7 @@ html[data-theme="light"] .footer {
 
 @media (max-width: 540px) {
     .hero-title {
-        font-size: 3.4rem;
+        font-size: 2.7rem;
     }
 
     .section-header h2,
@@ -778,7 +784,7 @@ html[data-theme="light"] .footer {
     .post-content h4,
     .post-cta h4,
     .references h5 {
-        font-size: 2.1rem;
+        font-size: 1.9rem;
     }
 
     .post-title {
