@@ -160,7 +160,7 @@ if (!articleCard || !postContent) {
 
     async function loadComments() {
       const commentsQuery = query(
-        collection(db, "blogComments"),
+        collection(db, "comments"),
         where("articleSlug", "==", articleSlug),
         where("isHidden", "==", false)
       );
@@ -251,12 +251,13 @@ if (!articleCard || !postContent) {
       setStatus("Posting your comment...");
 
       try {
-        await addDoc(collection(db, "blogComments"), {
+        await addDoc(collection(db, "comments"), {
           articleSlug,
           title: postTitle,
           name,
           email,
           commentBody,
+          isMember: false,
           isHidden: false,
           createdAt: serverTimestamp()
         });

@@ -379,6 +379,18 @@ html[data-theme="light"] .navbar {
     padding: 26px;
 }
 
+.article-page-card .post-meta,
+.article-page-card .post-title,
+.article-page-card .post-excerpt {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.article-page-card .post-meta {
+    justify-content: center;
+}
+
 .post-title {
     font-size: clamp(3rem, 6vw, 5.1rem);
     margin: 18px 0 12px;
