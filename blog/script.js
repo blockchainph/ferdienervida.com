@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     html.setAttribute('data-theme', savedTheme);
     updateThemeButton(savedTheme);
 
@@ -58,6 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
         readingTimeElement.className = 'reading-time';
         readingTimeElement.innerHTML = `<span>${readingTime} min read</span>`;
         articleMeta.appendChild(readingTimeElement);
+    }
+
+    if (document.body.classList.contains('article-template')) {
+        import('/blog/engagement.js').catch((error) => {
+            console.error('Blog engagement module failed to load.', error);
+        });
     }
 });
 
