@@ -2562,3 +2562,67 @@ body {
         border-radius: 0;
     }
 }
+
+/* Final hard overrides for main-site palette and square edges */
+.nav-link.cta-button,
+.cta-primary,
+.cta-secondary,
+.premium-cta .cta-primary,
+.post-category,
+.featured-badge,
+.hero-badge,
+.reading-time span,
+.article-card,
+.article-page-card,
+.blog-post,
+.hero-featured-post,
+.posts-toc,
+.post-cta,
+.premium-cta,
+.references,
+.post-feature-image {
+    border-radius: 0 !important;
+}
+
+.nav-link.cta-button,
+.cta-primary,
+.premium-cta .cta-primary,
+.post-category,
+.featured-badge {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.nav-link.cta-button:hover,
+.cta-primary:hover,
+.premium-cta .cta-primary:hover {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+.cta-secondary {
+    background: transparent !important;
+    color: #3b82f6 !important;
+    border: 2px solid #3b82f6 !important;
+    box-shadow: none !important;
+}
+
+.cta-secondary:hover {
+    background: #3b82f6 !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+.nav-logo h2,
+.nav-link:hover,
+.footer-section h3,
+.footer-section h4,
+.post-content h5,
+.article-card-title a:hover,
+.article-card-link,
+.article-backlink a {
+    color: #3b82f6 !important;
+}
