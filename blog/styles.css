@@ -246,14 +246,15 @@ html[data-theme="light"] .navbar {
 .article-card-title {
     font-family: "Bebas Neue", sans-serif;
     font-weight: 400;
-    line-height: 0.98;
-    letter-spacing: 0.02em;
+    line-height: 1.02;
+    letter-spacing: 0.012em;
     text-transform: uppercase;
+    text-wrap: balance;
 }
 
 .hero-title {
-    font-size: clamp(2.8rem, 6vw, 5rem);
-    max-width: 13ch;
+    font-size: clamp(2.6rem, 5.2vw, 4.3rem);
+    max-width: 18ch;
     margin-bottom: 12px;
     margin-left: auto;
     margin-right: auto;
@@ -356,7 +357,8 @@ html[data-theme="light"] .navbar {
 }
 
 .article-card-title {
-    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+    max-width: 20ch;
 }
 
 .article-card-title a {
@@ -392,9 +394,9 @@ html[data-theme="light"] .navbar {
 }
 
 .post-title {
-    font-size: clamp(3rem, 6vw, 5.1rem);
+    font-size: clamp(2.4rem, 4.8vw, 4.1rem);
     margin: 18px 0 12px;
-    max-width: 12ch;
+    max-width: 18ch;
 }
 
 .post-excerpt {
@@ -787,7 +789,7 @@ html[data-theme="light"] .footer {
 
 @media (max-width: 540px) {
     .hero-title {
-        font-size: 2.7rem;
+        font-size: 2.45rem;
     }
 
     .section-header h2,
@@ -800,6 +802,6 @@ html[data-theme="light"] .footer {
     }
 
     .post-title {
-        font-size: 3.15rem;
+        font-size: 2.65rem;
     }
 }
