@@ -40,6 +40,35 @@ document.addEventListener('DOMContentLoaded', () => {
         submitLabel.textContent = getSubmitLabel();
     }
 
+    function applyHashSelection() {
+        const hash = window.location.hash.replace('#', '');
+        const hashMap = {
+            speaking: 'Speaking Inquiry',
+            training: 'Training Inquiry',
+            recovery: 'Crypto Recovery Case Evaluation'
+        };
+
+        const targetValue = hashMap[hash];
+        if (!targetValue) {
+            return;
+        }
+
+        const targetInput = Array.from(serviceInputs).find((input) => input.value === targetValue);
+        if (!targetInput) {
+            return;
+        }
+
+        targetInput.checked = true;
+        updateVisibleSection();
+
+        const anchorTarget = document.getElementById(hash);
+        if (anchorTarget) {
+            requestAnimationFrame(() => {
+                anchorTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        }
+    }
+
     function validateForm() {
         let isValid = true;
 
@@ -110,6 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('change', updateVisibleSection);
     });
 
+    window.addEventListener('hashchange', applyHashSelection);
+
     closeModalBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (event) => {
         if (event.target === modal) {
@@ -160,4 +191,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     updateVisibleSection();
+    applyHashSelection();
 });

@@ -162,6 +162,84 @@ body.modal-open {
     margin-bottom: 28px;
 }
 
+.booking-shortcut {
+    margin-bottom: 28px;
+}
+
+.booking-shortcut-panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 22px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 24px 60px rgba(2, 6, 23, 0.35);
+    padding: 30px;
+}
+
+.booking-shortcut-panel h2 {
+    font-size: 1.55rem;
+    margin-bottom: 10px;
+}
+
+.booking-shortcut-copy {
+    color: var(--muted);
+    font-size: 1.02rem;
+    line-height: 1.7;
+    margin-bottom: 18px;
+}
+
+.booking-shortcut-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    padding: 0 24px;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.booking-shortcut-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(37, 99, 235, 0.25);
+}
+
+.booking-shortcut-telegram {
+    margin-top: 16px;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.booking-shortcut-telegram a {
+    color: #bfdbfe;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.booking-shortcut-telegram a:hover {
+    text-decoration: underline;
+}
+
+.booking-shortcut-separator {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 22px;
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.booking-shortcut-separator::before,
+.booking-shortcut-separator::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(148, 163, 184, 0.16);
+}
+
 .progress-strip {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -507,6 +585,7 @@ body.modal-open {
     }
 
     .hero-panel,
+    .booking-shortcut-panel,
     .inquiry-form {
         padding: 26px;
     }
@@ -523,6 +602,10 @@ body.modal-open {
 
     .hero-panel h1 {
         font-size: 2rem;
+    }
+
+    .booking-shortcut-button {
+        width: 100%;
     }
 
     .submit-btn {
