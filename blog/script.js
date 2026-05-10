@@ -3,6 +3,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const navMenu = document.querySelector('.nav-menu');
     const themeToggle = document.getElementById('themeToggle');
     const html = document.documentElement;
+    const navbar = document.querySelector('.navbar');
+
+    if (navbar && !document.querySelector('.blog-proposal-banner')) {
+        const banner = document.createElement('div');
+        banner.className = 'blog-proposal-banner';
+        banner.innerHTML = `
+            <div class="blog-proposal-banner__inner">
+                <span class="blog-proposal-banner__copy">Need cybersecurity training or a speaker?</span>
+                <a class="blog-proposal-banner__link" href="https://ferdienervida.com/book/">Request a Proposal</a>
+            </div>
+        `;
+        navbar.insertAdjacentElement('afterend', banner);
+    }
 
     if (hamburger && navMenu) {
         hamburger.addEventListener('click', () => {
@@ -28,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.addEventListener('scroll', () => {
-        const navbar = document.querySelector('.navbar');
         if (!navbar) return;
         if (window.scrollY > 50) {
             navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.08)';

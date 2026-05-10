@@ -444,6 +444,70 @@ class Carousel {
     }
 }
 
+class MediaCarousel {
+    constructor(container) {
+        this.container = container;
+        this.track = container.querySelector('.media-track');
+        this.items = Array.from(container.querySelectorAll('.media-item'));
+        this.prevBtn = container.querySelector('.media-carousel-prev');
+        this.nextBtn = container.querySelector('.media-carousel-next');
+        this.currentIndex = 0;
+
+        if (!this.track || this.items.length <= 3 || !this.prevBtn || !this.nextBtn) {
+            return;
+        }
+
+        this.maxIndex = this.items.length - this.getVisibleCount();
+        this.bindEvents();
+        this.update();
+    }
+
+    getVisibleCount() {
+        if (window.innerWidth <= 768) return 1;
+        if (window.innerWidth <= 1200) return 2;
+        return 3;
+    }
+
+    getStepWidth() {
+        if (this.items.length < 2) return this.items[0]?.offsetWidth || 0;
+        const itemWidth = this.items[0].offsetWidth;
+        const gap = this.items[1].offsetLeft - this.items[0].offsetLeft - itemWidth;
+        return itemWidth + Math.max(gap, 0);
+    }
+
+    bindEvents() {
+        this.prevBtn.addEventListener('click', () => {
+            this.currentIndex = Math.max(0, this.currentIndex - 1);
+            this.update();
+        });
+
+        this.nextBtn.addEventListener('click', () => {
+            this.currentIndex = Math.min(this.maxIndex, this.currentIndex + 1);
+            this.update();
+        });
+
+        window.addEventListener('resize', () => {
+            this.maxIndex = Math.max(0, this.items.length - this.getVisibleCount());
+            this.currentIndex = Math.min(this.currentIndex, this.maxIndex);
+            this.update();
+        });
+    }
+
+    update() {
+        if (window.innerWidth <= 768) {
+            this.track.style.transform = 'translateX(0)';
+            this.prevBtn.disabled = true;
+            this.nextBtn.disabled = true;
+            return;
+        }
+
+        const translateX = this.currentIndex * this.getStepWidth();
+        this.track.style.transform = `translateX(-${translateX}px)`;
+        this.prevBtn.disabled = this.currentIndex === 0;
+        this.nextBtn.disabled = this.currentIndex >= this.maxIndex;
+    }
+}
+
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Ferdie Nervida website loaded successfully!');
@@ -452,6 +516,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const carouselContainer = document.querySelector('.carousel-container');
     if (carouselContainer) {
         window.carousel = new Carousel(carouselContainer);
+    }
+
+    const mediaCarouselContainer = document.querySelector('.media-carousel');
+    if (mediaCarouselContainer) {
+        window.mediaCarousel = new MediaCarousel(mediaCarouselContainer);
     }
     
     // Add loading animation to page

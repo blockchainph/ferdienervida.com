@@ -110,6 +110,23 @@ p {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.hero-linkedin {
+    gap: 0.75rem;
+}
+
+.linkedin-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-transform: lowercase;
+}
+
 .btn-large {
     padding: 16px 32px;
     font-size: 1.1rem;
@@ -1269,10 +1286,48 @@ p {
     text-align: center;
 }
 
-.media-grid {
+.media-carousel {
+    position: relative;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2.5rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+.media-viewport {
+    overflow: hidden;
+}
+
+.media-track {
+    display: flex;
+    gap: 1.5rem;
+    transition: transform 0.35s ease;
+    will-change: transform;
+}
+
+.media-carousel-nav {
+    align-self: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.media-carousel-nav:hover {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.16);
+}
+
+.media-carousel-nav:disabled {
+    opacity: 0.4;
+    cursor: default;
 }
 
 .media-item {
@@ -1282,11 +1337,17 @@ p {
     padding: 1.5rem;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
+    min-width: 0;
+    flex: 0 0 calc((100% - 3rem) / 3);
 }
 
 .media-item:hover {
     border-color: #3b82f6;
     transform: translateY(-3px);
+}
+
+.media-item-tedx:hover {
+    border-color: rgba(235, 0, 40, 0.42);
 }
 
 .media-item h4 {
@@ -1319,6 +1380,30 @@ p {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.media-logo.media-logo-tedx {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.media-logo.media-logo-tedx .media-photo {
+    object-fit: cover;
+}
+
+.media-link {
+    display: inline-flex;
+    margin-top: 1rem;
+    color: #93c5fd;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.media-link:hover {
+    color: #ffffff;
 }
 
 
@@ -1368,6 +1453,85 @@ p {
 .testimonials {
     padding: 100px 0;
     background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+}
+
+.google-reviews-panel {
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    backdrop-filter: blur(10px);
+}
+
+.google-reviews-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.75rem;
+}
+
+.google-reviews-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.google-rating {
+    color: #ffffff;
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.google-stars,
+.google-review-stars {
+    color: #FBBC04;
+    letter-spacing: 0.14em;
+}
+
+.google-review-count {
+    color: #d1d5db;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.google-reviews-link {
+    color: #93c5fd;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.google-reviews-link:hover {
+    color: #ffffff;
+}
+
+.google-review-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.google-review-card {
+    padding: 1.4rem;
+    background: rgba(17, 24, 39, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+}
+
+.google-review-name {
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+}
+
+.google-review-card p {
+    color: #d1d5db;
+    line-height: 1.65;
+    margin-top: 0.75rem;
 }
 
 .testimonials-grid {
@@ -1701,6 +1865,15 @@ p {
         justify-content: center;
     }
 
+    .google-reviews-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .google-review-count {
+        width: 100%;
+    }
+
     .about-content {
         grid-template-columns: 1fr;
         gap: 2rem;
@@ -1760,6 +1933,10 @@ p {
     .testimonials-grid {
         grid-template-columns: 1fr;
     }
+
+    .media-item {
+        flex-basis: calc((100% - 1.5rem) / 2);
+    }
     
     .cert-grid {
         grid-template-columns: 1fr;
@@ -1767,6 +1944,25 @@ p {
     
     .media-grid {
         grid-template-columns: 1fr;
+    }
+
+    .media-carousel {
+        grid-template-columns: 1fr;
+    }
+
+    .media-carousel-nav {
+        display: none;
+    }
+
+    .media-track {
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+        padding-bottom: 0.25rem;
+    }
+
+    .media-item {
+        flex-basis: 100%;
+        scroll-snap-align: start;
     }
     
     /* Carousel Responsive Styles */

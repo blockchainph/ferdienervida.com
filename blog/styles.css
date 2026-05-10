@@ -80,6 +80,49 @@ html[data-theme="light"] .navbar {
     background: rgba(243, 247, 252, 0.94);
 }
 
+.blog-proposal-banner {
+    position: sticky;
+    top: 74px;
+    z-index: 999;
+    background: rgba(47, 124, 246, 0.96);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.blog-proposal-banner__inner {
+    width: min(100%, var(--max-width));
+    margin: 0 auto;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    text-align: center;
+}
+
+.blog-proposal-banner__copy {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.blog-proposal-banner__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 0 14px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(7, 17, 31, 0.28);
+    color: #ffffff;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+}
+
+.blog-proposal-banner__link:hover {
+    background: rgba(7, 17, 31, 0.42);
+}
+
 .nav-container {
     width: min(100%, var(--max-width));
     margin: 0 auto;
@@ -810,6 +853,16 @@ html[data-theme="light"] .footer {
 
     .hero {
         padding-top: 52px;
+    }
+
+    .blog-proposal-banner {
+        top: 74px;
+    }
+
+    .blog-proposal-banner__inner {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 18px;
     }
 
     .container,
