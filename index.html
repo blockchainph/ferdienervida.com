@@ -3,729 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ferdie James Nervida | Cybersecurity and Blockchain Forensics Expert</title>
-    <meta name="description" content="Ferdie James Nervida provides cybersecurity and blockchain forensics training, speaking, and investigative support for organizations across the Philippines and Asia Pacific.">
-    <meta name="keywords" content="blockchain speaker, crypto investigator, cybersecurity trainer, Asia Pacific, TEDx, cryptocurrency, digital forensics, emerging technologies">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.ferdienervida.com/">
-    <meta property="og:title" content="Ferdie James Nervida | Cybersecurity and Blockchain Forensics Expert">
-    <meta property="og:description" content="Ferdie James Nervida provides cybersecurity and blockchain forensics training, speaking, and investigative support for organizations across the Philippines and Asia Pacific.">
-    <meta property="og:image" content="https://www.ferdienervida.com/heronew.png">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://www.ferdienervida.com/">
-    <meta property="twitter:title" content="Ferdie James Nervida | Cybersecurity and Blockchain Forensics Expert">
-    <meta property="twitter:description" content="Ferdie James Nervida provides cybersecurity and blockchain forensics training, speaking, and investigative support for organizations across the Philippines and Asia Pacific.">
-    <meta property="twitter:image" content="https://www.ferdienervida.com/heronew.png">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    
-    <!-- Google Fonts -->
+    <title>Ferdie Nervida | Crypto AML & Fraud Investigations Training</title>
+    <meta name="description" content="Crypto AML, fraud investigations, blockchain intelligence, and digital asset risk training for financial institutions.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- CSS -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body { background:#07111f; color:#e5edf8; }
+        .sandbox-nav { position:sticky; top:0; z-index:1000; background:rgba(7,17,31,.94); border-bottom:1px solid rgba(148,163,184,.2); backdrop-filter:blur(16px); }
+        .sandbox-nav-inner,.sandbox-wrap { width:min(1180px,calc(100% - 32px)); margin:0 auto; }
+        .sandbox-nav-inner { min-height:74px; display:flex; align-items:center; justify-content:space-between; gap:1.5rem; }
+        .sandbox-brand,.sandbox-links a { color:#fff; text-decoration:none; font-weight:800; }
+        .sandbox-links { display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap; }
+        .sandbox-links a { color:#cbd5e1; font-size:.92rem; }
+        .sandbox-links .nav-cta { color:#fff; background:#2563eb; padding:.85rem 1.1rem; border-radius:999px; }
+        .sandbox-hero { min-height:calc(100vh - 74px); display:flex; align-items:center; background:linear-gradient(90deg,rgba(7,17,31,.96),rgba(7,17,31,.82),rgba(7,17,31,.34)),url('/heronew.png') center/cover no-repeat; }
+        .sandbox-hero-content { max-width:850px; padding:5.5rem 0 5rem; }
+        .sandbox-eyebrow { color:#93c5fd; text-transform:uppercase; letter-spacing:.14em; font-size:.78rem; font-weight:800; margin-bottom:1rem; }
+        .sandbox-hero h1 { color:#fff; font-size:clamp(2.8rem,6vw,5.4rem); line-height:.98; margin-bottom:1.35rem; letter-spacing:0; }
+        .sandbox-hero-copy,.sandbox-section-header p,.sandbox-card p,.sandbox-card li { color:#b8c4d6; line-height:1.75; }
+        .sandbox-hero-copy { font-size:clamp(1.08rem,2vw,1.32rem); max-width:760px; }
+        .sandbox-actions { display:flex; gap:1rem; flex-wrap:wrap; margin:2rem 0 1.25rem; }
+        .sandbox-button { display:inline-flex; align-items:center; justify-content:center; min-height:54px; padding:0 1.35rem; border-radius:999px; font-weight:800; text-decoration:none; }
+        .sandbox-button.primary { background:#2563eb; color:#fff; box-shadow:0 18px 36px rgba(37,99,235,.28); }
+        .sandbox-button.secondary { border:1px solid rgba(226,232,240,.28); color:#fff; background:rgba(15,23,42,.56); }
+        .sandbox-proof-grid,.sandbox-grid-3,.sandbox-grid-4,.sandbox-trust-strip { display:grid; gap:1rem; }
+        .sandbox-proof-grid { grid-template-columns:repeat(4,minmax(0,1fr)); margin-top:2.25rem; }
+        .sandbox-stat,.sandbox-card { background:rgba(15,23,42,.76); border:1px solid rgba(148,163,184,.18); border-radius:8px; padding:1.35rem; }
+        .sandbox-stat strong { display:block; color:#fff; font-size:1.6rem; margin-bottom:.25rem; }
+        .sandbox-stat span { color:#b8c4d6; line-height:1.5; }
+        .sandbox-section { padding:5rem 0; }
+        .sandbox-section.light { background:#f8fafc; color:#111827; }
+        .sandbox-section.dark { background:#0b1626; }
+        .sandbox-section.light .sandbox-card { background:#fff; border-color:#e2e8f0; box-shadow:0 16px 36px rgba(15,23,42,.08); }
+        .sandbox-section.light .sandbox-card p,.sandbox-section.light .sandbox-card li,.sandbox-section.light .sandbox-section-header p { color:#64748b; }
+        .sandbox-section-header { max-width:820px; margin-bottom:2.5rem; }
+        .sandbox-section-header.center { margin-left:auto; margin-right:auto; text-align:center; }
+        .sandbox-section-header h2 { font-size:clamp(2rem,4vw,3.25rem); line-height:1.05; margin-bottom:1rem; letter-spacing:0; }
+        .sandbox-grid-3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+        .sandbox-grid-4 { grid-template-columns:repeat(4,minmax(0,1fr)); }
+        .sandbox-card h3 { color:inherit; font-size:1.18rem; line-height:1.3; margin-bottom:.75rem; }
+        .sandbox-card ul { padding-left:1.1rem; margin:0; }
+        .sandbox-trust-strip { grid-template-columns:repeat(5,minmax(0,1fr)); }
+        .sandbox-trust-item { background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:1rem; text-align:center; color:#334155; font-weight:800; min-height:92px; display:grid; place-items:center; }
+        .sandbox-cta-band { background:#0f172a; color:#fff; padding:4rem 0; text-align:center; }
+        .sandbox-cta-band h2 { font-size:clamp(2rem,4vw,3.35rem); line-height:1.08; margin-bottom:1rem; }
+        .sandbox-cta-band p { color:#b8c4d6; line-height:1.75; max-width:720px; margin:0 auto 1.75rem; }
+        @media (max-width:900px){ .sandbox-nav-inner{align-items:flex-start;flex-direction:column;padding:1rem 0}.sandbox-proof-grid,.sandbox-grid-3,.sandbox-grid-4,.sandbox-trust-strip{grid-template-columns:1fr}.sandbox-hero{min-height:auto} }
+        @media (max-width:560px){ .sandbox-banner,.sandbox-nav{position:static}.sandbox-actions .sandbox-button{width:100%}.sandbox-hero-content{padding:4rem 0} }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <a href="#home">FJN</a>
-            </div>
-            <div class="nav-menu" id="nav-menu">
-                <a href="#home" class="nav-link">Home</a>
-                <a href="#about" class="nav-link">About</a>
-                <a href="#services" class="nav-link">Services</a>
-                <a href="https://share.google/poQSQr506rxPjM7yv" class="nav-link" target="_blank" rel="noopener">Reviews</a>
-                <a href="https://ferdienervida.com/blog/" class="nav-link">Blog</a>
-                <a href="#contact" class="nav-link">Contact</a>
-                <a href="/book/" class="nav-link cta-button">Request a Proposal</a>
-            </div>
-            <div class="nav-toggle" id="nav-toggle">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+    <nav class="sandbox-nav" aria-label="Main navigation">
+        <div class="sandbox-nav-inner">
+            <a class="sandbox-brand" href="/">Ferdie Nervida</a>
+            <div class="sandbox-links">
+                <a href="/">Home</a>
+                <a href="/financial-institutions/">Financial Institutions</a>
+                <a href="/services/">Services</a>
+                <a href="/past-engagements/">Past Engagements</a>
+                <a href="/media-recognition/">Media &amp; Recognition</a>
+                <a href="/reviews/">Reviews</a>
+                <a href="/blog/">Insights</a>
+                <a class="nav-cta" href="/book/">Contact</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-overlay"></div>
-        <div class="hero-container">
-            <div class="hero-content">
-                <div class="hero-badge">
-                    <span>Trusted by public sector teams, law enforcement, financial institutions, and regulated organizations</span>
-                </div>
-                <h1 class="hero-title">
-                    Build Real-World <span class="highlight">Cybersecurity, Fraud, and Blockchain Investigation Capability</span>
-                </h1>
-                <p class="hero-subtitle">
-                    Hands-on training, executive briefings, and blockchain forensics support for financial institutions, fraud teams, AML teams, and organizations facing digital asset risk.
-                </p>
-                <div class="hero-cta">
-                    <a href="/book/#training" class="btn btn-primary btn-large">Request Training Proposal</a>
-                    <a href="/book/#recovery" class="btn btn-secondary btn-large">Get Free Case Evaluation</a>
-                    <a href="https://www.linkedin.com/in/ferdiejamesnervida/" class="btn btn-outline btn-large hero-linkedin" target="_blank" rel="noopener">
-                        <span class="linkedin-icon" aria-hidden="true">in</span>
-                        <span>LinkedIn</span>
-                    </a>
-                </div>
-                <div class="hero-proof">
-                    <span>Used by teams in government, law enforcement, financial services, academe, and regulated environments.</span>
-                </div>
-                <div class="hero-stats">
-                    <div class="stat">
-                        <span class="stat-number">7+</span>
-                        <span class="stat-label">Years Experience</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">50+</span>
-                        <span class="stat-label">Training Sessions</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">100+</span>
-                        <span class="stat-label">Speaking Events</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="audience">
-        <div class="container">
-            <div class="section-header">
-                <h2>Who This Is <span class="highlight">For</span></h2>
-                <p>If you are responsible for capability-building, risk, investigations, or digital asset literacy, this site should make it immediately clear where you fit.</p>
-            </div>
-            <div class="audience-grid">
-                <div class="audience-card">
-                    <h3>Government and Public Sector</h3>
-                    <p>For agencies that need stronger cybersecurity awareness, incident response readiness, and digital workforce capability.</p>
-                </div>
-                <div class="audience-card">
-                    <h3>Law Enforcement and Investigators</h3>
-                    <p>For teams that need practical blockchain investigation workflows, crypto crime typologies, and tracing capability-building.</p>
-                </div>
-                <div class="audience-card">
-                    <h3>Financial Institutions and Enterprise Teams</h3>
-                    <p>For organizations navigating digital asset risk, compliance exposure, internal upskilling, and executive education.</p>
-                </div>
-                <div class="audience-card">
-                    <h3>Universities and Professional Groups</h3>
-                    <p>For institutions looking for credible speaking, workshops, or blockchain and cybersecurity literacy programs.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Current Engagement Section -->
-    <section id="engagement" class="featured-engagement">
-        <div class="container">
-            <div class="fe-grid">
-                <div class="fe-text">
-                    <div class="badge">City Government of Davao</div>
-                    <h2>5‑Day Intensive Technical Cybersecurity Training</h2>
-                    <p>
-                        Delivered a hands‑on program covering cybersecurity awareness, risk frameworks,
-                        attacks and defenses, and incident response—culminating in a capstone simulation and a
-                        practical cybersecurity roadmap.
+    <main id="home">
+        <section class="sandbox-hero">
+            <div class="sandbox-wrap">
+                <div class="sandbox-hero-content">
+                    <p class="sandbox-eyebrow">For financial institutions and financial crime teams</p>
+                    <h1>Crypto AML and fraud investigations training for regulated teams.</h1>
+                    <p class="sandbox-hero-copy">
+                        Ferdie Nervida helps banks, digital banks, fintechs, e-wallets, payment companies, and
+                        financial crime teams build practical capability for crypto-related fraud, blockchain
+                        intelligence, wallet tracing, AML red flags, and digital asset risk.
                     </p>
-                    <a href="/book/" class="btn btn-primary">Request Training Proposal</a>
-                </div>
-                <div class="fe-image">
-                    <img src="davao-training.jpeg" alt="Cybersecurity training session with the City Government of Davao">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Law Enforcement Training Section -->
-    <section id="law-enforcement" class="featured-engagement featured-engagement-alt">
-        <div class="container">
-            <div class="fe-grid">
-                <div class="fe-text">
-                    <div class="badge">Law Enforcement Training</div>
-                    <h2>Blockchain Investigations for Law Enforcement Training</h2>
-                    <p>
-                        Specialized training for law enforcement and government agencies covering cryptocurrency crime typologies,
-                        tracing techniques, blockchain investigation workflows, and how investigators follow illicit funds across chains.
-                    </p>
-                    <p>
-                        Designed for capability-building in public sector and enforcement environments where digital asset risk,
-                        cyber-enabled crime, and blockchain forensics are becoming increasingly relevant.
-                    </p>
-                    <a href="/book/" class="btn btn-primary">Request Training Proposal</a>
-                </div>
-                <div class="fe-image fe-image-stack">
-                    <img src="le1.png" alt="Blockchain investigations training session for law enforcement" class="cert-photo">
-                    <img src="le2.png" alt="Law enforcement and government participants in blockchain investigations training" class="cert-photo">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Ateneo Course Section -->
-    <section id="ateneo-course" class="featured-engagement">
-        <div class="container">
-            <div class="fe-grid">
-                <div class="fe-text">
-                    <div class="badge">Ateneo de Davao University</div>
-                    <h2>Blockchain Systems &amp; Digital Asset Literacy for Professionals</h2>
-                    <p>
-                        Teaching a fully online course under the Ateneo de Davao University Academy of Lifelong Learning,
-                        designed for professionals, managers, educators, and government personnel who need a practical
-                        understanding of how blockchain works and how to think about digital asset risk responsibly.
-                    </p>
-                    <p>
-                        The program focuses on literacy, decision-making, and real-world understanding rather than trading
-                        hype, making it accessible even to participants without a technical background.
-                    </p>
-                    <p>
-                        For enrollment inquiries: <a href="mailto:courses.lifelonglearning@addu.edu.ph?subject=Blockchain%20Systems">courses.lifelonglearning@addu.edu.ph</a>
-                    </p>
-                    <a href="mailto:courses.lifelonglearning@addu.edu.ph?subject=Blockchain%20Systems" class="btn btn-primary">Ask About Enrollment</a>
-                </div>
-                <div class="fe-image">
-                    <img src="addall.png" alt="Ateneo de Davao University Academy of Lifelong Learning Blockchain Systems and Digital Asset Literacy for Professionals course poster">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Cybersecurity Certification Section -->
-    <section id="certification" class="certification">
-        <div class="container">
-            <div class="cert-grid">
-                <div class="cert-text">
-                    <div class="badge">New Certification</div>
-                    <h2>Public Sector <span class="highlight">Cybersecurity Certification</span></h2>
-                    <p>
-                        Recently completed comprehensive cybersecurity certification program focusing on public sector security challenges, 
-                        threat detection, incident response, and infrastructure protection for government agencies.
-                    </p>
-                    <div class="cert-highlights">
-                        <div class="highlight-item">
-                            <span class="highlight-icon">🛡️</span>
-                            <span>Threat Detection & Analysis</span>
-                        </div>
-                        <div class="highlight-item">
-                            <span class="highlight-icon">🔐</span>
-                            <span>Infrastructure Security</span>
-                        </div>
-                        <div class="highlight-item">
-                            <span class="highlight-icon">⚡</span>
-                            <span>Incident Response</span>
-                        </div>
+                    <div class="sandbox-actions">
+                        <a class="sandbox-button primary" href="/book/">Request a Training Proposal</a>
+                        <a class="sandbox-button secondary" href="/financial-institutions/">For Financial Institutions</a>
                     </div>
-                    <a href="/book/" class="btn btn-primary">Request Training Proposal</a>
-                </div>
-                <div class="cert-image">
-                    <img src="cybersecurity-certification.jpeg" alt="Public Sector Cybersecurity Certification" class="cert-photo">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="about">
-        <div class="container">
-            <div class="about-content">
-                <div class="about-text">
-                    <h2>Leading <span class="highlight">Cybersecurity and Blockchain Forensics Expert</span></h2>
-                    <p>Ferdie James Nervida specializes in cybersecurity training, blockchain investigation techniques, cryptocurrency analysis, and digital forensics for government agencies, law enforcement, and financial institutions across the Philippines.</p>
-                    <div class="about-highlights">
-                        <div class="highlight-item">
-                            <span class="highlight-icon">🔒</span>
-                            <span>Cybersecurity Training</span>
-                        </div>
-                        <div class="highlight-item">
-                            <span class="highlight-icon">🔍</span>
-                            <span>Blockchain Forensics</span>
-                        </div>
-                        <div class="highlight-item">
-                            <span class="highlight-icon">🎤</span>
-                            <span>Keynote Speaking</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="about-image">
-                    <img src="hero-image.png" alt="Ferdie James Nervida - Training Expert" class="about-photo">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Services Section -->
-    <section id="services" class="services">
-        <div class="container">
-            <div class="section-header">
-                <h2>Expert <span class="highlight">Services</span></h2>
-                <p>Choose the path that best matches your role, your team, and the kind of decision you need to make next.</p>
-            </div>
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-icon">🎓</div>
-                    <h3>Training and Executive Briefings</h3>
-                    <p>For organizations that need practical cybersecurity or blockchain capability-building, not surface-level theory.</p>
-                    <a href="/book/#training" class="btn btn-primary">Request Training Proposal</a>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">🛡️</div>
-                    <h3>Crypto AML &amp; Fraud Investigations Training for Financial Institutions</h3>
-                    <p>Practical training for banks, fintechs, e-wallets, fraud teams, AML units, and compliance functions handling crypto scams, suspicious wallet activity, exchange exposure, and digital asset risk.</p>
-                    <a href="/book/#training" class="btn btn-primary">Request Training Proposal</a>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">🧭</div>
-                    <h3>Investigations and Recovery Evaluation</h3>
-                    <p>For individuals or organizations that need informed next steps on a crypto-related case, tracing question, or recovery assessment.</p>
-                    <a href="/book/#recovery" class="btn btn-primary">Get a Free Case Evaluation</a>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">🎤</div>
-                    <h3>Speaking and Conference Sessions</h3>
-                    <p>For conferences, leadership teams, and institutions looking for a credible speaker on cybersecurity, blockchain, and digital asset risk.</p>
-                    <a href="/book/#speaking" class="btn btn-primary">Ask About Speaking Availability</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Blog Section -->
-    <section id="blog" class="blog">
-        <div class="container">
-            <div class="section-header">
-                <h2>Latest <span class="highlight">Insights</span></h2>
-                <p>Stay updated with the latest trends in blockchain forensics, cybersecurity, and emerging technologies.</p>
-            </div>
-            <div class="blog-cta">
-                <div class="blog-content">
-                    <h3>Expert Analysis & Industry Insights</h3>
-                    <p>Read my latest articles on blockchain forensics, cryptocurrency investigations, cybersecurity trends, and regulatory developments in the Asia Pacific region.</p>
-                    <div class="blog-features">
-                        <div class="blog-feature">
-                            <span class="feature-icon">📊</span>
-                            <span>Industry Analysis</span>
-                        </div>
-                        <div class="blog-feature">
-                            <span class="feature-icon">🔍</span>
-                            <span>Forensics Techniques</span>
-                        </div>
-                        <div class="blog-feature">
-                            <span class="feature-icon">🌏</span>
-                            <span>Asia Pacific Focus</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="blog-button">
-                    <a href="https://ferdienervida.com/blog/" class="btn btn-primary btn-large">
-                        Read My Blog
-                        <span class="btn-icon">→</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Social Proof Section -->
-    <section id="social-proof" class="social-proof">
-        <div class="container">
-            <div class="section-header">
-                <h2>Trusted by <span class="highlight">Leading Organizations</span></h2>
-                <p>Featured in major media outlets and trusted by government agencies across the Philippines.</p>
-            </div>
-            
-            <!-- Featured Events Carousel -->
-            <div class="featured-events">
-                <h3>Recent Engagements</h3>
-                <div class="carousel-container" role="region" aria-label="Recent Engagements Carousel">
-                    <div class="carousel-wrapper">
-                        <div class="carousel-track" id="carousel-track" aria-live="polite">
-                            <!-- Event 1 -->
-                            <div class="carousel-slide">
-                                <div class="event-card">
-                                    <div class="event-image">
-                                        <img src="tesda-korphil-bpap-seminar.png" alt="TESDA KorPhil and BPAP Seminar for Blockchain and Cryptocurrency Fundamentals" class="event-photo">
-                                    </div>
-                                    <div class="event-content">
-                                        <h4>TESDA KorPhil × BPAP Seminar on Blockchain and Cryptocurrency Fundamentals</h4>
-                                        <p class="event-location">TESDA KorPhil • Student Seminar and Capstone Workshop</p>
-                                        <p>A recent seminar focused on helping students understand Bitcoin, Ethereum, smart contracts, and real-world blockchain applications critically and practically, not just speculatively. The capstone workshop closed with student teams presenting and defending their own blockchain innovation ideas.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Event 1 -->
-                            <div class="carousel-slide">
-                                <div class="event-card">
-                                    <div class="event-image">
-                                        <img src="Davao De Oro Blockchain Info Session.png" alt="Blockchain for Digital Workforce Info Session" class="event-photo">
-                                    </div>
-                                    <div class="event-content">
-                                        <h4>Blockchain for Digital Workforce Info Session</h4>
-                                        <p class="event-location">Online via Zoom</p>
-                                        <p>DICT Davao de Oro successfully hosted the Information Session on "Blockchain for the Digital Workforce" engaging 196 participants across government, private sector, and academia—uniting stakeholders to advance digital readiness.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Event 2 -->
-                            <div class="carousel-slide">
-                                <div class="event-card">
-                                    <div class="event-image">
-                                        <img src="blockchain_crypto_specialist.png" alt="DICT SPARK Blockchain & Cryptocurrency Specialist Certification" class="event-photo">
-                                    </div>
-                                    <div class="event-content">
-                                        <h4>DICT SPARK Blockchain & Cryptocurrency Specialist Certification</h4>
-                                        <p class="event-location">Hybrid, Dinagat Islands & Philippines Online</p>
-                                        <p>First DICT SPARK Blockchain Certification Training yields 21 Blockchain and Cryptocurrency Specialists, forging partnership with DJEMC. Week-long hybrid training covering blockchain technology, DeFi, NFTs, and cybersecurity.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Event 3 -->
-                            <div class="carousel-slide">
-                                <div class="event-card">
-                                    <div class="event-image">
-                                        <img src="digital_leaders.png" alt="Blockchain and Fintech for Digital Leaders" class="event-photo">
-                                    </div>
-                                    <div class="event-content">
-                                        <h4>Blockchain and Fintech for Digital Leaders</h4>
-                                        <p class="event-location">SMX Convention Hall, Davao City</p>
-                                        <p>DICT Executive Briefing for Digital Government Leaders discussing emerging technologies in shaping smarter governance—from digital identity to secure data systems powered by blockchain, AI, IoT, 5G, and cybersecurity.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Event 4 -->
-                            <div class="carousel-slide">
-                                <div class="event-card">
-                                    <div class="event-image">
-                                        <img src="innovationsummit.png" alt="Davao Chamber Innovation Summit 2024" class="event-photo">
-                                    </div>
-                                    <div class="event-content">
-                                        <h4>Davao Chamber Innovation Summit 2024</h4>
-                                        <p class="event-location">SMX Convention Center, Davao City</p>
-                                        <p>Featured speaker on blockchain and the future of payments for the business sector. Key insight: True innovation isn't about reinventing the wheel—it's about making technology inclusive, lifting everyone toward a shared future.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Event 5 -->
-                            <div class="carousel-slide">
-                                <div class="event-card">
-                                    <div class="event-image">
-                                        <img src="campusconference.png" alt="Blockchain Campus Conference" class="event-photo">
-                                    </div>
-                                    <div class="event-content">
-                                        <h4>Blockchain Campus Conference</h4>
-                                        <p class="event-location">Mapúa Malayan Colleges Philippines</p>
-                                        <p>Featured speaker on Blockchain, Web3, Cybersecurity and the future of AI. "Blockchain Cyber Tech Detection: Exploring AI-Powered Investigations for Safer Digital Assets."</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Event 6 -->
-                            <div class="carousel-slide">
-                                <div class="event-card">
-                                    <div class="event-image">
-                                        <img src="bitpinas-dict.png" alt="BitPinas feature on the DICT blockchain consultation meeting" class="event-photo">
-                                    </div>
-                                    <div class="event-content">
-                                        <h4>BitPinas Feature on DICT Blockchain Consultation</h4>
-                                        <p class="event-location">BitPinas • March 10, 2026</p>
-                                        <p>Featured in BitPinas following participation in the DICT blockchain consultation meeting, which brought together industry voices on standards, architecture, and practical direction for blockchain adoption in the Philippines.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Event 6 -->
-                            <div class="carousel-slide">
-                                <div class="event-card">
-                                    <div class="event-image">
-                                        <img src="pbw.jpeg" alt="Philippine Blockchain Week" class="event-photo">
-                                    </div>
-                                    <div class="event-content">
-                                        <h4>Philippine Blockchain Week</h4>
-                                        <p class="event-location">Davao City, Philippines</p>
-                                        <p>Blockchain Cyber Tech Detection: Exploring AI-Powered Investigations for Safer Digital Assets. Expert insights on securing digital assets through advanced blockchain forensics and AI-powered detection systems.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Navigation Controls -->
-                    <button class="carousel-nav carousel-prev" aria-label="Previous slide">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                    <button class="carousel-nav carousel-next" aria-label="Next slide">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                    
-                    <!-- Dot Indicators -->
-                    <div class="carousel-dots" id="carousel-dots" role="tablist" aria-label="Carousel navigation">
-                        <div class="carousel-counter" aria-live="polite">
-                            <span id="current-slide">1</span> of <span id="total-slides">8</span>
-                        </div>
-                        <button class="carousel-dot active" role="tab" aria-selected="true" aria-label="Go to slide 1" data-slide="0"></button>
-                        <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Go to slide 2" data-slide="1"></button>
-                        <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Go to slide 3" data-slide="2"></button>
-                        <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Go to slide 4" data-slide="3"></button>
-                        <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Go to slide 5" data-slide="4"></button>
-                        <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Go to slide 6" data-slide="5"></button>
-                        <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Go to slide 7" data-slide="6"></button>
-                        <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Go to slide 8" data-slide="7"></button>
+                    <div class="sandbox-proof-grid">
+                        <div class="sandbox-stat"><strong>50+</strong><span>training programs delivered</span></div>
+                        <div class="sandbox-stat"><strong>100+</strong><span>speaking engagements</span></div>
+                        <div class="sandbox-stat"><strong>4.8</strong><span>Google rating from 200+ reviews</span></div>
+                        <div class="sandbox-stat"><strong>BPAP</strong><span>interim president and ecosystem leader</span></div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Media Mentions -->
-            <div class="media-mentions">
-                <h3>Featured In</h3>
-                <div class="media-carousel" id="media-carousel">
-                    <button class="media-carousel-nav media-carousel-prev" type="button" aria-label="Previous featured mention">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                            <path d="M12.5 4.5L7 10L12.5 15.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                    <div class="media-viewport">
-                        <div class="media-track">
-                            <div class="media-item">
-                                <div class="media-logo">
-                                    <img src="blockandbeyond.png" alt="The Block and Beyond" class="media-photo">
-                                </div>
-                                <h4>The Block and Beyond</h4>
-                                <p>"Grassroots advocacy in cybersecurity - human error is Davao City's biggest cyber threat"</p>
-                            </div>
-                            <div class="media-item media-item-tedx">
-                                <div class="media-logo media-logo-tedx">
-                                    <img src="tedx-talk.png" alt="TEDxArellanoSt talk by Ferdie James Nervida" class="media-photo">
-                                </div>
-                                <h4>TEDxArellanoSt</h4>
-                                <p>"Upskill Yourself, Upgrade Your Life" · April 2023</p>
-                                <a href="https://www.ted.com/talks/ferdie_james_nervida_upskill_yourself_upgrade_your_life" class="media-link" target="_blank" rel="noopener">Watch on TED.com →</a>
-                            </div>
-                            <div class="media-item">
-                                <div class="media-logo">
-                                    <img src="cryptoradio.png" alt="The Crypto Radio" class="media-photo">
-                                </div>
-                                <h4>The Crypto Radio</h4>
-                                <p>"Lazarus Group's Bybit hack and industry collaboration to combat crypto threats"</p>
-                            </div>
-                            <div class="media-item">
-                                <div class="media-logo">
-                                    <img src="bitpinas.png" alt="BitPinas" class="media-photo">
-                                </div>
-                                <h4>BitPinas</h4>
-                                <p>"AI-powered blockchain forensics at Blockchain Campus Conference"</p>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="media-carousel-nav media-carousel-next" type="button" aria-label="Next featured mention">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                            <path d="M7.5 4.5L13 10L7.5 15.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="recognition-panel">
-                <div class="recognition-copy">
-                    <span class="recognition-kicker">Selected Recognition</span>
-                    <h3>Philippine Block Awards 2026</h3>
-                    <p class="recognition-title">Outstanding Community Contribution</p>
+        <section class="sandbox-section light">
+            <div class="sandbox-wrap">
+                <div class="sandbox-section-header center">
+                    <p class="sandbox-eyebrow">Client problem</p>
+                    <h2>Crypto-related risk is entering normal fraud and AML operations.</h2>
                     <p>
-                        Recognized by the Blockchain Council of the Philippines for community contribution in blockchain education,
-                        public-facing literacy, and ecosystem-building work across training, speaking, and practitioner development.
+                        Teams are receiving wallet addresses, exchange references, transaction hashes, scam reports,
+                        and blockchain intelligence outputs. The need is not general blockchain education. The need is
+                        practical investigation capability.
                     </p>
                 </div>
-                <div class="recognition-image-wrap">
-                    <img src="philippine-block-awards-2026.png" alt="Philippine Block Awards 2026 Outstanding Community Contribution award for Ferdie James Nervida" class="recognition-image">
+                <div class="sandbox-grid-3">
+                    <article class="sandbox-card"><h3>Interpret blockchain activity</h3><p>Understand transaction flows, wallet behavior, exchange exposure, and risk indicators.</p></article>
+                    <article class="sandbox-card"><h3>Improve case handling</h3><p>Build shared language across Fraud, AML, Compliance, Risk, and Operations teams.</p></article>
+                    <article class="sandbox-card"><h3>Support escalation decisions</h3><p>Use blockchain intelligence more effectively when triaging cases, documenting findings, and deciding next steps.</p></article>
                 </div>
             </div>
+        </section>
 
+        <section class="sandbox-section dark" id="services">
+            <div class="sandbox-wrap">
+                <div class="sandbox-section-header">
+                    <p class="sandbox-eyebrow">Services</p>
+                    <h2>Training and advisory support for crypto-related financial crime.</h2>
+                </div>
+                <div class="sandbox-grid-4">
+                    <article class="sandbox-card"><h3>Crypto AML &amp; Fraud Investigations Training</h3><p>Practical training for financial institutions handling crypto scams, wallet activity, and AML risk.</p></article>
+                    <article class="sandbox-card"><h3>Blockchain Forensics Training</h3><p>Wallet tracing, transaction analysis, attribution context, and evidence handling for investigation teams.</p></article>
+                    <article class="sandbox-card"><h3>Executive Risk Briefings</h3><p>Briefings for leaders who need to understand digital asset risk without technical noise.</p></article>
+                    <article class="sandbox-card"><h3>Workflow Advisory</h3><p>Support for intake questions, escalation paths, internal playbooks, and case review practices.</p></article>
+                </div>
+                <div class="sandbox-actions">
+                    <a class="sandbox-button secondary" href="/services/">View Services</a>
+                </div>
+            </div>
+        </section>
 
-        </div>
-    </section>
+        <section class="sandbox-section light" id="about">
+            <div class="sandbox-wrap">
+                <div class="sandbox-section-header center">
+                    <p class="sandbox-eyebrow">Why organizations work with Ferdie</p>
+                    <h2>Experience that helps regulated teams understand and act.</h2>
+                    <p>
+                        Ferdie has delivered cybersecurity, blockchain forensics, and digital asset risk training for
+                        government, law enforcement, public sector, academe, and professional organizations.
+                    </p>
+                </div>
+                <div class="sandbox-trust-strip">
+                    <div class="sandbox-trust-item">Law Enforcement Training</div>
+                    <div class="sandbox-trust-item">Government Resource Person</div>
+                    <div class="sandbox-trust-item">TEDx Speaker</div>
+                    <div class="sandbox-trust-item">Media Features</div>
+                    <div class="sandbox-trust-item">200+ Google Reviews</div>
+                </div>
+                <div class="sandbox-actions" style="justify-content:center;">
+                    <a class="sandbox-button secondary" style="color:#111827;border-color:#cbd5e1;background:#fff;" href="/past-engagements/">View Past Engagements</a>
+                    <a class="sandbox-button secondary" style="color:#111827;border-color:#cbd5e1;background:#fff;" href="/media-recognition/">View Media &amp; Recognition</a>
+                </div>
+            </div>
+        </section>
 
-    <!-- Testimonials Section -->
-    <section id="testimonials" class="testimonials">
-        <div class="container">
-            <div class="google-reviews-panel">
-                <div class="google-reviews-head">
-                    <div class="google-reviews-summary">
-                        <span class="google-rating">4.8</span>
-                        <span class="google-stars" aria-label="4.8 out of 5 stars">★ ★ ★ ★ ★</span>
-                        <span class="google-review-count">200+ Google Reviews</span>
-                    </div>
-                    <a href="https://share.google/poQSQr506rxPjM7yv" class="google-reviews-link" target="_blank" rel="noopener">See all reviews on Google →</a>
+        <section class="sandbox-section dark">
+            <div class="sandbox-wrap">
+                <div class="sandbox-section-header">
+                    <p class="sandbox-eyebrow">Client reviews</p>
+                    <h2>Participants value practical examples and clear investigation guidance.</h2>
                 </div>
-                <div class="google-review-cards">
-                    <div class="google-review-card">
-                        <div class="google-review-name">DOPCRT_Pat Napod</div>
-                        <div class="google-review-stars" aria-hidden="true">★★★★★</div>
-                        <p>
-                            The breakdown of how law enforcement can leverage blockchain forensic tools to uncover money trails in crypto crimes was very informative. I feel more equipped to handle cases involving digital assets and understand the importance of proper evidence preservation.
-                        </p>
-                    </div>
-                    <div class="google-review-card">
-                        <div class="google-review-name">Kristine Marie M Cordero-Bruno</div>
-                        <div class="google-review-stars" aria-hidden="true">★★★★★</div>
-                        <p>
-                            The lecture was very informative and timely. The instructor's conversational style made it easier to understand cryptocurrency concepts, especially for beginners. It would also be helpful to include more real-life case examples in future sessions.
-                        </p>
-                    </div>
-                    <div class="google-review-card">
-                        <div class="google-review-name">Li Banguran</div>
-                        <div class="google-review-stars" aria-hidden="true">★★★★★</div>
-                        <p>
-                            I really liked how the instructor discussed blockchain transactions. It was very clear and easy to follow, and it made the investigative use of the topic easier to understand.
-                        </p>
-                    </div>
+                <div class="sandbox-grid-3">
+                    <article class="sandbox-card"><h3>Clearer investigation understanding</h3><p>The breakdown of how law enforcement can use blockchain forensic tools to uncover money trails was informative and practical.</p></article>
+                    <article class="sandbox-card"><h3>Operationally useful</h3><p>Participants consistently mention that complex cryptocurrency concepts become easier to understand and apply.</p></article>
+                    <article class="sandbox-card"><h3>Case readiness</h3><p>The training helps teams understand evidence preservation, transaction analysis, and investigative use cases.</p></article>
+                </div>
+                <div class="sandbox-actions">
+                    <a class="sandbox-button secondary" href="/reviews/">View Reviews</a>
                 </div>
             </div>
-            <div class="section-header">
-                <h2>What <span class="highlight">Participants Say</span></h2>
-                <p>Hear from participants of our Public Sector Cybersecurity Certification program.</p>
-            </div>
-            
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <div class="quote-icon">"</div>
-                        <p class="testimonial-text">
-                            I gained a clearer understanding of how threats actually work—from phishing and social engineering to network vulnerabilities—and how layered defenses can protect against them.
-                        </p>
-                        <div class="testimonial-author">
-                            <div class="author-info">
-                                <span class="author-name">IT Officer</span>
-                                <span class="author-title">Local Government Unit, Davao Region</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <div class="quote-icon">"</div>
-                        <p class="testimonial-text">
-                            The training highlighted the importance of quick detection, clear communication, and well-practiced incident response playbooks to reduce damage and speed up recovery during a cyberattack.
-                        </p>
-                        <div class="testimonial-author">
-                            <div class="author-info">
-                                <span class="author-name">Information Systems Staff</span>
-                                <span class="author-title">Public Sector Program, Davao Region</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <div class="quote-icon">"</div>
-                        <p class="testimonial-text">
-                            Cybersecurity is essential in the city's digitalization roadmap. This program emphasized the need to secure critical IT infrastructure and make cybersecurity a continuous priority for local government.
-                        </p>
-                        <div class="testimonial-author">
-                            <div class="author-info">
-                                <span class="author-name">Technology and Planning Team</span>
-                                <span class="author-title">City Government of Davao</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="process">
-        <div class="container">
-            <div class="section-header">
-                <h2>What Happens <span class="highlight">Next</span></h2>
-                <p>Most serious buyers do not want guesswork. They want to know how inquiry becomes action.</p>
-            </div>
-            <div class="process-grid">
-                <div class="process-card">
-                    <span class="process-step">1</span>
-                    <h3>Tell us your need</h3>
-                    <p>Share whether you need training, speaking, or a crypto case evaluation, plus your team type and objective.</p>
+        <section class="sandbox-section light" id="blog">
+            <div class="sandbox-wrap">
+                <div class="sandbox-section-header">
+                    <p class="sandbox-eyebrow">Articles</p>
+                    <h2>Analysis on crypto fraud, regulation, and digital asset risk.</h2>
+                    <p>Insights for teams tracking blockchain forensics, AML, financial infrastructure, and Philippine digital asset regulation.</p>
                 </div>
-                <div class="process-card">
-                    <span class="process-step">2</span>
-                    <h3>We assess fit and scope</h3>
-                    <p>You get a clearer recommendation on the right engagement type, likely scope, and next-step direction.</p>
-                </div>
-                <div class="process-card">
-                    <span class="process-step">3</span>
-                    <h3>Receive next steps or proposal</h3>
-                    <p>If there is a good fit, the conversation moves into scheduling, proposal, or a more specific case discussion.</p>
+                <div class="sandbox-grid-3">
+                    <article class="sandbox-card"><h3>Crypto Fraud &amp; AML</h3><p>Investigation workflows, risk indicators, and scam typologies.</p></article>
+                    <article class="sandbox-card"><h3>Regulation &amp; Compliance</h3><p>Policy analysis for institutions operating around digital assets.</p></article>
+                    <article class="sandbox-card"><h3>Stablecoins &amp; Payments</h3><p>Financial infrastructure analysis for payments and remittance corridors.</p></article>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <div class="contact-content">
-                <div class="contact-info">
-                    <h3>Ready to Explore Fit, Scope, and Next Steps?</h3>
-                    <p>Use the booking link if you want a training proposal, a speaking discussion, or a free initial case evaluation for a crypto-related matter.</p>
-                    <div class="contact-details">
-                        <div class="contact-item">
-                            <span class="contact-icon">📧</span>
-                            <div>
-                                <h4>Email</h4>
-                                <a href="mailto:contact@ferdienervida.com">contact@ferdienervida.com</a>
-                            </div>
-                        </div>
-                        <div class="contact-item">
-                            <span class="contact-icon">📱</span>
-                            <div>
-                                <h4>Telegram</h4>
-                                <a href="https://t.me/FerdieCPS" target="_blank" rel="noopener">@FerdieCPS</a>
-                            </div>
-                        </div>
-                        <div class="contact-item">
-                            <span class="contact-icon">🌏</span>
-                            <div>
-                                <h4>Location</h4>
-                                <span>Asia Pacific</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="contact-form" id="booking">
-                    <div class="form-info">
-                        <h3>📅 Request a Proposal or Case Evaluation</h3>
-                        <p>Choose this if you want to discuss a training engagement, speaking request, or a free initial crypto case evaluation.</p>
-                    </div>
-                    <a href="/book/" class="btn btn-primary btn-full btn-large">📋 Request a Proposal</a>
+        <section class="sandbox-cta-band">
+            <div class="sandbox-wrap">
+                <h2>Need to strengthen your team's crypto fraud and AML capability?</h2>
+                <p>Send a short note with your organization, team, timeline, and the kind of crypto-related cases or risks your team is seeing.</p>
+                <div class="sandbox-actions" style="justify-content:center;">
+                    <a class="sandbox-button primary" href="/book/">Request a Proposal</a>
+                    <a class="sandbox-button secondary" href="mailto:contact@ferdienervida.com?subject=Crypto%20AML%20Training%20Inquiry">Email Ferdie</a>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
+
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer" id="contact">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
                     <h4>Ferdie James Nervida</h4>
-                    <p>Leading cybersecurity trainer and TEDx speaker specializing in blockchain forensics, digital threat analysis, and cybersecurity education.</p>
+                    <p>Crypto AML, fraud investigations, blockchain forensics, and digital asset risk training for financial institutions and regulated teams.</p>
                     <div class="social-links">
                         <a href="https://www.linkedin.com/in/ferdiejamesnervida/" target="_blank" rel="noopener">LinkedIn</a>
                         <a href="https://www.facebook.com/ferdiejamesnervida" target="_blank" rel="noopener">Facebook</a>
@@ -735,14 +219,16 @@
                 <div class="footer-section">
                     <h4>Services</h4>
                     <ul>
-                        <li><a href="#services">Training and Speaking</a></li>
-                        <li><a href="#services">Blockchain Forensics</a></li>
-                        <li><a href="#services">Recovery Support</a></li>
+                        <li><a href="/financial-institutions/">Financial Institutions</a></li>
+                        <li><a href="/services/">Services</a></li>
+                        <li><a href="/past-engagements/">Past Engagements</a></li>
+                        <li><a href="/media-recognition/">Media &amp; Recognition</a></li>
+                        <li><a href="/reviews/">Reviews</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Quick Contact</h4>
-                    <p>For booking inquiries:</p>
+                    <p>For training, speaking, or case inquiries:</p>
                     <a href="mailto:contact@ferdienervida.com" class="emergency-phone">contact@ferdienervida.com</a>
                     <p class="response-time">Response within 24 hours</p>
                 </div>
@@ -753,12 +239,9 @@
         </div>
     </footer>
 
-
-    
-    <!-- JavaScript -->
-    <script src="script.js"></script>
+    <script src="/script.js"></script>
     <script
-        src="chat-widget.js"
+        src="/chat-widget.js"
         data-color="#3b82f6"
         data-welcome="Hi! How can I help you today?"
         data-api="https://ferdie-chat-backend.vercel.app/api/chat"
