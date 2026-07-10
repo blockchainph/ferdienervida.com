@@ -8,21 +8,23 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
     <style>
-        body { background:#07111f; color:#e5edf8; }
+        :root { --sandbox-bg:#07111f; --sandbox-panel:#0f1828; --sandbox-panel-strong:#13233a; --sandbox-line:rgba(148,163,184,.18); --sandbox-line-strong:rgba(148,163,184,.3); --sandbox-copy:#b8c4d6; --sandbox-copy-soft:#90a1b9; --sandbox-heading:"Fraunces", Georgia, serif; --sandbox-body:"Inter", sans-serif; --sandbox-mono:"IBM Plex Mono", monospace; }
+        body { background:var(--sandbox-bg); color:#e5edf8; font-family:var(--sandbox-body); }
         .sandbox-nav { position:sticky; top:0; z-index:1000; background:rgba(7,17,31,.94); border-bottom:1px solid rgba(148,163,184,.2); backdrop-filter:blur(16px); }
         .sandbox-nav-inner,.sandbox-wrap { width:min(1180px,calc(100% - 32px)); margin:0 auto; }
         .sandbox-nav-inner { min-height:74px; display:flex; align-items:center; justify-content:space-between; gap:1.5rem; }
         .sandbox-brand,.sandbox-links a { color:#fff; text-decoration:none; font-weight:800; }
+        .sandbox-brand { font-family:var(--sandbox-heading); letter-spacing:.01em; }
         .sandbox-links { display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap; }
         .sandbox-links a { color:#cbd5e1; font-size:.92rem; }
         .sandbox-links .nav-cta { color:#fff; background:#2563eb; padding:.85rem 1.1rem; border-radius:999px; }
         .sandbox-hero { min-height:calc(100vh - 74px); display:flex; align-items:center; background:linear-gradient(90deg,rgba(7,17,31,.96),rgba(7,17,31,.82),rgba(7,17,31,.34)),url('/heronew.png') center/cover no-repeat; }
         .sandbox-hero-content { max-width:850px; padding:5.5rem 0 5rem; }
-        .sandbox-eyebrow { color:#93c5fd; text-transform:uppercase; letter-spacing:.14em; font-size:.78rem; font-weight:800; margin-bottom:1rem; }
-        .sandbox-hero h1 { color:#fff; font-size:clamp(2.8rem,6vw,5.4rem); line-height:.98; margin-bottom:1.35rem; letter-spacing:0; }
+        .sandbox-eyebrow { color:#93c5fd; text-transform:uppercase; letter-spacing:.14em; font-size:.78rem; font-weight:700; margin-bottom:1rem; font-family:var(--sandbox-mono); }
+        .sandbox-hero h1 { color:#fff; font-size:clamp(2.8rem,6vw,5.4rem); line-height:.98; margin-bottom:1.35rem; letter-spacing:0; font-family:var(--sandbox-heading); font-weight:700; }
         .sandbox-hero-copy,.sandbox-section-header p,.sandbox-card p,.sandbox-card li { color:#b8c4d6; line-height:1.75; }
         .sandbox-hero-copy { font-size:clamp(1.08rem,2vw,1.32rem); max-width:760px; }
         .sandbox-actions { display:flex; gap:1rem; flex-wrap:wrap; margin:2rem 0 1.25rem; }
@@ -31,27 +33,43 @@
         .sandbox-button.secondary { border:1px solid rgba(226,232,240,.28); color:#fff; background:rgba(15,23,42,.56); }
         .sandbox-proof-grid,.sandbox-grid-3,.sandbox-grid-4,.sandbox-trust-strip { display:grid; gap:1rem; }
         .sandbox-proof-grid { grid-template-columns:repeat(4,minmax(0,1fr)); margin-top:2.25rem; }
-        .sandbox-stat,.sandbox-card { background:rgba(15,23,42,.76); border:1px solid rgba(148,163,184,.18); border-radius:8px; padding:1.35rem; }
-        .sandbox-stat strong { display:block; color:#fff; font-size:1.6rem; margin-bottom:.25rem; }
+        .sandbox-stat,.sandbox-card { background:rgba(15,23,42,.76); border:1px solid var(--sandbox-line); border-radius:8px; padding:1.35rem; }
+        .sandbox-stat:nth-child(2) { transform:translateY(10px); }
+        .sandbox-stat:nth-child(3) { background:linear-gradient(180deg,rgba(19,35,58,.98),rgba(15,24,40,.88)); }
+        .sandbox-stat:nth-child(4) { border-color:rgba(59,130,246,.38); }
+        .sandbox-stat strong { display:block; color:#fff; font-size:1.6rem; margin-bottom:.25rem; font-family:var(--sandbox-mono); letter-spacing:-.03em; }
         .sandbox-stat span { color:#b8c4d6; line-height:1.5; }
-        .sandbox-section { padding:5rem 0; }
-        .sandbox-section.light { background:#f8fafc; color:#111827; }
-        .sandbox-section.dark { background:#0b1626; }
-        .sandbox-section.light .sandbox-card { background:#fff; border-color:#e2e8f0; box-shadow:0 16px 36px rgba(15,23,42,.08); }
-        .sandbox-section.light .sandbox-card p,.sandbox-section.light .sandbox-card li,.sandbox-section.light .sandbox-section-header p { color:#64748b; }
+        .sandbox-section,.sandbox-cta-band { padding:5rem 0; border-top:1px solid rgba(148,163,184,.16); background:transparent; }
         .sandbox-section-header { max-width:820px; margin-bottom:2.5rem; }
         .sandbox-section-header.center { margin-left:auto; margin-right:auto; text-align:center; }
-        .sandbox-section-header h2 { font-size:clamp(2rem,4vw,3.25rem); line-height:1.05; margin-bottom:1rem; letter-spacing:0; }
+        .sandbox-section-header h2 { font-size:clamp(2rem,4vw,3.25rem); line-height:1.05; margin-bottom:1rem; letter-spacing:0; font-family:var(--sandbox-heading); font-weight:700; }
         .sandbox-grid-3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
         .sandbox-grid-4 { grid-template-columns:repeat(4,minmax(0,1fr)); }
-        .sandbox-card h3 { color:inherit; font-size:1.18rem; line-height:1.3; margin-bottom:.75rem; }
+        .sandbox-card h3 { color:inherit; font-size:1.18rem; line-height:1.3; margin-bottom:.75rem; font-family:var(--sandbox-heading); font-weight:700; }
         .sandbox-card ul { padding-left:1.1rem; margin:0; }
-        .sandbox-trust-strip { grid-template-columns:repeat(5,minmax(0,1fr)); }
-        .sandbox-trust-item { background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:1rem; text-align:center; color:#334155; font-weight:800; min-height:92px; display:grid; place-items:center; }
-        .sandbox-cta-band { background:#0f172a; color:#fff; padding:4rem 0; text-align:center; }
-        .sandbox-cta-band h2 { font-size:clamp(2rem,4vw,3.35rem); line-height:1.08; margin-bottom:1rem; }
+        .sandbox-card.feature-accent { background:linear-gradient(180deg,rgba(19,35,58,.98),rgba(15,24,40,.92)); border-color:rgba(59,130,246,.34); box-shadow:0 20px 44px rgba(6,10,18,.28); }
+        .sandbox-problem-grid article:first-child { grid-column:span 2; padding:1.75rem; }
+        .sandbox-problem-grid article:nth-child(2) { transform:translateY(18px); }
+        .sandbox-problem-grid article:nth-child(3) { background:rgba(17,30,48,.9); }
+        .sandbox-services-layout { display:grid; grid-template-columns:minmax(0,1.18fr) minmax(320px,.82fr); gap:1rem; align-items:start; }
+        .sandbox-service-featured { position:relative; padding:1.9rem; background:linear-gradient(180deg,rgba(19,35,58,.98),rgba(15,24,40,.92)); border-color:rgba(59,130,246,.36); box-shadow:0 24px 48px rgba(6,10,18,.32); }
+        .sandbox-service-tag { display:inline-flex; align-items:center; min-height:28px; padding:0 .65rem; border:1px solid rgba(147,197,253,.34); border-radius:999px; color:#cfe3ff; font-size:.72rem; font-family:var(--sandbox-mono); letter-spacing:.1em; text-transform:uppercase; margin-bottom:1rem; }
+        .sandbox-service-stack { display:grid; gap:.9rem; }
+        .sandbox-service-compact { padding:1rem 1.1rem; background:rgba(14,23,37,.88); }
+        .sandbox-service-compact h3 { font-size:1.02rem; margin-bottom:.45rem; }
+        .sandbox-service-compact p { font-size:.95rem; line-height:1.65; }
+        .sandbox-trust-strip { grid-template-columns:1.3fr 1fr 1fr 1fr 1.2fr; }
+        .sandbox-trust-item { border:1px solid var(--sandbox-line); border-radius:8px; padding:1rem; text-align:center; color:#e7eef9; font-weight:800; min-height:92px; display:grid; place-items:center; background:rgba(15,23,42,.7); font-family:var(--sandbox-heading); }
+        .sandbox-trust-item:nth-child(1) { grid-column:span 2; justify-items:start; text-align:left; padding:1.25rem 1.4rem; background:linear-gradient(180deg,rgba(19,35,58,.98),rgba(15,24,40,.92)); }
+        .sandbox-trust-item:nth-child(3) { background:rgba(255,255,255,.06); }
+        .sandbox-trust-item:nth-child(5) { border-color:rgba(59,130,246,.38); }
+        .sandbox-testimonial-grid article:nth-child(2) { transform:translateY(-16px); padding:1.7rem; background:linear-gradient(180deg,rgba(19,35,58,.98),rgba(15,24,40,.92)); border-color:rgba(59,130,246,.34); }
+        .sandbox-testimonial-grid article:nth-child(1) { background:rgba(18,30,47,.82); }
+        .sandbox-testimonial-grid article:nth-child(3) { background:rgba(12,21,35,.92); }
+        .sandbox-cta-band { color:#fff; text-align:center; padding-bottom:4rem; }
+        .sandbox-cta-band h2 { font-size:clamp(2rem,4vw,3.35rem); line-height:1.08; margin-bottom:1rem; font-family:var(--sandbox-heading); font-weight:700; }
         .sandbox-cta-band p { color:#b8c4d6; line-height:1.75; max-width:720px; margin:0 auto 1.75rem; }
-        @media (max-width:900px){ .sandbox-nav-inner{align-items:flex-start;flex-direction:column;padding:1rem 0}.sandbox-proof-grid,.sandbox-grid-3,.sandbox-grid-4,.sandbox-trust-strip{grid-template-columns:1fr}.sandbox-hero{min-height:auto} }
+        @media (max-width:900px){ .sandbox-nav-inner{align-items:flex-start;flex-direction:column;padding:1rem 0}.sandbox-proof-grid,.sandbox-grid-3,.sandbox-grid-4,.sandbox-trust-strip,.sandbox-services-layout{grid-template-columns:1fr}.sandbox-hero{min-height:auto}.sandbox-problem-grid article:first-child{grid-column:auto}.sandbox-problem-grid article:nth-child(2),.sandbox-testimonial-grid article:nth-child(2),.sandbox-stat:nth-child(2){transform:none}.sandbox-trust-item:nth-child(1){grid-column:auto;justify-items:center;text-align:center}.sandbox-service-featured{padding:1.6rem} }
         @media (max-width:560px){ .sandbox-banner,.sandbox-nav{position:static}.sandbox-actions .sandbox-button{width:100%}.sandbox-hero-content{padding:4rem 0} }
     </style>
 </head>
@@ -97,7 +115,7 @@
             </div>
         </section>
 
-        <section class="sandbox-section light">
+        <section class="sandbox-section" id="problem">
             <div class="sandbox-wrap">
                 <div class="sandbox-section-header center">
                     <p class="sandbox-eyebrow">Client problem</p>
@@ -108,25 +126,31 @@
                         practical investigation capability.
                     </p>
                 </div>
-                <div class="sandbox-grid-3">
-                    <article class="sandbox-card"><h3>Interpret blockchain activity</h3><p>Understand transaction flows, wallet behavior, exchange exposure, and risk indicators.</p></article>
+                <div class="sandbox-grid-3 sandbox-problem-grid">
+                    <article class="sandbox-card feature-accent"><h3>Interpret blockchain activity</h3><p>Understand transaction flows, wallet behavior, exchange exposure, and risk indicators.</p></article>
                     <article class="sandbox-card"><h3>Improve case handling</h3><p>Build shared language across Fraud, AML, Compliance, Risk, and Operations teams.</p></article>
                     <article class="sandbox-card"><h3>Support escalation decisions</h3><p>Use blockchain intelligence more effectively when triaging cases, documenting findings, and deciding next steps.</p></article>
                 </div>
             </div>
         </section>
 
-        <section class="sandbox-section dark" id="services">
+        <section class="sandbox-section" id="services">
             <div class="sandbox-wrap">
                 <div class="sandbox-section-header">
                     <p class="sandbox-eyebrow">Services</p>
                     <h2>Training and advisory support for crypto-related financial crime.</h2>
                 </div>
-                <div class="sandbox-grid-4">
-                    <article class="sandbox-card"><h3>Crypto AML &amp; Fraud Investigations Training</h3><p>Practical training for financial institutions handling crypto scams, wallet activity, and AML risk.</p></article>
-                    <article class="sandbox-card"><h3>Blockchain Forensics Training</h3><p>Wallet tracing, transaction analysis, attribution context, and evidence handling for investigation teams.</p></article>
-                    <article class="sandbox-card"><h3>Executive Risk Briefings</h3><p>Briefings for leaders who need to understand digital asset risk without technical noise.</p></article>
-                    <article class="sandbox-card"><h3>Workflow Advisory</h3><p>Support for intake questions, escalation paths, internal playbooks, and case review practices.</p></article>
+                <div class="sandbox-services-layout">
+                    <article class="sandbox-card sandbox-service-featured">
+                        <span class="sandbox-service-tag">Most Requested</span>
+                        <h3>Crypto AML &amp; Fraud Investigations Training</h3>
+                        <p>Practical training for financial institutions handling crypto scams, wallet activity, and AML risk.</p>
+                    </article>
+                    <div class="sandbox-service-stack">
+                        <article class="sandbox-card sandbox-service-compact"><h3>Blockchain Forensics Training</h3><p>Wallet tracing, transaction analysis, attribution context, and evidence handling for investigation teams.</p></article>
+                        <article class="sandbox-card sandbox-service-compact"><h3>Executive Risk Briefings</h3><p>Briefings for leaders who need to understand digital asset risk without technical noise.</p></article>
+                        <article class="sandbox-card sandbox-service-compact"><h3>Workflow Advisory</h3><p>Support for intake questions, escalation paths, internal playbooks, and case review practices.</p></article>
+                    </div>
                 </div>
                 <div class="sandbox-actions">
                     <a class="sandbox-button secondary" href="/services/">View Services</a>
@@ -134,7 +158,7 @@
             </div>
         </section>
 
-        <section class="sandbox-section light" id="about">
+        <section class="sandbox-section" id="about">
             <div class="sandbox-wrap">
                 <div class="sandbox-section-header center">
                     <p class="sandbox-eyebrow">Why organizations work with Ferdie</p>
@@ -158,13 +182,13 @@
             </div>
         </section>
 
-        <section class="sandbox-section dark">
+        <section class="sandbox-section" id="reviews">
             <div class="sandbox-wrap">
                 <div class="sandbox-section-header">
                     <p class="sandbox-eyebrow">Client reviews</p>
                     <h2>Participants value practical examples and clear investigation guidance.</h2>
                 </div>
-                <div class="sandbox-grid-3">
+                <div class="sandbox-grid-3 sandbox-testimonial-grid">
                     <article class="sandbox-card"><h3>Clearer investigation understanding</h3><p>The breakdown of how law enforcement can use blockchain forensic tools to uncover money trails was informative and practical.</p></article>
                     <article class="sandbox-card"><h3>Operationally useful</h3><p>Participants consistently mention that complex cryptocurrency concepts become easier to understand and apply.</p></article>
                     <article class="sandbox-card"><h3>Case readiness</h3><p>The training helps teams understand evidence preservation, transaction analysis, and investigative use cases.</p></article>
@@ -175,7 +199,7 @@
             </div>
         </section>
 
-        <section class="sandbox-section light" id="blog">
+        <section class="sandbox-section" id="blog">
             <div class="sandbox-wrap">
                 <div class="sandbox-section-header">
                     <p class="sandbox-eyebrow">Articles</p>
