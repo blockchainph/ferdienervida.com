@@ -8,243 +8,218 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css">
-    <style>
-        body { background:#07111f; color:#e5edf8; }
-        .sandbox-nav { position:sticky; top:0; z-index:1000; background:rgba(7,17,31,.94); border-bottom:1px solid rgba(148,163,184,.2); backdrop-filter:blur(16px); }
-        .sandbox-nav-inner,.sandbox-wrap { width:min(1180px,calc(100% - 32px)); margin:0 auto; }
-        .sandbox-nav-inner { min-height:74px; display:flex; align-items:center; justify-content:space-between; gap:1.5rem; }
-        .sandbox-brand,.sandbox-links a { color:#fff; text-decoration:none; font-weight:800; }
-        .sandbox-links { display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap; }
-        .sandbox-links a { color:#cbd5e1; font-size:.92rem; }
-        .sandbox-links .nav-cta { color:#fff; background:#2563eb; padding:.85rem 1.1rem; border-radius:999px; }
-        .sandbox-hero { min-height:calc(100vh - 74px); display:flex; align-items:center; background:linear-gradient(90deg,rgba(7,17,31,.96),rgba(7,17,31,.82),rgba(7,17,31,.34)),url('/heronew.png') center/cover no-repeat; }
-        .sandbox-hero-content { max-width:850px; padding:5.5rem 0 5rem; }
-        .sandbox-eyebrow { color:#93c5fd; text-transform:uppercase; letter-spacing:.14em; font-size:.78rem; font-weight:800; margin-bottom:1rem; }
-        .sandbox-hero h1 { color:#fff; font-size:clamp(2.8rem,6vw,5.4rem); line-height:.98; margin-bottom:1.35rem; letter-spacing:0; }
-        .sandbox-hero-copy,.sandbox-section-header p,.sandbox-card p,.sandbox-card li { color:#b8c4d6; line-height:1.75; }
-        .sandbox-hero-copy { font-size:clamp(1.08rem,2vw,1.32rem); max-width:760px; }
-        .sandbox-actions { display:flex; gap:1rem; flex-wrap:wrap; margin:2rem 0 1.25rem; }
-        .sandbox-button { display:inline-flex; align-items:center; justify-content:center; min-height:54px; padding:0 1.35rem; border-radius:999px; font-weight:800; text-decoration:none; }
-        .sandbox-button.primary { background:#2563eb; color:#fff; box-shadow:0 18px 36px rgba(37,99,235,.28); }
-        .sandbox-button.secondary { border:1px solid rgba(226,232,240,.28); color:#fff; background:rgba(15,23,42,.56); }
-        .sandbox-proof-grid,.sandbox-grid-3,.sandbox-grid-4,.sandbox-trust-strip { display:grid; gap:1rem; }
-        .sandbox-proof-grid { grid-template-columns:repeat(4,minmax(0,1fr)); margin-top:2.25rem; }
-        .sandbox-stat,.sandbox-card { background:rgba(15,23,42,.76); border:1px solid rgba(148,163,184,.18); border-radius:8px; padding:1.35rem; }
-        .sandbox-stat strong { display:block; color:#fff; font-size:1.6rem; margin-bottom:.25rem; }
-        .sandbox-stat span { color:#b8c4d6; line-height:1.5; }
-        .sandbox-section { padding:5rem 0; }
-        .sandbox-section.light { background:#f8fafc; color:#111827; }
-        .sandbox-section.dark { background:#0b1626; }
-        .sandbox-section.light .sandbox-card { background:#fff; border-color:#e2e8f0; box-shadow:0 16px 36px rgba(15,23,42,.08); }
-        .sandbox-section.light .sandbox-card p,.sandbox-section.light .sandbox-card li,.sandbox-section.light .sandbox-section-header p { color:#64748b; }
-        .sandbox-section-header { max-width:820px; margin-bottom:2.5rem; }
-        .sandbox-section-header.center { margin-left:auto; margin-right:auto; text-align:center; }
-        .sandbox-section-header h2 { font-size:clamp(2rem,4vw,3.25rem); line-height:1.05; margin-bottom:1rem; letter-spacing:0; }
-        .sandbox-grid-3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
-        .sandbox-grid-4 { grid-template-columns:repeat(4,minmax(0,1fr)); }
-        .sandbox-card h3 { color:inherit; font-size:1.18rem; line-height:1.3; margin-bottom:.75rem; }
-        .sandbox-card ul { padding-left:1.1rem; margin:0; }
-        .sandbox-trust-strip { grid-template-columns:repeat(5,minmax(0,1fr)); }
-        .sandbox-trust-item { background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:1rem; text-align:center; color:#334155; font-weight:800; min-height:92px; display:grid; place-items:center; }
-        .sandbox-cta-band { background:#0f172a; color:#fff; padding:4rem 0; text-align:center; }
-        .sandbox-cta-band h2 { font-size:clamp(2rem,4vw,3.35rem); line-height:1.08; margin-bottom:1rem; }
-        .sandbox-cta-band p { color:#b8c4d6; line-height:1.75; max-width:720px; margin:0 auto 1.75rem; }
-        @media (max-width:900px){ .sandbox-nav-inner{align-items:flex-start;flex-direction:column;padding:1rem 0}.sandbox-proof-grid,.sandbox-grid-3,.sandbox-grid-4,.sandbox-trust-strip{grid-template-columns:1fr}.sandbox-hero{min-height:auto} }
-        @media (max-width:560px){ .sandbox-banner,.sandbox-nav{position:static}.sandbox-actions .sandbox-button{width:100%}.sandbox-hero-content{padding:4rem 0} }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/design-system.css">
     <script src="analytics-config.js"></script>
     <script src="analytics.js"></script>
 </head>
-<body>
-    <nav class="sandbox-nav" aria-label="Main navigation">
-        <div class="sandbox-nav-inner">
-            <a class="sandbox-brand" href="/">Ferdie Nervida</a>
-            <div class="sandbox-links">
-                <a href="/">Home</a>
+<body class="ds-page">
+  <div class="ds-wrap">
+    <nav class="ds-nav" aria-label="Main navigation">
+        <a class="ds-brand" href="/">Ferdie Nervida</a>
+        <div class="ds-nav-links">
+            <a href="/financial-institutions/">Financial Institutions</a>
+            <a href="/services/">Services</a>
+            <a href="/past-engagements/">Past Engagements</a>
+            <a href="/media-recognition/">Media &amp; Recognition</a>
+            <a href="/reviews/">Reviews</a>
+            <a href="/blog/">Insights</a>
+            <a class="ds-btn ds-btn-fill ds-btn-sm" href="/book/">Request Proposal</a>
+        </div>
+    </nav>
+
+    <main id="home">
+        <section class="ds-hero">
+            <div>
+                <p class="ds-eyebrow">For financial institutions and financial crime teams</p>
+                <h1>Crypto AML and fraud investigations training for regulated teams.</h1>
+                <p>
+                    Ferdie Nervida helps banks, digital banks, fintechs, e-wallets, payment companies, and
+                    financial crime teams build practical capability for crypto-related fraud, blockchain
+                    intelligence, wallet tracing, AML red flags, and digital asset risk.
+                </p>
+                <div class="ds-hero-actions">
+                    <a class="ds-btn ds-btn-fill" href="/book/">Request a Training Proposal</a>
+                    <a class="ds-btn ds-btn-text" href="/financial-institutions/">For Financial Institutions &nbsp;→</a>
+                </div>
+            </div>
+            <img class="ds-hero-photo" src="pbw.jpeg" alt="Ferdie Nervida speaking at Philippine Blockchain Week">
+        </section>
+
+        <div class="ds-stats">
+            <div class="ds-stat"><div class="ds-stat-value">50+</div><div class="ds-stat-label">Training programs delivered</div></div>
+            <div class="ds-stat"><div class="ds-stat-value">100+</div><div class="ds-stat-label">Speaking engagements</div></div>
+            <div class="ds-stat"><div class="ds-stat-value">4.8</div><div class="ds-stat-label">Google rating, 200+ reviews</div></div>
+            <div class="ds-stat"><div class="ds-stat-value">BPAP</div><div class="ds-stat-label">Interim president &amp; ecosystem leader</div></div>
+        </div>
+
+        <section class="ds-section">
+            <div class="ds-split ds-split-85-115">
+                <div>
+                    <p class="ds-eyebrow">Client problem</p>
+                    <h2>Crypto-related risk is entering normal fraud and AML operations.</h2>
+                    <p>Teams are receiving wallet addresses, exchange references, transaction hashes, scam reports, and blockchain intelligence outputs. The need is not general blockchain education — it's practical investigation capability.</p>
+                </div>
+                <div>
+                    <div class="ds-numbered-item">
+                        <div class="ds-num">01</div>
+                        <div><div class="ds-item-title">Interpret blockchain activity</div><div class="ds-item-body">Understand transaction flows, wallet behavior, exchange exposure, and risk indicators.</div></div>
+                    </div>
+                    <div class="ds-numbered-item">
+                        <div class="ds-num">02</div>
+                        <div><div class="ds-item-title">Improve case handling</div><div class="ds-item-body">Build shared language across Fraud, AML, Compliance, Risk, and Operations teams.</div></div>
+                    </div>
+                    <div class="ds-numbered-item">
+                        <div class="ds-num">03</div>
+                        <div><div class="ds-item-title">Support escalation decisions</div><div class="ds-item-body">Use blockchain intelligence more effectively when triaging cases, documenting findings, and deciding next steps.</div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="ds-section ds-dark">
+            <div class="ds-section-head">
+                <div>
+                    <p class="ds-eyebrow">Services</p>
+                    <h2>Training and advisory support for crypto-related financial crime.</h2>
+                </div>
+                <a href="/services/">View all services &nbsp;→</a>
+            </div>
+            <div class="ds-row-list">
+                <div class="ds-row"><div class="ds-row-title">Crypto AML &amp; Fraud Investigations Training</div><div class="ds-row-body">Practical training for financial institutions handling crypto scams, wallet activity, and AML risk.</div><div class="ds-row-arrow">→</div></div>
+                <div class="ds-row"><div class="ds-row-title">Blockchain Forensics Training</div><div class="ds-row-body">Wallet tracing, transaction analysis, attribution context, and evidence handling for investigation teams.</div><div class="ds-row-arrow">→</div></div>
+                <div class="ds-row"><div class="ds-row-title">Executive Risk Briefings</div><div class="ds-row-body">Briefings for leaders who need to understand digital asset risk without technical noise.</div><div class="ds-row-arrow">→</div></div>
+                <div class="ds-row"><div class="ds-row-title">Workflow Advisory</div><div class="ds-row-body">Support for intake questions, escalation paths, internal playbooks, and case review practices.</div><div class="ds-row-arrow">→</div></div>
+            </div>
+        </section>
+
+        <section class="ds-section">
+            <div class="ds-split ds-split-90-110">
+                <div>
+                    <p class="ds-eyebrow">Why organizations work with Ferdie</p>
+                    <h2>Experience that helps regulated teams understand and act.</h2>
+                    <p style="margin-bottom:26px">Ferdie has delivered cybersecurity, blockchain forensics, and digital asset risk training for government, law enforcement, public sector, academe, and professional organizations.</p>
+                    <div class="ds-tags">
+                        <span>Law Enforcement Training</span>
+                        <span>Government Resource Person</span>
+                        <span>TEDx Speaker</span>
+                        <span>Media Features</span>
+                        <span>200+ Google Reviews</span>
+                    </div>
+                    <div class="ds-link-row-actions">
+                        <a href="/past-engagements/">View Past Engagements →</a>
+                        <a href="/media-recognition/">View Media &amp; Recognition →</a>
+                    </div>
+                </div>
+                <div class="ds-photo-pair">
+                    <img src="tesda-korphil-bpap-seminar.png" alt="TESDA KorPhil x BPAP training session">
+                    <img src="block3.jpg" alt="Ferdie Nervida at the Philippine Block Awards">
+                </div>
+            </div>
+        </section>
+
+        <div class="ds-section-tight">
+            <p class="ds-logo-strip-label">Featured in / trained with</p>
+            <div class="ds-logo-strip">
+                <div class="ds-logo-cell"><img src="bpap-logo.png" alt="Blockchain Practitioners Association of the Philippines"></div>
+                <div class="ds-logo-cell"><img src="tedx-talk.png" alt="TEDxArellanoSt"></div>
+            </div>
+        </div>
+
+        <section class="ds-section-tight">
+            <div class="ds-section-head">
+                <div>
+                    <p class="ds-eyebrow">Client reviews</p>
+                    <h2>Participants value practical examples and clear investigation guidance.</h2>
+                </div>
+                <a href="/reviews/">View all reviews →</a>
+            </div>
+            <div class="ds-reviews-grid">
+                <div class="ds-review-featured">
+                    <blockquote>&ldquo;The breakdown of how law enforcement can use blockchain forensic tools to uncover money trails was informative and practical.&rdquo;</blockquote>
+                    <cite>— Training participant</cite>
+                </div>
+                <div class="ds-review-small-list">
+                    <div class="ds-review-small">
+                        <p>Complex cryptocurrency concepts become easier to understand and apply.</p>
+                        <cite>— Compliance lead</cite>
+                    </div>
+                    <div class="ds-review-small">
+                        <p>The training helps teams understand evidence preservation and investigative use cases.</p>
+                        <cite>— Fraud operations manager</cite>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="ds-section-tight">
+            <p class="ds-eyebrow">Insights</p>
+            <h2 style="font-size:34px;line-height:1.2;max-width:26ch;margin-bottom:40px">Analysis on crypto fraud, regulation, and digital asset risk.</h2>
+            <div>
+                <a class="ds-link-row" href="/blog/articles/bitcoin-solved-the-wrong-problem/">
+                    <div class="ds-tag">Cryptocurrency Analysis</div>
+                    <div><div class="ds-item-title">Bitcoin Solved the Wrong Problem</div><div class="ds-item-body">The crypto movement promised decentralized money. What it actually delivered was a digital dollar with a new middleman.</div></div>
+                    <div class="ds-arrow">→</div>
+                </a>
+                <a class="ds-link-row" href="/blog/articles/private-sector-data-breaches-exploded-in-2024/">
+                    <div class="ds-tag">Cybersecurity Analysis</div>
+                    <div><div class="ds-item-title">Private Sector Data Breaches Exploded in 2024</div><div class="ds-item-body">A closer look at how major Philippine private-sector breaches exposed the same detection gaps and disclosure failures.</div></div>
+                    <div class="ds-arrow">→</div>
+                </a>
+                <a class="ds-link-row" href="/blog/articles/the-antivirus-expired-42-million-records-didnt/">
+                    <div class="ds-tag">Cybersecurity Analysis</div>
+                    <div><div class="ds-item-title">The Antivirus Expired. 42 Million Records Didn't.</div><div class="ds-item-body">The PhilHealth breach was a maintenance failure and a warning about institutional cybersecurity.</div></div>
+                    <div class="ds-arrow">→</div>
+                </a>
+            </div>
+        </section>
+
+        <section class="ds-cta-band ds-dark">
+            <div>
+                <h2>Need to strengthen your team's crypto fraud and AML capability?</h2>
+                <p>Send a short note with your organization, team, timeline, and the kind of crypto-related cases or risks your team is seeing.</p>
+            </div>
+            <div class="ds-cta-actions">
+                <a class="ds-btn ds-btn-accent" href="/book/">Request a Proposal</a>
+                <a class="ds-btn ds-btn-text" href="mailto:contact@ferdienervida.com?subject=Crypto%20AML%20Training%20Inquiry" style="color:var(--ds-dark-text)">Email Ferdie</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="ds-footer">
+        <div>
+            <div class="ds-footer-brand">Ferdie James Nervida</div>
+            <p>Crypto AML, fraud investigations, blockchain forensics, and digital asset risk training for financial institutions and regulated teams.</p>
+            <div class="ds-footer-social">
+                <a href="https://www.linkedin.com/in/ferdiejamesnervida/" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="https://www.facebook.com/ferdiejamesnervida" target="_blank" rel="noopener">Facebook</a>
+                <a href="https://t.me/FerdieCPS" target="_blank" rel="noopener">Telegram</a>
+            </div>
+        </div>
+        <div>
+            <div class="ds-footer-col-label">Services</div>
+            <div class="ds-footer-links">
                 <a href="/financial-institutions/">Financial Institutions</a>
                 <a href="/services/">Services</a>
                 <a href="/past-engagements/">Past Engagements</a>
                 <a href="/media-recognition/">Media &amp; Recognition</a>
                 <a href="/reviews/">Reviews</a>
-                <a href="/blog/">Insights</a>
-                <a class="nav-cta" href="/book/">Contact</a>
             </div>
         </div>
-    </nav>
-
-    <main id="home">
-        <section class="sandbox-hero">
-            <div class="sandbox-wrap">
-                <div class="sandbox-hero-content">
-                    <p class="sandbox-eyebrow">For financial institutions and financial crime teams</p>
-                    <h1>Crypto AML and fraud investigations training for regulated teams.</h1>
-                    <p class="sandbox-hero-copy">
-                        Ferdie Nervida helps banks, digital banks, fintechs, e-wallets, payment companies, and
-                        financial crime teams build practical capability for crypto-related fraud, blockchain
-                        intelligence, wallet tracing, AML red flags, and digital asset risk.
-                    </p>
-                    <div class="sandbox-actions">
-                        <a class="sandbox-button primary" href="/book/">Request a Training Proposal</a>
-                        <a class="sandbox-button secondary" href="/financial-institutions/">For Financial Institutions</a>
-                    </div>
-                    <div class="sandbox-proof-grid">
-                        <div class="sandbox-stat"><strong>50+</strong><span>training programs delivered</span></div>
-                        <div class="sandbox-stat"><strong>100+</strong><span>speaking engagements</span></div>
-                        <div class="sandbox-stat"><strong>4.8</strong><span>Google rating from 200+ reviews</span></div>
-                        <div class="sandbox-stat"><strong>BPAP</strong><span>interim president and ecosystem leader</span></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="sandbox-section light">
-            <div class="sandbox-wrap">
-                <div class="sandbox-section-header center">
-                    <p class="sandbox-eyebrow">Client problem</p>
-                    <h2>Crypto-related risk is entering normal fraud and AML operations.</h2>
-                    <p>
-                        Teams are receiving wallet addresses, exchange references, transaction hashes, scam reports,
-                        and blockchain intelligence outputs. The need is not general blockchain education. The need is
-                        practical investigation capability.
-                    </p>
-                </div>
-                <div class="sandbox-grid-3">
-                    <article class="sandbox-card"><h3>Interpret blockchain activity</h3><p>Understand transaction flows, wallet behavior, exchange exposure, and risk indicators.</p></article>
-                    <article class="sandbox-card"><h3>Improve case handling</h3><p>Build shared language across Fraud, AML, Compliance, Risk, and Operations teams.</p></article>
-                    <article class="sandbox-card"><h3>Support escalation decisions</h3><p>Use blockchain intelligence more effectively when triaging cases, documenting findings, and deciding next steps.</p></article>
-                </div>
-            </div>
-        </section>
-
-        <section class="sandbox-section dark" id="services">
-            <div class="sandbox-wrap">
-                <div class="sandbox-section-header">
-                    <p class="sandbox-eyebrow">Services</p>
-                    <h2>Training and advisory support for crypto-related financial crime.</h2>
-                </div>
-                <div class="sandbox-grid-4">
-                    <article class="sandbox-card"><h3>Crypto AML &amp; Fraud Investigations Training</h3><p>Practical training for financial institutions handling crypto scams, wallet activity, and AML risk.</p></article>
-                    <article class="sandbox-card"><h3>Blockchain Forensics Training</h3><p>Wallet tracing, transaction analysis, attribution context, and evidence handling for investigation teams.</p></article>
-                    <article class="sandbox-card"><h3>Executive Risk Briefings</h3><p>Briefings for leaders who need to understand digital asset risk without technical noise.</p></article>
-                    <article class="sandbox-card"><h3>Workflow Advisory</h3><p>Support for intake questions, escalation paths, internal playbooks, and case review practices.</p></article>
-                </div>
-                <div class="sandbox-actions">
-                    <a class="sandbox-button secondary" href="/services/">View Services</a>
-                </div>
-            </div>
-        </section>
-
-        <section class="sandbox-section light" id="about">
-            <div class="sandbox-wrap">
-                <div class="sandbox-section-header center">
-                    <p class="sandbox-eyebrow">Why organizations work with Ferdie</p>
-                    <h2>Experience that helps regulated teams understand and act.</h2>
-                    <p>
-                        Ferdie has delivered cybersecurity, blockchain forensics, and digital asset risk training for
-                        government, law enforcement, public sector, academe, and professional organizations.
-                    </p>
-                </div>
-                <div class="sandbox-trust-strip">
-                    <div class="sandbox-trust-item">Law Enforcement Training</div>
-                    <div class="sandbox-trust-item">Government Resource Person</div>
-                    <div class="sandbox-trust-item">TEDx Speaker</div>
-                    <div class="sandbox-trust-item">Media Features</div>
-                    <div class="sandbox-trust-item">200+ Google Reviews</div>
-                </div>
-                <div class="sandbox-actions" style="justify-content:center;">
-                    <a class="sandbox-button secondary" style="color:#111827;border-color:#cbd5e1;background:#fff;" href="/past-engagements/">View Past Engagements</a>
-                    <a class="sandbox-button secondary" style="color:#111827;border-color:#cbd5e1;background:#fff;" href="/media-recognition/">View Media &amp; Recognition</a>
-                </div>
-            </div>
-        </section>
-
-        <section class="sandbox-section dark">
-            <div class="sandbox-wrap">
-                <div class="sandbox-section-header">
-                    <p class="sandbox-eyebrow">Client reviews</p>
-                    <h2>Participants value practical examples and clear investigation guidance.</h2>
-                </div>
-                <div class="sandbox-grid-3">
-                    <article class="sandbox-card"><h3>Clearer investigation understanding</h3><p>The breakdown of how law enforcement can use blockchain forensic tools to uncover money trails was informative and practical.</p></article>
-                    <article class="sandbox-card"><h3>Operationally useful</h3><p>Participants consistently mention that complex cryptocurrency concepts become easier to understand and apply.</p></article>
-                    <article class="sandbox-card"><h3>Case readiness</h3><p>The training helps teams understand evidence preservation, transaction analysis, and investigative use cases.</p></article>
-                </div>
-                <div class="sandbox-actions">
-                    <a class="sandbox-button secondary" href="/reviews/">View Reviews</a>
-                </div>
-            </div>
-        </section>
-
-        <section class="sandbox-section light" id="blog">
-            <div class="sandbox-wrap">
-                <div class="sandbox-section-header">
-                    <p class="sandbox-eyebrow">Articles</p>
-                    <h2>Analysis on crypto fraud, regulation, and digital asset risk.</h2>
-                    <p>Insights for teams tracking blockchain forensics, AML, financial infrastructure, and Philippine digital asset regulation.</p>
-                </div>
-                <div class="sandbox-grid-3">
-                    <article class="sandbox-card"><h3>Crypto Fraud &amp; AML</h3><p>Investigation workflows, risk indicators, and scam typologies.</p></article>
-                    <article class="sandbox-card"><h3>Regulation &amp; Compliance</h3><p>Policy analysis for institutions operating around digital assets.</p></article>
-                    <article class="sandbox-card"><h3>Stablecoins &amp; Payments</h3><p>Financial infrastructure analysis for payments and remittance corridors.</p></article>
-                </div>
-            </div>
-        </section>
-
-        <section class="sandbox-cta-band">
-            <div class="sandbox-wrap">
-                <h2>Need to strengthen your team's crypto fraud and AML capability?</h2>
-                <p>Send a short note with your organization, team, timeline, and the kind of crypto-related cases or risks your team is seeing.</p>
-                <div class="sandbox-actions" style="justify-content:center;">
-                    <a class="sandbox-button primary" href="/book/">Request a Proposal</a>
-                    <a class="sandbox-button secondary" href="mailto:contact@ferdienervida.com?subject=Crypto%20AML%20Training%20Inquiry">Email Ferdie</a>
-                </div>
-            </div>
-        </section>
-    </main>
-
-
-    <!-- Footer -->
-    <footer class="footer" id="contact">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Ferdie James Nervida</h4>
-                    <p>Crypto AML, fraud investigations, blockchain forensics, and digital asset risk training for financial institutions and regulated teams.</p>
-                    <div class="social-links">
-                        <a href="https://www.linkedin.com/in/ferdiejamesnervida/" target="_blank" rel="noopener">LinkedIn</a>
-                        <a href="https://www.facebook.com/ferdiejamesnervida" target="_blank" rel="noopener">Facebook</a>
-                        <a href="https://t.me/FerdieCPS" target="_blank" rel="noopener">Telegram</a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>Services</h4>
-                    <ul>
-                        <li><a href="/financial-institutions/">Financial Institutions</a></li>
-                        <li><a href="/services/">Services</a></li>
-                        <li><a href="/past-engagements/">Past Engagements</a></li>
-                        <li><a href="/media-recognition/">Media &amp; Recognition</a></li>
-                        <li><a href="/reviews/">Reviews</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Contact</h4>
-                    <p>For training, speaking, or case inquiries:</p>
-                    <a href="mailto:contact@ferdienervida.com" class="emergency-phone">contact@ferdienervida.com</a>
-                    <p class="response-time">Response within 24 hours</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Ferdie James Nervida. All rights reserved. | Cybersecurity and Blockchain Forensics Specialist</p>
-            </div>
+        <div class="ds-footer-contact">
+            <div class="ds-footer-col-label">Quick contact</div>
+            <p>For training, speaking, or case inquiries:</p>
+            <a href="mailto:contact@ferdienervida.com">contact@ferdienervida.com</a>
+            <p class="ds-response">Response within 24 hours</p>
         </div>
     </footer>
+    <div class="ds-copyright">© 2026 Ferdie James Nervida. All rights reserved. — Cybersecurity and Blockchain Forensics Specialist</div>
+  </div>
 
     <script src="/script.js"></script>
     <script
         src="/chat-widget.js"
-        data-color="#3b82f6"
+        data-color="#c9601f"
         data-welcome="Hi! How can I help you today?"
         data-api="https://ferdie-chat-backend.vercel.app/api/chat"
         data-handoff-api="https://ferdie-chat-backend.vercel.app/api/chat"
