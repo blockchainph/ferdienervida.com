@@ -327,6 +327,28 @@ body.ds-page {
 .ds-recognition-dot { width: 8px; height: 8px; border: 0; background: var(--ds-hairline); padding: 0; cursor: pointer; }
 .ds-recognition-dot.active { background: var(--ds-accent); }
 
+/* General-purpose photo carousel — supports multiple independent instances
+   per page (each [data-carousel] gets its own state) and is light/dark
+   context aware via .ds-dark ancestry. Uses object-fit:contain so mixed
+   real photos are never cropped, letterboxed on a neutral dark stage. */
+.ds-carousel { display: grid; gap: 14px; }
+.ds-carousel-stage { position: relative; overflow: hidden; aspect-ratio: 4/3; background: var(--ds-dark-bg); }
+.ds-carousel-track { display: flex; height: 100%; transition: transform .4s ease; }
+.ds-carousel-slide { min-width: 100%; height: 100%; }
+.ds-carousel-slide img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.ds-carousel-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ds-carousel-status { font-size: 13px; color: var(--ds-text-muted); }
+.ds-carousel-nav { display: flex; gap: 8px; }
+.ds-carousel-button { width: 38px; height: 38px; border: 1px solid var(--ds-hairline); background: var(--ds-bg); color: var(--ds-text); cursor: pointer; font-size: 15px; }
+.ds-carousel-button:disabled { opacity: .4; cursor: default; }
+.ds-carousel-dots { display: flex; gap: 8px; }
+.ds-carousel-dot { width: 8px; height: 8px; border: 0; background: var(--ds-hairline); padding: 0; cursor: pointer; }
+.ds-carousel-dot.active { background: var(--ds-accent); }
+.ds-dark .ds-carousel-button { background: transparent; border-color: var(--ds-hairline-dark); color: var(--ds-dark-text); }
+.ds-dark .ds-carousel-status { color: var(--ds-dark-text-body); }
+.ds-dark .ds-carousel-dot { background: var(--ds-hairline-dark); }
+.ds-dark .ds-carousel-dot.active { background: var(--ds-accent-on-dark); }
+
 /* Book/contact page */
 .ds-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .ds-info-card { padding: 28px; border: 1px solid var(--ds-hairline); }
