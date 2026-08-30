@@ -1,0 +1,676 @@
+<meta charset="UTF-8">
+<title>Risk Matrix Sort</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root {
+    --bg: #f5f7fc;
+    --surface: #ffffff;
+    --surface-2: #eef1fa;
+    --surface-3: #e4e9f8;
+    --ink: #14172b;
+    --ink-dim: #565b78;
+    --navy: #1e2761;
+    --navy-ink: #ffffff;
+    --cyan: #0090ac;
+    --low: #2e9e6b;
+    --med: #c98a12;
+    --high: #d9631e;
+    --crit: #c62839;
+    --border: #dde2f2;
+    --shadow: 30 40 100;
+    --focus: #0090ac;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d1024;
+      --surface: #161a36;
+      --surface-2: #1e2344;
+      --surface-3: #262c52;
+      --ink: #edeffb;
+      --ink-dim: #a7acd4;
+      --navy: #7c8ff2;
+      --navy-ink: #0d1024;
+      --cyan: #57d6ef;
+      --low: #4fe3b9;
+      --med: #ffcf5c;
+      --high: #ffb35e;
+      --crit: #ff6b81;
+      --border: #2b3162;
+      --focus: #57d6ef;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0d1024;
+    --surface: #161a36;
+    --surface-2: #1e2344;
+    --surface-3: #262c52;
+    --ink: #edeffb;
+    --ink-dim: #a7acd4;
+    --navy: #7c8ff2;
+    --navy-ink: #0d1024;
+    --cyan: #57d6ef;
+    --low: #4fe3b9;
+    --med: #ffcf5c;
+    --high: #ffb35e;
+    --crit: #ff6b81;
+    --border: #2b3162;
+    --focus: #57d6ef;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; margin: 0; }
+  .mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+
+  #canvas-bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 30rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 1.1rem 1.1rem 1.6rem;
+  }
+
+  header.topbar { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1rem; }
+  .badge-mark { flex-shrink: 0; }
+  .topbar-text { line-height: 1.15; }
+  .topbar-text .eyebrow {
+    font-size: 0.66rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .topbar-text .title { font-size: 0.92rem; font-weight: 600; }
+
+  .progress-track {
+    height: 0.4rem; background: var(--surface-2); border-radius: 999px; overflow: hidden; margin-bottom: 1.2rem;
+    border: 1px solid var(--border);
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--cyan), var(--navy));
+    border-radius: 999px; transition: width 0.4s ease; width: 0%;
+  }
+
+  .stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1.1rem;
+    padding: 1.5rem 1.35rem 1.35rem;
+    box-shadow: 0 1px 2px rgba(var(--shadow) / 0.06), 0 12px 32px -16px rgba(var(--shadow) / 0.28);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .view { display: none; flex-direction: column; flex: 1; min-height: 0; animation: rise 0.35s ease; }
+  .view.active { display: flex; }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .view, .app * { animation: none !important; transition: none !important; } }
+
+  /* --- Intro --- */
+  #view-intro h1 { font-size: 1.65rem; line-height: 1.15; margin-bottom: 0.65rem; }
+  #view-intro .lede { color: var(--ink-dim); font-size: 0.95rem; line-height: 1.55; margin-bottom: 1.2rem; }
+
+  .t-legend { display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 1.3rem; }
+  .t-row {
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 0.7rem; padding: 0.6rem 0.8rem;
+  }
+  .t-letter {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 0.68rem;
+    color: var(--navy); background: var(--surface-3); border-radius: 0.4rem;
+    width: 1.9rem; height: 1.6rem; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 0.05rem;
+  }
+  .t-row b { font-family: 'Fraunces', serif; font-size: 0.95rem; }
+  .t-row p { margin: 0.1rem 0 0; font-size: 0.82rem; color: var(--ink-dim); line-height: 1.4; }
+
+  .meta-line { display: flex; gap: 1.1rem; font-size: 0.78rem; color: var(--ink-dim); margin-bottom: 1.3rem; flex-wrap: wrap; }
+  .meta-line span { display: flex; align-items: center; gap: 0.35rem; }
+
+  /* --- Scenario --- */
+  .scenario-kicker {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 0.55rem;
+  }
+  .scenario-text { font-size: 1.06rem; line-height: 1.45; margin-bottom: 1.1rem; font-weight: 500; }
+
+  .group-label {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--ink-dim); margin-bottom: 0.45rem; display: flex; align-items: center; gap: 0.4rem;
+  }
+
+  .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; margin-bottom: 0.95rem; }
+  .row2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.45rem; margin-bottom: 0.2rem; }
+
+  .pill {
+    border: 1.5px solid var(--border); background: var(--surface-2);
+    border-radius: 0.65rem; padding: 0.55rem 0.4rem; cursor: pointer;
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 0.82rem; font-weight: 600; color: var(--ink);
+    text-align: center; transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  }
+  .pill:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .pill.selected { border-color: var(--navy); background: color-mix(in srgb, var(--navy) 14%, var(--surface)); }
+  .pill:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .rating-badge {
+    display: flex; align-items: center; justify-content: space-between;
+    border-radius: 0.7rem; padding: 0.6rem 0.85rem; margin: 0.2rem 0 1rem;
+    font-size: 0.85rem; font-weight: 600; border: 1.5px dashed var(--border); color: var(--ink-dim);
+    background: var(--surface-2);
+  }
+  .rating-badge .val { font-family: 'IBM Plex Mono', monospace; font-weight: 700; }
+  .rating-badge.live { border-style: solid; color: var(--navy-ink); }
+
+  .response-pill { padding: 0.7rem 0.5rem; font-size: 0.85rem; }
+
+  .spacer { flex: 1; }
+
+  .btn {
+    border: none; border-radius: 0.7rem; padding: 0.85rem 1rem; font-size: 0.95rem; font-weight: 600;
+    font-family: 'IBM Plex Sans', sans-serif; cursor: pointer; width: 100%;
+    transition: opacity 0.15s ease, transform 0.1s ease;
+  }
+  .btn:active { transform: scale(0.985); }
+  .btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .btn-primary { background: var(--navy); color: var(--navy-ink); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--ink-dim); border: 1px solid var(--border); }
+
+  /* --- Feedback --- */
+  .feedback-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.74rem; font-weight: 700; letter-spacing: 0.03em;
+    padding: 0.3rem 0.65rem; border-radius: 999px; margin-bottom: 0.85rem; width: fit-content;
+  }
+  .fb-full { background: color-mix(in srgb, var(--low) 18%, var(--surface)); color: var(--low); }
+  .fb-partial { background: color-mix(in srgb, var(--med) 22%, var(--surface)); color: var(--med); }
+  .fb-miss { background: color-mix(in srgb, var(--crit) 18%, var(--surface)); color: var(--crit); }
+
+  .answer-line { font-size: 0.85rem; color: var(--ink-dim); margin-bottom: 0.5rem; line-height: 1.5; }
+  .answer-line b { color: var(--ink); }
+  .explain {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 0.75rem;
+    padding: 0.8rem 0.9rem; font-size: 0.88rem; line-height: 1.5; color: var(--ink); margin-bottom: 1.1rem;
+  }
+
+  /* --- Results --- */
+  #view-results h1 { font-size: 1.5rem; margin-bottom: 0.3rem; }
+  .score-line { font-size: 0.95rem; color: var(--ink-dim); margin-bottom: 1.3rem; }
+  .score-line .num { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--ink); }
+
+  .recap-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 0.6rem; }
+  .recap-grid { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.3rem; }
+  .recap-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 0.6rem; padding: 0.5rem 0.7rem;
+    font-size: 0.78rem;
+  }
+  .recap-row .n { color: var(--ink-dim); font-family: 'IBM Plex Mono', monospace; flex-shrink: 0; }
+  .recap-row .r { font-weight: 700; }
+  .recap-row .ok { color: var(--low); }
+  .recap-row .no { color: var(--crit); }
+
+  .discuss-box {
+    background: var(--navy); color: var(--navy-ink); border-radius: 0.9rem; padding: 1.05rem 1.1rem;
+    margin-bottom: 1.2rem;
+  }
+  .discuss-box .dt { font-family: 'Fraunces', serif; font-size: 1.05rem; margin-bottom: 0.6rem; }
+  .discuss-box p { margin: 0; font-size: 0.87rem; line-height: 1.55; }
+
+  @media (min-width: 640px) { .app { padding-top: 2.4rem; } }
+</style>
+
+<canvas id="canvas-bg" aria-hidden="true"></canvas>
+
+<div class="app">
+
+  <header class="topbar">
+    <svg class="badge-mark" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+      <rect x="4" y="21" width="5" height="9" rx="1" fill="var(--low)"></rect>
+      <rect x="14.5" y="14" width="5" height="16" rx="1" fill="var(--med)"></rect>
+      <rect x="25" y="5" width="5" height="25" rx="1" fill="var(--crit)"></rect>
+    </svg>
+    <div class="topbar-text">
+      <div class="eyebrow">Risk Management Activity</div>
+      <div class="title">Risk Matrix Sort</div>
+    </div>
+  </header>
+
+  <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="stage">
+
+    <!-- INTRO -->
+    <div class="view active" id="view-intro">
+      <h1>Rate It, Then Respond</h1>
+      <p class="lede">You'll read 8 real situations from provincial-government operations. For each one: rate how <b>likely</b> it is, rate how <b>bad</b> it would be, then decide the right response — one of these four:</p>
+
+      <div class="t-legend">
+        <div class="t-row"><span class="t-letter">TR</span><div><b>Treat</b><p>Reduce the likelihood or impact directly — fix the actual weakness.</p></div></div>
+        <div class="t-row"><span class="t-letter">TF</span><div><b>Transfer</b><p>Shift the risk to someone else — a vendor contract, insurance, an SLA.</p></div></div>
+        <div class="t-row"><span class="t-letter">TL</span><div><b>Tolerate</b><p>Accept it and monitor — not worth the cost or effort to fix.</p></div></div>
+        <div class="t-row"><span class="t-letter">TE</span><div><b>Terminate</b><p>Eliminate it entirely by stopping the activity that causes it.</p></div></div>
+      </div>
+
+      <div class="meta-line">
+        <span>⏱ ~15 minutes</span>
+        <span>📋 8 scenarios</span>
+        <span>🗣 group share-out after</span>
+      </div>
+
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="startBtn">Start rating →</button>
+    </div>
+
+    <!-- SCENARIO -->
+    <div class="view" id="view-scenario">
+      <div class="scenario-kicker mono" id="scenarioKicker">SCENARIO 1 OF 8</div>
+      <div class="scenario-text" id="scenarioText"></div>
+
+      <div class="group-label">How likely is this?</div>
+      <div class="row3" id="likelihoodRow">
+        <button class="pill" type="button" data-val="L">Low</button>
+        <button class="pill" type="button" data-val="M">Medium</button>
+        <button class="pill" type="button" data-val="H">High</button>
+      </div>
+
+      <div class="group-label">How bad would it be?</div>
+      <div class="row3" id="impactRow">
+        <button class="pill" type="button" data-val="L">Low</button>
+        <button class="pill" type="button" data-val="M">Medium</button>
+        <button class="pill" type="button" data-val="H">High</button>
+      </div>
+
+      <div class="rating-badge" id="ratingBadge">Your risk rating: <span class="val" id="ratingVal">—</span></div>
+
+      <div class="group-label">What's the right response?</div>
+      <div class="row2" id="responseRow" style="margin-bottom: 0.95rem;">
+        <button class="pill response-pill" type="button" data-val="treat" disabled>Treat</button>
+        <button class="pill response-pill" type="button" data-val="transfer" disabled>Transfer</button>
+        <button class="pill response-pill" type="button" data-val="tolerate" disabled>Tolerate</button>
+        <button class="pill response-pill" type="button" data-val="terminate" disabled>Terminate</button>
+      </div>
+
+      <div id="feedbackBlock" style="display:none;">
+        <div class="feedback-badge" id="feedbackBadge"></div>
+        <div class="answer-line" id="answerLine"></div>
+        <div class="explain" id="explainText"></div>
+      </div>
+
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="submitBtn" disabled>Reveal answer</button>
+      <button class="btn btn-primary" id="nextBtn" style="display:none; margin-top:0.6rem;">Next scenario →</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="view" id="view-results">
+      <h1>Here's your read on it</h1>
+      <div class="score-line">You called the full risk + response right on <span class="num" id="scoreNum">0 / 8</span> scenarios.</div>
+
+      <div class="recap-title">Scenario-by-scenario</div>
+      <div class="recap-grid" id="recapGrid"></div>
+
+      <div class="discuss-box">
+        <div class="dt">Talk it over — 5 min</div>
+        <p>Pick one risk from your own office that you've never actually written down. Using today's Likelihood × Impact test, is it something you should Treat, Transfer, Tolerate, or Terminate — and be honest, is your office really doing that right now, or just hoping nothing happens?</p>
+      </div>
+
+      <button class="btn btn-ghost" id="restartBtn">Restart activity</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var SCENARIOS = [
+    {
+      text: "During typhoon relief, the Bids and Awards Committee skips the usual three-canvasser requirement to rush emergency food-pack purchases.",
+      L: "M", I: "H", response: "treat",
+      explain: "Emergency procurement without full canvass is legally allowed under RA 9184 — the fix isn't to avoid it, it's to require a documented justification and after-the-fact review every time it's used. That's Treat: reduce the risk without giving up the option."
+    },
+    {
+      text: "The Provincial Treasurer's revenue-collection system runs on a single aging server. The last successful backup was six months ago.",
+      L: "H", I: "H", response: "treat",
+      explain: "A revenue system with no recent backup is a Critical risk that's entirely fixable — redundant backups, a tested restore process, and a hardware refresh. This is Treat, not something to accept or hand off."
+    },
+    {
+      text: "PhilHealth eligibility records sit in a shared office drive that every provincial employee can open, including staff who have no reason to see them.",
+      L: "H", I: "M", response: "treat",
+      explain: "This is a straightforward access-control fix, not a reason to stop using shared drives — restrict access to only the staff who actually need it (least privilege). That's Treat."
+    },
+    {
+      text: "Only one employee knows how to operate the online business-permit renewal system, and she retires next month with no documented handover.",
+      L: "H", I: "M", response: "treat",
+      explain: "This is a knowledge-continuity gap, not a vendor problem or something to shrug off — document the process and cross-train a backup person before she leaves. Treat."
+    },
+    {
+      text: "The capitol's server room sits in the basement, in a municipality that floods almost every rainy season.",
+      L: "H", I: "H", response: "treat",
+      explain: "This is a physical risk you can directly reduce — relocate the equipment or add real flood protection. Insurance won't stop the flood; Treat is the right call."
+    },
+    {
+      text: "A new admin aide occasionally emails draft, non-confidential meeting notes to a co-worker through her personal Gmail to save time.",
+      L: "M", I: "L", response: "tolerate",
+      explain: "Low likelihood of real harm and low impact if it happened — this is worth a quiet policy reminder, not a project. Spending real effort here isn't worth it: Tolerate."
+    },
+    {
+      text: "An outsourced IT contractor requires remote access to your network to maintain your servers, under a signed service agreement.",
+      L: "M", I: "M", response: "transfer",
+      explain: "You're relying on a third party's own security controls and contractual accountability — the SLA and data-handling clauses do the work here. That's a textbook Transfer."
+    },
+    {
+      text: "An old permit-tracking system that nobody uses anymore is still plugged into the network and hasn't been patched in years.",
+      L: "M", I: "M", response: "terminate",
+      explain: "There's no business reason to keep this running. You can't leak or lose data through a system that no longer exists — decommission it. Terminate."
+    }
+  ];
+
+  var SCORE = { L: 1, M: 2, H: 3 };
+  var BAND_NAME = { 1: "Low", 2: "Low", 3: "Medium", 4: "Medium", 6: "High", 9: "Critical" };
+  var BAND_VAR = { Low: "--low", Medium: "--med", High: "--high", Critical: "--crit" };
+  var RESPONSE_NAME = { treat: "Treat", transfer: "Transfer", tolerate: "Tolerate", terminate: "Terminate" };
+  var LI_NAME = { L: "Low", M: "Medium", H: "High" };
+
+  function bandOf(lv, iv) {
+    var score = SCORE[lv] * SCORE[iv];
+    return BAND_NAME[score];
+  }
+
+  var state = {
+    idx: 0,
+    likelihood: null,
+    impact: null,
+    response: null,
+    revealed: false,
+    fullMatches: 0,
+    results: []
+  };
+
+  var viewIntro = document.getElementById("view-intro");
+  var viewScenario = document.getElementById("view-scenario");
+  var viewResults = document.getElementById("view-results");
+  var progressFill = document.getElementById("progressFill");
+
+  var scenarioKicker = document.getElementById("scenarioKicker");
+  var scenarioText = document.getElementById("scenarioText");
+  var likelihoodPills = Array.prototype.slice.call(document.querySelectorAll("#likelihoodRow .pill"));
+  var impactPills = Array.prototype.slice.call(document.querySelectorAll("#impactRow .pill"));
+  var responsePills = Array.prototype.slice.call(document.querySelectorAll("#responseRow .pill"));
+  var ratingBadge = document.getElementById("ratingBadge");
+  var ratingVal = document.getElementById("ratingVal");
+  var submitBtn = document.getElementById("submitBtn");
+  var nextBtn = document.getElementById("nextBtn");
+  var feedbackBlock = document.getElementById("feedbackBlock");
+  var feedbackBadge = document.getElementById("feedbackBadge");
+  var answerLine = document.getElementById("answerLine");
+  var explainText = document.getElementById("explainText");
+
+  function showView(view) {
+    [viewIntro, viewScenario, viewResults].forEach(function (v) { v.classList.remove("active"); });
+    view.classList.add("active");
+  }
+
+  function setProgress() {
+    var pct = Math.round((state.idx / SCENARIOS.length) * 100);
+    progressFill.style.width = pct + "%";
+  }
+
+  function updateRating() {
+    if (state.likelihood && state.impact) {
+      var band = bandOf(state.likelihood, state.impact);
+      var color = getComputedStyle(document.documentElement).getPropertyValue(BAND_VAR[band]).trim();
+      ratingVal.textContent = band;
+      ratingBadge.classList.add("live");
+      ratingBadge.style.background = color;
+      ratingBadge.style.borderColor = color;
+      ratingBadge.style.color = "#ffffff";
+      responsePills.forEach(function (p) { p.disabled = false; });
+    } else {
+      ratingVal.textContent = "—";
+      ratingBadge.classList.remove("live");
+      ratingBadge.style.background = "";
+      ratingBadge.style.borderColor = "";
+      ratingBadge.style.color = "";
+      responsePills.forEach(function (p) { p.disabled = true; p.classList.remove("selected"); });
+      state.response = null;
+    }
+  }
+
+  function checkSubmittable() {
+    submitBtn.disabled = !(state.likelihood && state.impact && state.response);
+  }
+
+  function renderScenario() {
+    state.likelihood = null;
+    state.impact = null;
+    state.response = null;
+    state.revealed = false;
+    var s = SCENARIOS[state.idx];
+    scenarioKicker.textContent = "SCENARIO " + (state.idx + 1) + " OF " + SCENARIOS.length;
+    scenarioText.textContent = s.text;
+    likelihoodPills.concat(impactPills).forEach(function (p) {
+      p.classList.remove("selected");
+      p.disabled = false;
+    });
+    responsePills.forEach(function (p) {
+      p.classList.remove("selected");
+      p.disabled = true;
+    });
+    updateRating();
+    feedbackBlock.style.display = "none";
+    submitBtn.style.display = "block";
+    submitBtn.disabled = true;
+    nextBtn.style.display = "none";
+    setProgress();
+  }
+
+  likelihoodPills.forEach(function (pill) {
+    pill.addEventListener("click", function () {
+      if (state.revealed) return;
+      likelihoodPills.forEach(function (p) { p.classList.remove("selected"); });
+      pill.classList.add("selected");
+      state.likelihood = pill.getAttribute("data-val");
+      updateRating();
+      checkSubmittable();
+    });
+  });
+
+  impactPills.forEach(function (pill) {
+    pill.addEventListener("click", function () {
+      if (state.revealed) return;
+      impactPills.forEach(function (p) { p.classList.remove("selected"); });
+      pill.classList.add("selected");
+      state.impact = pill.getAttribute("data-val");
+      updateRating();
+      checkSubmittable();
+    });
+  });
+
+  responsePills.forEach(function (pill) {
+    pill.addEventListener("click", function () {
+      if (state.revealed || pill.disabled) return;
+      responsePills.forEach(function (p) { p.classList.remove("selected"); });
+      pill.classList.add("selected");
+      state.response = pill.getAttribute("data-val");
+      checkSubmittable();
+    });
+  });
+
+  submitBtn.addEventListener("click", function () {
+    if (!(state.likelihood && state.impact && state.response)) return;
+    state.revealed = true;
+    var s = SCENARIOS[state.idx];
+
+    var yourBand = bandOf(state.likelihood, state.impact);
+    var officialBand = bandOf(s.L, s.I);
+    var bandMatch = yourBand === officialBand;
+    var responseMatch = state.response === s.response;
+    var fullMatch = bandMatch && responseMatch;
+
+    if (fullMatch) {
+      feedbackBadge.className = "feedback-badge fb-full";
+      feedbackBadge.textContent = "✓ Nailed it";
+      state.fullMatches++;
+    } else if (bandMatch || responseMatch) {
+      feedbackBadge.className = "feedback-badge fb-partial";
+      feedbackBadge.textContent = "◐ Half right";
+    } else {
+      feedbackBadge.className = "feedback-badge fb-miss";
+      feedbackBadge.textContent = "✕ Off base";
+    }
+
+    answerLine.innerHTML = "Answer key: <b>" + LI_NAME[s.L] + " likelihood × " + LI_NAME[s.I] + " impact</b> = <b>" +
+      officialBand + " risk</b> → <b>" + RESPONSE_NAME[s.response] + "</b>.";
+    explainText.textContent = s.explain;
+
+    feedbackBlock.style.display = "block";
+    likelihoodPills.concat(impactPills).concat(responsePills).forEach(function (p) { p.disabled = true; });
+    submitBtn.style.display = "none";
+    nextBtn.style.display = "block";
+    nextBtn.textContent = (state.idx === SCENARIOS.length - 1) ? "See your results →" : "Next scenario →";
+
+    state.results.push({ n: state.idx + 1, band: officialBand, response: RESPONSE_NAME[s.response], full: fullMatch });
+  });
+
+  nextBtn.addEventListener("click", function () {
+    state.idx++;
+    if (state.idx >= SCENARIOS.length) {
+      showResults();
+    } else {
+      renderScenario();
+    }
+  });
+
+  document.getElementById("startBtn").addEventListener("click", function () {
+    state.idx = 0;
+    showView(viewScenario);
+    renderScenario();
+  });
+
+  document.getElementById("restartBtn").addEventListener("click", function () {
+    state.idx = 0;
+    state.fullMatches = 0;
+    state.results = [];
+    progressFill.style.width = "0%";
+    showView(viewIntro);
+  });
+
+  function showResults() {
+    progressFill.style.width = "100%";
+    document.getElementById("scoreNum").textContent = state.fullMatches + " / " + SCENARIOS.length;
+
+    var wrap = document.getElementById("recapGrid");
+    wrap.innerHTML = "";
+    state.results.forEach(function (r) {
+      var color = getComputedStyle(document.documentElement).getPropertyValue(BAND_VAR[r.band]).trim();
+      var row = document.createElement("div");
+      row.className = "recap-row";
+      row.innerHTML =
+        '<span class="n">#' + r.n + '</span>' +
+        '<span class="r" style="color:' + color + '">' + r.band + '</span>' +
+        '<span>' + r.response + '</span>' +
+        '<span class="' + (r.full ? "ok" : "no") + '">' + (r.full ? "✓" : "✕") + '</span>';
+      wrap.appendChild(row);
+    });
+
+    showView(viewResults);
+  }
+
+  // Ambient network/circuit canvas background — subtle, theme-aware
+  (function () {
+    var canvas = document.getElementById("canvas-bg");
+    var ctx = canvas.getContext("2d");
+    var w, h, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var nodes = [];
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function isDark() {
+      var t = document.documentElement.getAttribute("data-theme");
+      if (t === "dark") return true;
+      if (t === "light") return false;
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+
+    function resize() {
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      canvas.style.width = w + "px"; canvas.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var count = Math.round((w * h) / 26000);
+      nodes = [];
+      for (var i = 0; i < count; i++) {
+        nodes.push({
+          x: Math.random() * w, y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.12, vy: (Math.random() - 0.5) * 0.12,
+          r: 1 + Math.random() * 1.2
+        });
+      }
+    }
+
+    function step() {
+      ctx.clearRect(0, 0, w, h);
+      var dark = isDark();
+      var dot = dark ? "rgba(124,143,242,0.35)" : "rgba(30,39,97,0.16)";
+      var line = dark ? "rgba(87,214,239,0.10)" : "rgba(30,39,97,0.055)";
+
+      nodes.forEach(function (n) {
+        if (!reduceMotion) {
+          n.x += n.vx; n.y += n.vy;
+          if (n.x < 0 || n.x > w) n.vx *= -1;
+          if (n.y < 0 || n.y > h) n.vy *= -1;
+        }
+      });
+
+      for (var i = 0; i < nodes.length; i++) {
+        for (var j = i + 1; j < nodes.length; j++) {
+          var dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+          var d2 = dx * dx + dy * dy;
+          if (d2 < 130 * 130) {
+            ctx.strokeStyle = line;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      nodes.forEach(function (n) {
+        ctx.fillStyle = dot;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      if (!reduceMotion) requestAnimationFrame(step);
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+    step();
+  })();
+
+  setProgress();
+})();
+</script>
