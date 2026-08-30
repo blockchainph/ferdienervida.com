@@ -1,0 +1,647 @@
+<title>CIA Triad Sort</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root {
+    --bg: #f5f7fc;
+    --surface: #ffffff;
+    --surface-2: #eef1fa;
+    --surface-3: #e4e9f8;
+    --ink: #14172b;
+    --ink-dim: #565b78;
+    --navy: #1e2761;
+    --navy-ink: #ffffff;
+    --cyan: #0090ac;
+    --conf: #6c4fd1;
+    --integ: #0f8a6e;
+    --avail: #b8690f;
+    --border: #dde2f2;
+    --shadow: 30 40 100;
+    --focus: #0090ac;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d1024;
+      --surface: #161a36;
+      --surface-2: #1e2344;
+      --surface-3: #262c52;
+      --ink: #edeffb;
+      --ink-dim: #a7acd4;
+      --navy: #7c8ff2;
+      --navy-ink: #0d1024;
+      --cyan: #57d6ef;
+      --conf: #b09bff;
+      --integ: #4fe3b9;
+      --avail: #ffb35e;
+      --border: #2b3162;
+      --focus: #57d6ef;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0d1024;
+    --surface: #161a36;
+    --surface-2: #1e2344;
+    --surface-3: #262c52;
+    --ink: #edeffb;
+    --ink-dim: #a7acd4;
+    --navy: #7c8ff2;
+    --navy-ink: #0d1024;
+    --cyan: #57d6ef;
+    --conf: #b09bff;
+    --integ: #4fe3b9;
+    --avail: #ffb35e;
+    --border: #2b3162;
+    --focus: #57d6ef;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; margin: 0; }
+
+  .mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+
+  #canvas-bg {
+    position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 30rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 1.1rem 1.1rem 1.6rem;
+  }
+
+  header.topbar {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+  }
+
+  .badge-mark { flex-shrink: 0; }
+
+  .topbar-text { line-height: 1.15; }
+  .topbar-text .eyebrow {
+    font-size: 0.66rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .topbar-text .title { font-size: 0.92rem; font-weight: 600; }
+
+  .progress-track {
+    height: 0.4rem; background: var(--surface-2); border-radius: 999px; overflow: hidden; margin-bottom: 1.2rem;
+    border: 1px solid var(--border);
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--cyan), var(--navy));
+    border-radius: 999px; transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1.1rem;
+    padding: 1.5rem 1.35rem 1.35rem;
+    box-shadow: 0 1px 2px rgba(var(--shadow) / 0.06), 0 12px 32px -16px rgba(var(--shadow) / 0.28);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .view { display: none; flex-direction: column; flex: 1; min-height: 0; animation: rise 0.35s ease; }
+  .view.active { display: flex; }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .view, .app * { animation: none !important; transition: none !important; } }
+
+  /* --- Intro --- */
+  #view-intro h1 { font-size: 1.7rem; line-height: 1.15; margin-bottom: 0.65rem; }
+  #view-intro .lede { color: var(--ink-dim); font-size: 0.95rem; line-height: 1.55; margin-bottom: 1.3rem; }
+
+  .cia-legend { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.4rem; }
+  .cia-row {
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 0.7rem; padding: 0.65rem 0.8rem;
+  }
+  .cia-dot { width: 0.65rem; height: 0.65rem; border-radius: 999px; margin-top: 0.35rem; flex-shrink: 0; }
+  .cia-row b { font-family: 'Fraunces', serif; font-size: 0.98rem; }
+  .cia-row p { margin: 0.1rem 0 0; font-size: 0.84rem; color: var(--ink-dim); line-height: 1.4; }
+
+  .meta-line {
+    display: flex; gap: 1.1rem; font-size: 0.78rem; color: var(--ink-dim); margin-bottom: 1.3rem;
+  }
+  .meta-line span { display: flex; align-items: center; gap: 0.35rem; }
+
+  /* --- Scenario --- */
+  .scenario-kicker {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 0.55rem;
+  }
+  .scenario-text {
+    font-size: 1.12rem; line-height: 1.48; margin-bottom: 1.3rem; font-weight: 500;
+  }
+
+  .chip-row { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.1rem; }
+  .chip {
+    display: flex; align-items: center; gap: 0.65rem;
+    border: 1.5px solid var(--border); background: var(--surface-2);
+    border-radius: 0.75rem; padding: 0.7rem 0.85rem; cursor: pointer;
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 0.92rem; font-weight: 500; color: var(--ink);
+    text-align: left; width: 100%;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .chip:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .chip .dot { width: 0.7rem; height: 0.7rem; border-radius: 999px; flex-shrink: 0; border: 1.5px solid transparent; }
+  .chip .letter {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 0.78rem;
+    color: var(--ink-dim); margin-left: auto;
+  }
+  .chip[data-cat="C"].selected { border-color: var(--conf); background: color-mix(in srgb, var(--conf) 14%, var(--surface)); }
+  .chip[data-cat="I"].selected { border-color: var(--integ); background: color-mix(in srgb, var(--integ) 14%, var(--surface)); }
+  .chip[data-cat="A"].selected { border-color: var(--avail); background: color-mix(in srgb, var(--avail) 14%, var(--surface)); }
+
+  .spacer { flex: 1; }
+
+  .btn {
+    border: none; border-radius: 0.7rem; padding: 0.85rem 1rem; font-size: 0.95rem; font-weight: 600;
+    font-family: 'IBM Plex Sans', sans-serif; cursor: pointer; width: 100%;
+    transition: opacity 0.15s ease, transform 0.1s ease;
+  }
+  .btn:active { transform: scale(0.985); }
+  .btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .btn-primary { background: var(--navy); color: var(--navy-ink); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--ink-dim); border: 1px solid var(--border); }
+
+  /* --- Feedback --- */
+  .feedback-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.74rem; font-weight: 700; letter-spacing: 0.03em;
+    padding: 0.3rem 0.65rem; border-radius: 999px; margin-bottom: 0.9rem;
+    width: fit-content;
+  }
+  .fb-match { background: color-mix(in srgb, var(--integ) 18%, var(--surface)); color: var(--integ); }
+  .fb-partial { background: color-mix(in srgb, var(--avail) 18%, var(--surface)); color: var(--avail); }
+  .fb-miss { background: color-mix(in srgb, var(--conf) 18%, var(--surface)); color: var(--conf); }
+
+  .answer-line { font-size: 0.85rem; color: var(--ink-dim); margin-bottom: 0.4rem; }
+  .answer-line b { color: var(--ink); }
+  .explain {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 0.75rem;
+    padding: 0.8rem 0.9rem; font-size: 0.9rem; line-height: 1.5; color: var(--ink); margin-bottom: 1.1rem;
+  }
+  .tag-pill {
+    display: inline-flex; align-items: center; gap: 0.3rem; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 999px;
+    border: 1px solid currentColor; margin-right: 0.3rem;
+  }
+
+  /* --- Results --- */
+  #view-results h1 { font-size: 1.55rem; margin-bottom: 0.3rem; }
+  .score-line { font-size: 0.95rem; color: var(--ink-dim); margin-bottom: 1.3rem; }
+  .score-line .num { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--ink); }
+
+  .compare-block { margin-bottom: 1.3rem; }
+  .compare-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 0.6rem; }
+  .compare-row { margin-bottom: 0.75rem; }
+  .compare-label { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.3rem; }
+  .compare-label b { font-family: 'Fraunces', serif; font-weight: 600; }
+  .bars { display: flex; flex-direction: column; gap: 0.28rem; }
+  .bar-track { height: 0.5rem; background: var(--surface-2); border-radius: 999px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 999px; transition: width 0.6s ease; }
+  .bar-sub { font-size: 0.68rem; color: var(--ink-dim); }
+
+  .discuss-box {
+    background: var(--navy); color: var(--navy-ink); border-radius: 0.9rem; padding: 1.05rem 1.1rem;
+    margin-bottom: 1.2rem;
+  }
+  .discuss-box .dt { font-family: 'Fraunces', serif; font-size: 1.05rem; margin-bottom: 0.6rem; }
+  .discuss-box p { margin: 0; font-size: 0.87rem; line-height: 1.55; }
+
+  @media (min-width: 640px) {
+    .app { padding-top: 2.4rem; }
+  }
+</style>
+
+<canvas id="canvas-bg" aria-hidden="true"></canvas>
+
+<div class="app">
+
+  <header class="topbar">
+    <svg class="badge-mark" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+      <polygon points="17,4 30,27 4,27" fill="none" stroke="var(--border)" stroke-width="1.6" stroke-linejoin="round"></polygon>
+      <circle cx="17" cy="4" r="3" fill="var(--conf)"></circle>
+      <circle cx="30" cy="27" r="3" fill="var(--integ)"></circle>
+      <circle cx="4" cy="27" r="3" fill="var(--avail)"></circle>
+    </svg>
+    <div class="topbar-text">
+      <div class="eyebrow">Security Awareness Activity</div>
+      <div class="title">CIA Triad Sort</div>
+    </div>
+  </header>
+
+  <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="stage">
+
+    <!-- INTRO -->
+    <div class="view active" id="view-intro">
+      <h1>Classify the Incident</h1>
+      <p class="lede">You'll read 12 short situations pulled from real provincial-government operations. For each one, decide which part of security it breaks — Confidentiality, Integrity, or Availability. Some break more than one.</p>
+
+      <div class="cia-legend">
+        <div class="cia-row">
+          <span class="cia-dot" style="background: var(--conf)"></span>
+          <div><b>Confidentiality</b><p>Information was seen, taken, or leaked by someone who shouldn't have had it.</p></div>
+        </div>
+        <div class="cia-row">
+          <span class="cia-dot" style="background: var(--integ)"></span>
+          <div><b>Integrity</b><p>Information or a record was changed, and can no longer be trusted as accurate.</p></div>
+        </div>
+        <div class="cia-row">
+          <span class="cia-dot" style="background: var(--avail)"></span>
+          <div><b>Availability</b><p>A system or service that should be usable isn't — for anyone who needs it.</p></div>
+        </div>
+      </div>
+
+      <div class="meta-line">
+        <span>⏱ ~15 minutes</span>
+        <span>📋 12 scenarios</span>
+        <span>🗣 group share-out after</span>
+      </div>
+
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="startBtn">Start sorting →</button>
+    </div>
+
+    <!-- SCENARIO -->
+    <div class="view" id="view-scenario">
+      <div class="scenario-kicker mono" id="scenarioKicker">SCENARIO 1 OF 12</div>
+      <div class="scenario-text" id="scenarioText"></div>
+
+      <div class="chip-row" id="chipRow" role="group" aria-label="Choose one or more">
+        <button class="chip" type="button" data-cat="C"><span class="dot" style="background: var(--conf)"></span>Confidentiality<span class="letter">C</span></button>
+        <button class="chip" type="button" data-cat="I"><span class="dot" style="background: var(--integ)"></span>Integrity<span class="letter">I</span></button>
+        <button class="chip" type="button" data-cat="A"><span class="dot" style="background: var(--avail)"></span>Availability<span class="letter">A</span></button>
+      </div>
+
+      <div id="feedbackBlock" style="display:none;">
+        <div class="feedback-badge" id="feedbackBadge"></div>
+        <div class="answer-line" id="answerLine"></div>
+        <div class="explain" id="explainText"></div>
+      </div>
+
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="submitBtn" disabled>Reveal answer</button>
+      <button class="btn btn-primary" id="nextBtn" style="display:none; margin-top:0.6rem;">Next scenario →</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="view" id="view-results">
+      <h1>Here's your read on it</h1>
+      <div class="score-line">You matched the primary issue on <span class="num" id="scoreNum">0 / 12</span> scenarios.</div>
+
+      <div class="compare-block">
+        <div class="compare-title">Your calls vs. the group's answer key</div>
+        <div class="bars" id="compareBars"></div>
+      </div>
+
+      <div class="discuss-box">
+        <div class="dt">Talk it over — 5 min</div>
+        <p>Pick the one system your office truly can't function without. If an attacker could only do ONE thing to it — leak its data, quietly alter it, or shut it down completely — which would hurt the people you serve most? Defend your pick to your table, then see who disagrees.</p>
+      </div>
+
+      <button class="btn btn-ghost" id="restartBtn">Restart activity</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var SCENARIOS = [
+    {
+      text: "A staff member accidentally emails a spreadsheet of residents' PhilHealth numbers and home addresses to the wrong department's mailing list.",
+      correct: ["C"],
+      explain: "The data itself wasn't changed or knocked offline — it just reached people who shouldn't have seen it. That's a Confidentiality failure."
+    },
+    {
+      text: "Before a procurement request goes up for approval, someone quietly edits the peso amount on the form.",
+      correct: ["I"],
+      explain: "The document was tampered with, so the numbers on it can no longer be trusted as accurate. That's an Integrity failure."
+    },
+    {
+      text: "The Provincial Treasurer's Office online payment portal crashes during real property tax deadline week, and no one can process payments.",
+      correct: ["A"],
+      explain: "Nothing was stolen or altered — the service just isn't there when residents need it. That's an Availability failure."
+    },
+    {
+      text: "A contractor doing unrelated IT work is caught browsing HR personnel files that have nothing to do with their assignment.",
+      correct: ["C"],
+      explain: "This is unauthorized access to information that should have stayed restricted — a Confidentiality issue, even though nothing was changed or taken offline."
+    },
+    {
+      text: "Someone deletes and rewrites audit-log entries to hide an unauthorized fund transfer.",
+      correct: ["I"],
+      explain: "The records no longer reflect what actually happened. That's a direct attack on Integrity — specifically to cover something up."
+    },
+    {
+      text: "Ransomware encrypts the permit-issuance database. Staff can't open a single record until it's paid or restored.",
+      correct: ["A", "C"],
+      explain: "Primarily Availability — the system is locked and unusable. Worth knowing: many modern ransomware attacks also quietly copy the data out first, which adds a Confidentiality angle too."
+    },
+    {
+      text: "An employee's unencrypted laptop, containing resident health records, is stolen from their vehicle.",
+      correct: ["C"],
+      explain: "The concern here is who might now be able to read that data — a Confidentiality issue, even though the office itself still functions normally."
+    },
+    {
+      text: "A phishing email tricks an employee into giving up their login. The attacker uses it to edit payroll entries and lock other staff out of the system.",
+      correct: ["C", "I", "A"],
+      explain: "This one hits all three: the attacker obtained credentials they shouldn't have (C), changed payroll data (I), and locked other staff out (A) — a good example of how one incident can cascade across the whole triad."
+    },
+    {
+      text: "A flood of fake traffic overwhelms the province's website during voter registration season, making it unreachable.",
+      correct: ["A"],
+      explain: "Nothing is read or changed — the site is simply overwhelmed and unreachable. A textbook Availability attack (a DDoS)."
+    },
+    {
+      text: "A sticky note with an admin password is left in plain view at a public-facing counter.",
+      correct: ["C"],
+      explain: "Right now, this is a Confidentiality risk — a secret that shouldn't be visible is visible. Depending on who reads it, it could later become the doorway to an Integrity or Availability incident too."
+    },
+    {
+      text: "A typhoon knocks out power, and the backup generator fails, taking the LGU's central server offline for a full day.",
+      correct: ["A"],
+      explain: "No attacker involved at all — Availability failures can be entirely accidental or environmental, not just malicious."
+    },
+    {
+      text: "A former employee's account — never deactivated after they left — is used to quietly change several business-permit applications from “denied” to “approved.”",
+      correct: ["I", "C"],
+      explain: "The core harm is that official records were changed by someone with no authority to change them — an Integrity failure. It also flags a Confidentiality/access-control gap: an account that should have been shut off was still live."
+    }
+  ];
+
+  var CAT_INFO = {
+    C: { name: "Confidentiality", varName: "--conf" },
+    I: { name: "Integrity", varName: "--integ" },
+    A: { name: "Availability", varName: "--avail" }
+  };
+
+  var state = {
+    idx: 0,
+    selected: [],
+    revealed: false,
+    matchedCount: 0,
+    userTally: { C: 0, I: 0, A: 0 },
+    correctTally: { C: 0, I: 0, A: 0 }
+  };
+
+  var viewIntro = document.getElementById("view-intro");
+  var viewScenario = document.getElementById("view-scenario");
+  var viewResults = document.getElementById("view-results");
+  var progressFill = document.getElementById("progressFill");
+
+  var scenarioKicker = document.getElementById("scenarioKicker");
+  var scenarioText = document.getElementById("scenarioText");
+  var chips = Array.prototype.slice.call(document.querySelectorAll(".chip"));
+  var submitBtn = document.getElementById("submitBtn");
+  var nextBtn = document.getElementById("nextBtn");
+  var feedbackBlock = document.getElementById("feedbackBlock");
+  var feedbackBadge = document.getElementById("feedbackBadge");
+  var answerLine = document.getElementById("answerLine");
+  var explainText = document.getElementById("explainText");
+
+  function showView(view) {
+    [viewIntro, viewScenario, viewResults].forEach(function (v) { v.classList.remove("active"); });
+    view.classList.add("active");
+  }
+
+  function setProgress() {
+    var pct = Math.round((state.idx / SCENARIOS.length) * 100);
+    progressFill.style.width = pct + "%";
+  }
+
+  function renderScenario() {
+    state.selected = [];
+    state.revealed = false;
+    var s = SCENARIOS[state.idx];
+    scenarioKicker.textContent = "SCENARIO " + (state.idx + 1) + " OF " + SCENARIOS.length;
+    scenarioText.textContent = s.text;
+    chips.forEach(function (c) {
+      c.classList.remove("selected");
+      c.disabled = false;
+    });
+    feedbackBlock.style.display = "none";
+    submitBtn.style.display = "block";
+    submitBtn.disabled = true;
+    nextBtn.style.display = "none";
+    setProgress();
+  }
+
+  chips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      if (state.revealed) return;
+      var cat = chip.getAttribute("data-cat");
+      var i = state.selected.indexOf(cat);
+      if (i === -1) {
+        state.selected.push(cat);
+        chip.classList.add("selected");
+      } else {
+        state.selected.splice(i, 1);
+        chip.classList.remove("selected");
+      }
+      submitBtn.disabled = state.selected.length === 0;
+    });
+  });
+
+  function arraysEqualAsSets(a, b) {
+    if (a.length !== b.length) return false;
+    var as = a.slice().sort(), bs = b.slice().sort();
+    for (var i = 0; i < as.length; i++) if (as[i] !== bs[i]) return false;
+    return true;
+  }
+
+  submitBtn.addEventListener("click", function () {
+    if (state.selected.length === 0) return;
+    state.revealed = true;
+    var s = SCENARIOS[state.idx];
+
+    state.selected.forEach(function (c) { state.userTally[c]++; });
+    s.correct.forEach(function (c) { state.correctTally[c]++; });
+
+    var overlap = state.selected.filter(function (c) { return s.correct.indexOf(c) !== -1; });
+    var exact = arraysEqualAsSets(state.selected, s.correct);
+    var hasPrimaryOverlap = overlap.length > 0;
+
+    if (exact) {
+      feedbackBadge.className = "feedback-badge fb-match";
+      feedbackBadge.textContent = "✓ Correct";
+      state.matchedCount++;
+    } else if (hasPrimaryOverlap) {
+      feedbackBadge.className = "feedback-badge fb-partial";
+      feedbackBadge.textContent = "◐ Partial match";
+      state.matchedCount++;
+    } else {
+      feedbackBadge.className = "feedback-badge fb-miss";
+      feedbackBadge.textContent = "✕ Different take";
+    }
+
+    answerLine.innerHTML = "You said <b>" + state.selected.map(function(c){return CAT_INFO[c].name;}).join(" + ") +
+      "</b> — this one's actually <b>" + s.correct.map(function(c){return CAT_INFO[c].name;}).join(" + ") + "</b>.";
+    explainText.textContent = s.explain;
+
+    feedbackBlock.style.display = "block";
+    chips.forEach(function (c) { c.disabled = true; });
+    submitBtn.style.display = "none";
+    nextBtn.style.display = "block";
+    nextBtn.textContent = (state.idx === SCENARIOS.length - 1) ? "See your results →" : "Next scenario →";
+  });
+
+  nextBtn.addEventListener("click", function () {
+    state.idx++;
+    if (state.idx >= SCENARIOS.length) {
+      showResults();
+    } else {
+      renderScenario();
+    }
+  });
+
+  document.getElementById("startBtn").addEventListener("click", function () {
+    state.idx = 0;
+    showView(viewScenario);
+    renderScenario();
+  });
+
+  document.getElementById("restartBtn").addEventListener("click", function () {
+    state.idx = 0;
+    state.matchedCount = 0;
+    state.userTally = { C: 0, I: 0, A: 0 };
+    state.correctTally = { C: 0, I: 0, A: 0 };
+    progressFill.style.width = "0%";
+    showView(viewIntro);
+  });
+
+  function showResults() {
+    progressFill.style.width = "100%";
+    document.getElementById("scoreNum").textContent = state.matchedCount + " / " + SCENARIOS.length;
+
+    var wrap = document.getElementById("compareBars");
+    wrap.innerHTML = "";
+    ["C", "I", "A"].forEach(function (cat) {
+      var info = CAT_INFO[cat];
+      var color = getComputedStyle(document.documentElement).getPropertyValue(info.varName).trim();
+      var you = state.userTally[cat];
+      var key = state.correctTally[cat];
+      var max = SCENARIOS.length;
+
+      var row = document.createElement("div");
+      row.className = "compare-row";
+      row.innerHTML =
+        '<div class="compare-label"><b style="color:' + color + '">' + info.name + '</b><span class="mono">you ' + you + ' · key ' + key + '</span></div>' +
+        '<div class="bars">' +
+          '<div class="bar-track"><div class="bar-fill" style="width:' + (you / max * 100) + '%; background:' + color + ';"></div></div>' +
+          '<div class="bar-track"><div class="bar-fill" style="width:' + (key / max * 100) + '%; background:' + color + '; opacity:0.45;"></div></div>' +
+        '</div>';
+      wrap.appendChild(row);
+    });
+
+    showView(viewResults);
+  }
+
+  // Ambient network/circuit canvas background — subtle, theme-aware
+  (function () {
+    var canvas = document.getElementById("canvas-bg");
+    var ctx = canvas.getContext("2d");
+    var w, h, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var nodes = [];
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function isDark() {
+      var t = document.documentElement.getAttribute("data-theme");
+      if (t === "dark") return true;
+      if (t === "light") return false;
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+
+    function resize() {
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      canvas.style.width = w + "px"; canvas.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var count = Math.round((w * h) / 26000);
+      nodes = [];
+      for (var i = 0; i < count; i++) {
+        nodes.push({
+          x: Math.random() * w, y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.12, vy: (Math.random() - 0.5) * 0.12,
+          r: 1 + Math.random() * 1.2
+        });
+      }
+    }
+
+    function step() {
+      ctx.clearRect(0, 0, w, h);
+      var dark = isDark();
+      var dot = dark ? "rgba(124,143,242,0.35)" : "rgba(30,39,97,0.16)";
+      var line = dark ? "rgba(87,214,239,0.10)" : "rgba(30,39,97,0.055)";
+
+      nodes.forEach(function (n) {
+        if (!reduceMotion) {
+          n.x += n.vx; n.y += n.vy;
+          if (n.x < 0 || n.x > w) n.vx *= -1;
+          if (n.y < 0 || n.y > h) n.vy *= -1;
+        }
+      });
+
+      for (var i = 0; i < nodes.length; i++) {
+        for (var j = i + 1; j < nodes.length; j++) {
+          var dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+          var d2 = dx * dx + dy * dy;
+          if (d2 < 130 * 130) {
+            ctx.strokeStyle = line;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      nodes.forEach(function (n) {
+        ctx.fillStyle = dot;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      if (!reduceMotion) requestAnimationFrame(step);
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+    step();
+  })();
+
+  setProgress();
+})();
+</script>
