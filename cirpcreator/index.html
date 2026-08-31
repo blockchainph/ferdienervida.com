@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CIRP Intake Wizard</title>
+<meta name="description" content="Guided, gap-flagging intake wizard for drafting a Philippine LGU/government Computer Incident Response Plan.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    --paper: #f7f8fa;
+    --panel: #ffffff;
+    --ink: #16233a;
+    --ink-soft: #4b5768;
+    --navy: #1f3a5f;
+    --navy-deep: #0f1d33;
+    --gold: #b8860b;
+    --gold-soft: #e7c874;
+    --line: #dce1e8;
+    --line-soft: #eceff3;
+    --rail-text: #cdd8ea;
+    --rail-text-dim: #8ea0bc;
+    --gate-bad-bg: #fbeaea;
+    --gate-bad-fg: #8b1e1e;
+    --gate-ok-bg: #e9f5ec;
+    --gate-ok-fg: #1f6b3a;
+    --focus: #2f6fb0;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --paper: #10182a;
+      --panel: #16223a;
+      --ink: #e8edf6;
+      --ink-soft: #aab7cc;
+      --line: #2a3752;
+      --line-soft: #202c46;
+      --gate-bad-bg: #3a1f1f;
+      --gate-bad-fg: #f1a3a3;
+      --gate-ok-bg: #1c3527;
+      --gate-ok-fg: #8fd6a8;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #10182a;
+    --panel: #16223a;
+    --ink: #e8edf6;
+    --ink-soft: #aab7cc;
+    --line: #2a3752;
+    --line-soft: #202c46;
+    --gate-bad-bg: #3a1f1f;
+    --gate-bad-fg: #f1a3a3;
+    --gate-ok-bg: #1c3527;
+    --gate-ok-fg: #8fd6a8;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Public Sans', system-ui, sans-serif;
+    margin: 0;
+  }
+  h1, h2, h3, .display {
+    font-family: 'Spectral', Georgia, serif;
+    text-wrap: balance;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .app {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: 100vh;
+  }
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; }
+    .rail { position: static !important; height: auto !important; }
+  }
+
+  /* ---------- Rail ---------- */
+  .rail {
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+    color: var(--rail-text);
+    padding: 28px 22px 22px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .rail-brand {
+    font-family: 'Spectral', serif;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    margin-bottom: 4px;
+  }
+  .rail-title {
+    font-family: 'Spectral', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 22px;
+    line-height: 1.25;
+  }
+  .rail-steps { list-style: none; margin: 0; padding: 0; }
+  .rail-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 8px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    line-height: 1.4;
+    color: var(--rail-text-dim);
+    transition: background 0.15s, color 0.15s;
+  }
+  .rail-step:hover { background: rgba(255,255,255,0.06); color: var(--rail-text); }
+  .rail-step.done { color: var(--rail-text); }
+  .rail-step.active { background: rgba(184,134,11,0.16); color: #fff; }
+  .rail-num {
+    flex: 0 0 auto;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--rail-text-dim);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .rail-step.done .rail-num { background: var(--gold); border-color: var(--gold); color: var(--navy-deep); }
+  .rail-step.active .rail-num { border-color: var(--gold); color: var(--gold-soft); }
+  .rail-step-label { padding-top: 2px; }
+  .rail-footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    font-size: 11.5px;
+    color: var(--rail-text-dim);
+    line-height: 1.5;
+  }
+
+  /* ---------- Main ---------- */
+  .main { padding: 48px 56px 80px; max-width: 780px; }
+  @media (max-width: 640px) { .main { padding: 32px 20px 60px; } }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 8px;
+  }
+  .step-title { font-size: 28px; margin: 0 0 10px; }
+  .step-help { color: var(--ink-soft); font-size: 15px; line-height: 1.55; margin: 0 0 30px; max-width: 62ch; }
+
+  .field { margin-bottom: 22px; }
+  .field label.flabel {
+    display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 7px; color: var(--ink);
+  }
+  .field .fhint { font-size: 12.5px; color: var(--ink-soft); margin: -3px 0 8px; }
+  input[type="text"], textarea, select {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14.5px;
+    color: var(--ink);
+    background: var(--panel);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 13px;
+    line-height: 1.5;
+  }
+  textarea { resize: vertical; min-height: 84px; }
+  input:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px rgba(47,111,176,0.16);
+  }
+
+  .radio-grid { display: grid; gap: 8px; }
+  .radio-opt {
+    display: flex; align-items: center; gap: 10px;
+    border: 1.5px solid var(--line); border-radius: 8px; padding: 11px 13px;
+    cursor: pointer; font-size: 14px;
+  }
+  .radio-opt:has(input:checked) { border-color: var(--navy); background: var(--line-soft); font-weight: 600; }
+  .radio-opt input { accent-color: var(--navy); }
+
+  .role-row {
+    display: grid; grid-template-columns: 1fr 1.2fr 1fr auto; gap: 10px; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--line-soft);
+  }
+  .role-row:last-child { border-bottom: none; }
+  .role-name { font-weight: 600; font-size: 13.5px; }
+  .role-name .req { color: var(--gate-bad-fg); font-weight: 700; }
+  .unassign-chip {
+    display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-soft); white-space: nowrap;
+  }
+
+  table.severity-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.severity-table th, table.severity-table td { border: 1px solid var(--line); padding: 8px; vertical-align: top; }
+  table.severity-table th { background: var(--navy); color: #fff; font-weight: 600; text-align: left; font-size: 12px; }
+  table.severity-table td input, table.severity-table td textarea { border: none; padding: 4px; min-height: 40px; background: transparent; }
+  .severity-wrap { overflow-x: auto; margin-bottom: 8px; }
+
+  .playbook-card {
+    border: 1.5px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .playbook-card.on { border-color: var(--navy); background: var(--line-soft); }
+  .playbook-head { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .playbook-head input { width: 17px; height: 17px; accent-color: var(--navy); }
+  .playbook-head span { font-weight: 600; font-size: 14.5px; }
+  .playbook-detail { margin-top: 10px; }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 36px; }
+  button {
+    font-family: inherit; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer;
+    padding: 12px 22px; border: none;
+  }
+  .btn-primary { background: var(--navy); color: #fff; }
+  .btn-primary:hover { background: var(--navy-deep); }
+  .btn-ghost { background: transparent; color: var(--ink-soft); border: 1.5px solid var(--line); }
+  .btn-ghost:hover { border-color: var(--ink-soft); color: var(--ink); }
+  .btn-gold { background: var(--gold); color: var(--navy-deep); }
+  .btn-gold:hover { filter: brightness(0.94); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ---------- Review screen ---------- */
+  .gate-list { list-style: none; margin: 0 0 26px; padding: 0; }
+  .gate-item {
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 13px; border-radius: 8px; margin-bottom: 6px; font-size: 13.5px;
+  }
+  .gate-item.bad { background: var(--gate-bad-bg); color: var(--gate-bad-fg); }
+  .gate-item.ok { background: var(--gate-ok-bg); color: var(--gate-ok-fg); }
+  .gate-item .dot { flex: 0 0 auto; margin-top: 4px; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .gate-summary { font-size: 14.5px; margin-bottom: 4px; font-weight: 600; }
+
+  .preview-pane {
+    background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px;
+    padding: 18px 20px; margin-top: 8px; max-height: 480px; overflow-y: auto;
+  }
+  .preview-pane pre {
+    white-space: pre-wrap; word-wrap: break-word; font-family: 'Public Sans', sans-serif; font-size: 12.5px;
+    color: var(--ink-soft); line-height: 1.6; margin: 0;
+  }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--navy-deep); color: #fff; padding: 11px 20px; border-radius: 8px; font-size: 13.5px;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <nav class="rail" id="rail"></nav>
+  <main class="main" id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var ROLE_DEFS = [
+    { id: "exec", label: "Executive / Incident Authority", critical: true },
+    { id: "irLead", label: "IR Team Lead", critical: true },
+    { id: "techLead", label: "Technical / IT Lead", critical: true },
+    { id: "dpo", label: "Data Protection Officer", critical: true },
+    { id: "legal", label: "Legal / Compliance", critical: false },
+    { id: "comms", label: "Communications / PIO", critical: false },
+    { id: "hr", label: "HR", critical: false },
+    { id: "bizcont", label: "Business Continuity / Operations", critical: false },
+    { id: "evidence", label: "Evidence / Forensics Lead", critical: true },
+    { id: "sysowner", label: "System / Application Owner", critical: false },
+    { id: "dictLiaison", label: "DICT / CERT-PH Liaison", critical: false },
+    { id: "lawEnforcement", label: "Law Enforcement Liaison", critical: false }
+  ];
+
+  var PLAYBOOK_DEFS = [
+    { id: "ransomware", label: "Ransomware" },
+    { id: "phishing", label: "Phishing / Credential Compromise" },
+    { id: "ddos", label: "DDoS" },
+    { id: "insider", label: "Insider Incident" },
+    { id: "defacement", label: "Website Defacement" },
+    { id: "databreach", label: "Data Breach (non-ransomware)" }
+  ];
+
+  function defaultSeverity() {
+    return [
+      { level: "Low", def: "Isolated, no data or service impact", example: "", response: "" },
+      { level: "Medium", def: "Limited impact, single system or office", example: "", response: "" },
+      { level: "High", def: "Multiple systems, service disruption, or possible data exposure", example: "", response: "" },
+      { level: "Critical", def: "Widespread outage, confirmed data breach, or public safety/financial impact", example: "", response: "" }
+    ];
+  }
+
+  function defaultState() {
+    var roles = {};
+    ROLE_DEFS.forEach(function (r) { roles[r.id] = { name: "", contact: "", unassigned: false }; });
+    var playbooks = {};
+    PLAYBOOK_DEFS.forEach(function (p) { playbooks[p.id] = { on: false, detail: "" }; });
+    return {
+      orgType: "", orgName: "", orgMandate: "", approvingAuthority: "",
+      scope: "",
+      ciiStatus: "", ciiNotes: "",
+      dpoAppointed: "", dataCategories: "",
+      roles: roles,
+      severityTouched: false,
+      severity: defaultSeverity(),
+      detectionSources: "", reportingChannel: "",
+      activationCriteria: "", escalationChain: "",
+      playbooks: playbooks,
+      containmentGeneral: "",
+      npcChainDesc: "", dictContact: "", lawEnforcementCriteria: "",
+      internalComms: "", execBriefing: "", publicComms: "",
+      evidencePreserve: "", evidenceCustodian: "", evidenceLogging: "",
+      reviewTimeline: "", reviewAttendees: "",
+      reviewCycle: "", drillSchedule: "", versionControl: "",
+      notes: ""
+    };
+  }
+
+  var state = defaultState();
+  var stepIndex = 0;
+
+  var STEPS = [
+    { id: "orgType", title: "Organization Classification", eyebrow: "Step 1 of 15", railLabel: "Organization type",
+      help: "This determines which regulatory questions apply for the rest of this intake — it's the first thing a CIRP has to get right.",
+      render: renderOrgType, isComplete: function () { return !!state.orgType; } },
+    { id: "orgIdentity", title: "Organization Identity & Authority", eyebrow: "Step 2 of 15", railLabel: "Identity & authority",
+      help: "Who is this plan for, and who has the authority to approve and formally invoke it?",
+      render: renderOrgIdentity, isComplete: function () { return !!(state.orgName && state.approvingAuthority); } },
+    { id: "scope", title: "Scope", eyebrow: "Step 3 of 15", railLabel: "Scope",
+      help: "Which offices, systems, platforms, and data does this plan cover?",
+      render: renderScope, isComplete: function () { return !!state.scope; } },
+    { id: "cii", title: "Critical Information Infrastructure Status", eyebrow: "Step 4 of 15", railLabel: "CII status",
+      help: "Under DICT Memorandum Circular No. 005. If you're not sure, say so — don't guess.",
+      render: renderCII, isComplete: function () { return !!state.ciiStatus; } },
+    { id: "privacy", title: "Data Privacy Governance", eyebrow: "Step 5 of 15", railLabel: "Privacy governance",
+      help: "For any Philippine government entity, RA 10173 applies by default. This step establishes who owns that and what data is at stake.",
+      render: renderPrivacy, isComplete: function () { return !!state.dpoAppointed; } },
+    { id: "roles", title: "Named Roles", eyebrow: "Step 6 of 15", railLabel: "Named roles",
+      help: "A role with no name attached fails during an actual incident. Mark a role “Unassigned” rather than leaving it blank — that gap needs to be visible, not hidden.",
+      render: renderRoles, isComplete: function () { return ROLE_DEFS.filter(function (r) { return r.critical; }).every(function (r) { return state.roles[r.id].unassigned || state.roles[r.id].name; }); } },
+    { id: "severity", title: "Severity Classification", eyebrow: "Step 7 of 15", railLabel: "Severity",
+      help: "Defaults are pre-filled. Adjust the examples and target response times for your organization — don't ship the generic version unreviewed.",
+      render: renderSeverity, isComplete: function () { return state.severityTouched; } },
+    { id: "detection", title: "Detection & Reporting", eyebrow: "Step 8 of 15", railLabel: "Detection & reporting",
+      help: "How incidents get noticed, and how staff report a suspected one.",
+      render: renderDetection, isComplete: function () { return !!(state.detectionSources && state.reportingChannel); } },
+    { id: "activation", title: "Activation Criteria & Escalation", eyebrow: "Step 9 of 15", railLabel: "Activation & escalation",
+      help: "What triggers formal IR team activation, and the full escalation chain in order.",
+      render: renderActivation, isComplete: function () { return !!(state.activationCriteria && state.escalationChain); } },
+    { id: "playbooks", title: "Containment, Eradication & Recovery", eyebrow: "Step 10 of 15", railLabel: "Containment & playbooks",
+      help: "General procedures, plus which incident types need a dedicated playbook annex.",
+      render: renderPlaybooks, isComplete: function () { return !!state.containmentGeneral; } },
+    { id: "regulatory", title: "Regulatory & Communications", eyebrow: "Step 11 of 15", railLabel: "Regulatory & comms",
+      help: "The NPC Circular 16-03 breach-notification chain, DICT/CERT-PH coordination, and who communicates with whom.",
+      render: renderRegulatory, isComplete: function () { return !!(state.npcChainDesc && state.publicComms); } },
+    { id: "evidence", title: "Evidence Handling & Chain of Custody", eyebrow: "Step 12 of 15", railLabel: "Evidence & custody",
+      help: "Decide this before an incident, not during one.",
+      render: renderEvidence, isComplete: function () { return !!state.evidenceCustodian; } },
+    { id: "postincident", title: "Post-Incident Review", eyebrow: "Step 13 of 15", railLabel: "Post-incident review",
+      help: "A review that never happens is the most common reason the same incident recurs.",
+      render: renderPostIncident, isComplete: function () { return !!state.reviewTimeline; } },
+    { id: "maintenance", title: "Maintenance, Testing & Version Control", eyebrow: "Step 14 of 15", railLabel: "Maintenance & testing",
+      help: "A plan that's never rehearsed will fail the first time it's needed.",
+      render: renderMaintenance, isComplete: function () { return !!state.reviewCycle; } },
+    { id: "notes", title: "Anything Else?", eyebrow: "Step 15 of 15", railLabel: "Additional notes",
+      help: "Optional — any other process, detail, or note worth including.",
+      render: renderNotes, isComplete: function () { return true; } },
+    { id: "review", title: "Review & Generate", eyebrow: "Final step", railLabel: "Review & generate",
+      help: "", render: renderReview, isComplete: function () { return true; } }
+  ];
+
+  function field(labelText, hint, inputHtml) {
+    return '<div class="field"><label class="flabel">' + labelText + '</label>' +
+      (hint ? '<div class="fhint">' + hint + '</div>' : '') + inputHtml + '</div>';
+  }
+
+  function textInput(id, value, placeholder) {
+    return '<input type="text" id="' + id + '" value="' + escapeAttr(value) + '" placeholder="' + escapeAttr(placeholder || "") + '">';
+  }
+  function textArea(id, value, placeholder, rows) {
+    return '<textarea id="' + id + '" rows="' + (rows || 4) + '" placeholder="' + escapeAttr(placeholder || "") + '">' + escapeHtml(value) + '</textarea>';
+  }
+  function escapeHtml(s) { return (s || "").replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); }
+  function escapeAttr(s) { return escapeHtml(s).replace(/"/g, "&quot;"); }
+
+  // ---------- Step renderers ----------
+
+  function renderOrgType() {
+    var opts = ["National government agency", "Provincial government", "City government", "Municipal government", "Barangay", "GOCC", "CII operator", "Private-sector organization", "Other"];
+    var html = '<div class="radio-grid">';
+    opts.forEach(function (o) {
+      html += '<label class="radio-opt"><input type="radio" name="orgType" value="' + escapeAttr(o) + '" ' + (state.orgType === o ? "checked" : "") + '> ' + o + '</label>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function renderOrgIdentity() {
+    return field("Organization name", "Full name of the agency / LGU / office.", textInput("orgName", state.orgName)) +
+      field("Mandate / legal authority", "What law, charter, or issuance establishes this organization's authority.", textArea("orgMandate", state.orgMandate, "", 3)) +
+      field("Approving authority", "Who signs this plan into effect — e.g., the Governor's Office, agency head.", textInput("approvingAuthority", state.approvingAuthority));
+  }
+
+  function renderScope() {
+    return field("Scope", "List the offices, systems, platforms, and data this plan covers.", textArea("scope", state.scope, "e.g., Provincial Treasurer's Office financial systems, public-facing portals, email, file servers", 5));
+  }
+
+  function renderCII() {
+    var opts = ["Yes", "No", "Unsure"];
+    var html = '<div class="radio-grid">';
+    opts.forEach(function (o) {
+      html += '<label class="radio-opt"><input type="radio" name="ciiStatus" value="' + o + '" ' + (state.ciiStatus === o ? "checked" : "") + '> ' + o + '</label>';
+    });
+    html += '</div>';
+    html += field("Notes (optional)", "", textArea("ciiNotes", state.ciiNotes, "", 3));
+    return html;
+  }
+
+  function renderPrivacy() {
+    var opts = ["Yes, DPO appointed", "No DPO appointed yet"];
+    var html = '<div class="radio-grid">';
+    opts.forEach(function (o) {
+      html += '<label class="radio-opt"><input type="radio" name="dpoAppointed" value="' + o + '" ' + (state.dpoAppointed === o ? "checked" : "") + '> ' + o + '</label>';
+    });
+    html += '</div>';
+    html += '<div class="fhint" style="margin-top:6px;">The DPO\'s name and contact are collected in the Named Roles step next.</div>';
+    html += field("Data categories", "What personal or sensitive personal information does the organization process? (e.g., constituent names, addresses, TINs, property records)", textArea("dataCategories", state.dataCategories, "", 4));
+    return html;
+  }
+
+  function renderRoles() {
+    var html = "";
+    ROLE_DEFS.forEach(function (r) {
+      var v = state.roles[r.id];
+      html += '<div class="role-row">' +
+        '<div class="role-name">' + r.label + (r.critical ? ' <span class="req">*</span>' : '') + '</div>' +
+        '<input type="text" data-role="' + r.id + '" data-field="name" value="' + escapeAttr(v.name) + '" placeholder="Full name" ' + (v.unassigned ? "disabled" : "") + '>' +
+        '<input type="text" data-role="' + r.id + '" data-field="contact" value="' + escapeAttr(v.contact) + '" placeholder="Position / contact" ' + (v.unassigned ? "disabled" : "") + '>' +
+        '<label class="unassign-chip"><input type="checkbox" data-role="' + r.id + '" data-field="unassigned" ' + (v.unassigned ? "checked" : "") + '> Unassigned</label>' +
+        '</div>';
+    });
+    return '<div style="margin-bottom:6px; font-size:12.5px; color:var(--ink-soft);"><span class="req" style="color:var(--gate-bad-fg);">*</span> required for the completeness check</div>' + html;
+  }
+
+  function renderSeverity() {
+    var html = '<div class="severity-wrap"><table class="severity-table"><thead><tr><th style="width:12%">Level</th><th style="width:32%">Definition</th><th style="width:28%">Example</th><th style="width:28%">Target Response Time</th></tr></thead><tbody>';
+    state.severity.forEach(function (row, i) {
+      html += '<tr>' +
+        '<td><strong>' + row.level + '</strong></td>' +
+        '<td>' + '<textarea data-sev="' + i + '" data-field="def" rows="2">' + escapeHtml(row.def) + '</textarea></td>' +
+        '<td>' + '<textarea data-sev="' + i + '" data-field="example" rows="2" placeholder="Add an example">' + escapeHtml(row.example) + '</textarea></td>' +
+        '<td>' + '<textarea data-sev="' + i + '" data-field="response" rows="2" placeholder="e.g., 4 hours">' + escapeHtml(row.response) + '</textarea></td>' +
+        '</tr>';
+    });
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  function renderDetection() {
+    return field("Detection sources", "Alert sources, monitoring, staff reports — how an incident actually gets noticed.", textArea("detectionSources", state.detectionSources, "", 4)) +
+      field("Reporting channel", "How staff report a suspected incident, and who receives the first report.", textArea("reportingChannel", state.reportingChannel, "", 4));
+  }
+
+  function renderActivation() {
+    return field("Activation criteria", "What triggers formal IR team activation.", textArea("activationCriteria", state.activationCriteria, "", 4)) +
+      field("Escalation chain", "The full order — who is notified first, second, third.", textArea("escalationChain", state.escalationChain, "", 4));
+  }
+
+  function renderPlaybooks() {
+    var html = field("General containment / eradication / recovery", "Your baseline procedure, before incident-specific detail.", textArea("containmentGeneral", state.containmentGeneral, "", 4));
+    html += '<div class="flabel" style="margin: 22px 0 10px;">Incident-specific playbook annexes</div>';
+    PLAYBOOK_DEFS.forEach(function (p) {
+      var v = state.playbooks[p.id];
+      html += '<div class="playbook-card ' + (v.on ? "on" : "") + '">' +
+        '<label class="playbook-head"><input type="checkbox" data-pb="' + p.id + '" ' + (v.on ? "checked" : "") + '><span>' + p.label + '</span></label>' +
+        (v.on ? '<div class="playbook-detail">' + textArea("pbdetail-" + p.id, v.detail, "Specifics for this incident type", 3) + '</div>' : '') +
+        '</div>';
+    });
+    return html;
+  }
+
+  function renderRegulatory() {
+    return '<div class="fhint" style="margin-bottom:14px;">If personal or sensitive personal data is confirmed or suspected involved, your DPO determines notifiability and, where the threshold is met, submits to the National Privacy Commission via the DBNMS portal within 72 hours of discovery.</div>' +
+      field("NPC breach-notification chain", "Describe the decision chain: who assesses, who decides, who submits, and how the 72-hour clock is tracked from discovery.", textArea("npcChainDesc", state.npcChainDesc, "", 4)) +
+      field("DICT / CERT-PH coordination", "Contact and criteria for engaging DICT's regional office or CERT-PH.", textArea("dictContact", state.dictContact, "", 3)) +
+      field("Law enforcement referral criteria", "When PNP Anti-Cybercrime Group or NBI Cybercrime Division get engaged.", textArea("lawEnforcementCriteria", state.lawEnforcementCriteria, "", 3)) +
+      field("Internal staff communication", "", textArea("internalComms", state.internalComms, "", 3)) +
+      field("Executive briefing cadence", "", textArea("execBriefing", state.execBriefing, "", 3)) +
+      field("Public / media statement authorization", "Who is authorized to speak, and who signs off first.", textArea("publicComms", state.publicComms, "", 3));
+  }
+
+  function renderEvidence() {
+    return field("What must be preserved", "Before any system is wiped or reimaged — logs, disk images, memory captures.", textArea("evidencePreserve", state.evidencePreserve, "", 4)) +
+      field("Evidence custodian", "Who is authorized to collect evidence.", textInput("evidenceCustodian", state.evidenceCustodian)) +
+      field("Logging process", "How chain of custody is logged.", textArea("evidenceLogging", state.evidenceLogging, "", 3));
+  }
+
+  function renderPostIncident() {
+    return field("Review timeline", "e.g., within 10 business days of closure.", textInput("reviewTimeline", state.reviewTimeline)) +
+      field("Attendees & feedback loop", "Who attends, and how findings feed back into this plan.", textArea("reviewAttendees", state.reviewAttendees, "", 4));
+  }
+
+  function renderMaintenance() {
+    return field("Plan review cycle", "e.g., annually, or after any Critical incident.", textInput("reviewCycle", state.reviewCycle)) +
+      field("Drill / tabletop schedule", "", textArea("drillSchedule", state.drillSchedule, "", 3)) +
+      field("Version control", "How plan revisions are tracked.", textArea("versionControl", state.versionControl, "", 3));
+  }
+
+  function renderNotes() {
+    return field("Additional notes", "", textArea("notes", state.notes, "", 5));
+  }
+
+  // ---------- Completeness gate ----------
+
+  function completenessChecks() {
+    var checks = [];
+    checks.push({ label: "Organization classification", ok: !!state.orgType });
+    checks.push({ label: "Approving authority named", ok: !!state.approvingAuthority });
+    checks.push({ label: "DPO status recorded", ok: !!state.dpoAppointed });
+    ["exec", "irLead", "techLead"].forEach(function (id) {
+      var def = ROLE_DEFS.filter(function (r) { return r.id === id; })[0];
+      var v = state.roles[id];
+      checks.push({ label: def.label + " has a named owner", ok: !!(v.unassigned || v.name) });
+    });
+    checks.push({ label: "Severity table reviewed for this organization", ok: state.severityTouched });
+    checks.push({ label: "NPC 72-hour notification chain described", ok: !!state.npcChainDesc });
+    checks.push({ label: "Evidence custodian named", ok: !!state.evidenceCustodian });
+    return checks;
+  }
+
+  // ---------- Document generation ----------
+
+  function gap(v) { return v ? escapeHtml(v) : "**[UNRESOLVED — see Completeness Gate]**"; }
+
+  function roleLine(id) {
+    var def = ROLE_DEFS.filter(function (r) { return r.id === id; })[0];
+    var v = state.roles[id];
+    if (v.unassigned) return "- **" + def.label + ":** UNASSIGNED — gap";
+    if (!v.name) return "- **" + def.label + ":** " + gap("");
+    return "- **" + def.label + ":** " + escapeHtml(v.name) + (v.contact ? " — " + escapeHtml(v.contact) : "");
+  }
+
+  function generateDocument() {
+    var lines = [];
+    var checks = completenessChecks();
+    var failing = checks.filter(function (c) { return !c.ok; });
+
+    lines.push("# Computer Incident Response Plan");
+    lines.push("");
+    lines.push("**Organization:** " + gap(state.orgName));
+    lines.push("**Classification:** " + gap(state.orgType));
+    lines.push("**Generated:** " + new Date().toISOString().slice(0, 10) + " via CIRP Intake Wizard");
+    lines.push("");
+
+    if (failing.length) {
+      lines.push("## Completeness Gate — Unresolved Items");
+      lines.push("");
+      lines.push("This draft has " + failing.length + " unresolved item(s). Resolve these before formal adoption:");
+      lines.push("");
+      failing.forEach(function (c) { lines.push("- " + c.label); });
+      lines.push("");
+    }
+
+    lines.push("## 1. Purpose, Scope & Authority");
+    lines.push("");
+    lines.push("**Mandate / legal authority:** " + gap(state.orgMandate));
+    lines.push("");
+    lines.push("**Approving authority:** " + gap(state.approvingAuthority));
+    lines.push("");
+    lines.push("**Scope:** " + gap(state.scope));
+    lines.push("");
+    lines.push("**CII status:** " + gap(state.ciiStatus) + (state.ciiNotes ? " — " + escapeHtml(state.ciiNotes) : ""));
+    lines.push("");
+
+    lines.push("## 2. Definitions & Severity Classification");
+    lines.push("");
+    lines.push("| Level | Definition | Example | Target Response Time |");
+    lines.push("|---|---|---|---|");
+    state.severity.forEach(function (row) {
+      lines.push("| " + row.level + " | " + gap(row.def) + " | " + gap(row.example) + " | " + gap(row.response) + " |");
+    });
+    lines.push("");
+
+    lines.push("## 3. Roles, Responsibilities & RACI");
+    lines.push("");
+    lines.push("**Data privacy governance:** " + gap(state.dpoAppointed));
+    lines.push("");
+    lines.push("**Personal data categories processed:** " + gap(state.dataCategories));
+    lines.push("");
+    ROLE_DEFS.forEach(function (r) { lines.push(roleLine(r.id)); });
+    lines.push("");
+
+    lines.push("## 4. Detection & Reporting Procedures");
+    lines.push("");
+    lines.push("**Detection sources:** " + gap(state.detectionSources));
+    lines.push("");
+    lines.push("**Reporting channel:** " + gap(state.reportingChannel));
+    lines.push("");
+
+    lines.push("## 5. Activation Criteria & Escalation");
+    lines.push("");
+    lines.push("**Activation criteria:** " + gap(state.activationCriteria));
+    lines.push("");
+    lines.push("**Escalation chain:** " + gap(state.escalationChain));
+    lines.push("");
+
+    lines.push("## 6. Containment, Eradication & Recovery");
+    lines.push("");
+    lines.push("**General procedure:** " + gap(state.containmentGeneral));
+    lines.push("");
+    var anyPlaybook = false;
+    PLAYBOOK_DEFS.forEach(function (p) {
+      var v = state.playbooks[p.id];
+      if (v.on) {
+        anyPlaybook = true;
+        lines.push("### Playbook Annex — " + p.label);
+        lines.push("");
+        lines.push(gap(v.detail));
+        lines.push("");
+      }
+    });
+    if (!anyPlaybook) { lines.push("*No incident-specific playbook annexes selected.*"); lines.push(""); }
+
+    lines.push("## 7. Communications Plan");
+    lines.push("");
+    lines.push("**NPC Circular 16-03 breach-notification chain:** " + gap(state.npcChainDesc));
+    lines.push("");
+    lines.push("**DICT / CERT-PH coordination:** " + gap(state.dictContact));
+    lines.push("");
+    lines.push("**Law enforcement referral criteria:** " + gap(state.lawEnforcementCriteria));
+    lines.push("");
+    lines.push("**Internal staff communication:** " + gap(state.internalComms));
+    lines.push("");
+    lines.push("**Executive briefing cadence:** " + gap(state.execBriefing));
+    lines.push("");
+    lines.push("**Public / media statement authorization:** " + gap(state.publicComms));
+    lines.push("");
+
+    lines.push("## 8. Evidence Handling & Chain of Custody");
+    lines.push("");
+    lines.push("**What must be preserved:** " + gap(state.evidencePreserve));
+    lines.push("");
+    lines.push("**Evidence custodian:** " + gap(state.evidenceCustodian));
+    lines.push("");
+    lines.push("**Logging process:** " + gap(state.evidenceLogging));
+    lines.push("");
+
+    lines.push("## 9. Post-Incident Review");
+    lines.push("");
+    lines.push("**Review timeline:** " + gap(state.reviewTimeline));
+    lines.push("");
+    lines.push("**Attendees & feedback loop:** " + gap(state.reviewAttendees));
+    lines.push("");
+
+    lines.push("## 10. Plan Maintenance & Testing");
+    lines.push("");
+    lines.push("**Review cycle:** " + gap(state.reviewCycle));
+    lines.push("");
+    lines.push("**Drill / tabletop schedule:** " + gap(state.drillSchedule));
+    lines.push("");
+    lines.push("**Version control:** " + gap(state.versionControl));
+    lines.push("");
+
+    lines.push("## 11. Appendices");
+    lines.push("");
+    lines.push("- Contact tree — build from the named roles in Section 3");
+    lines.push("- Escalation flowchart — build from Section 5");
+    lines.push("- Playbook annexes — see Section 6");
+    if (state.notes) {
+      lines.push("");
+      lines.push("**Additional notes:** " + escapeHtml(state.notes));
+    }
+    lines.push("");
+
+    lines.push("---");
+    lines.push("");
+    lines.push("*This draft was AI-assisted and has not been legally reviewed. It must be reviewed and formally adopted by the organization's Data Protection Officer, legal/compliance office, and IT/ICT authority (e.g., PICTO) before use. This document does not certify compliance with RA 10173, NPC Circular 16-03, DICT issuances, or any other law or regulation. The classic four-phase IR lifecycle referenced in facilitation materials for this plan traces to NIST SP 800-61 Rev. 2 (2012, withdrawn April 2025); current NIST guidance is SP 800-61 Rev. 3.*");
+
+    return lines.join("\n");
+  }
+
+  // ---------- Review screen ----------
+
+  function renderReview() {
+    var checks = completenessChecks();
+    var failing = checks.filter(function (c) { return !c.ok; });
+    var html = "";
+
+    html += '<div class="gate-summary">' + (failing.length === 0
+      ? '<span style="color:var(--gate-ok-fg);">All completeness checks passed.</span>'
+      : '<span style="color:var(--gate-bad-fg);">' + failing.length + ' item(s) still need attention.</span>') + '</div>';
+    html += '<ul class="gate-list">';
+    checks.forEach(function (c) {
+      html += '<li class="gate-item ' + (c.ok ? "ok" : "bad") + '"><span class="dot"></span>' + c.label + (c.ok ? "" : " — not yet provided") + '</li>';
+    });
+    html += '</ul>';
+
+    html += '<div class="fhint" style="margin-bottom:6px;">You can generate the draft now regardless — unresolved items are flagged inline in the document rather than silently omitted. Fix anything above by using the steps on the left, then come back here.</div>';
+
+    html += '<div style="display:flex; gap:10px; margin: 18px 0 8px; flex-wrap:wrap;">';
+    html += '<button class="btn-gold" id="btn-download">Download draft (.md)</button>';
+    html += '<button class="btn-ghost" id="btn-copy">Copy to clipboard</button>';
+    html += '</div>';
+
+    html += '<div class="preview-pane"><pre id="doc-preview"></pre></div>';
+    return html;
+  }
+
+  // ---------- Wiring ----------
+
+  function bindStepEvents(stepId) {
+    if (stepId === "orgType") {
+      document.querySelectorAll('input[name="orgType"]').forEach(function (el) {
+        el.addEventListener("change", function () { state.orgType = el.value; renderAll(); });
+      });
+    } else if (stepId === "orgIdentity") {
+      bindText("orgName"); bindArea("orgMandate"); bindText("approvingAuthority");
+    } else if (stepId === "scope") {
+      bindArea("scope");
+    } else if (stepId === "cii") {
+      document.querySelectorAll('input[name="ciiStatus"]').forEach(function (el) {
+        el.addEventListener("change", function () { state.ciiStatus = el.value; renderAll(); });
+      });
+      bindArea("ciiNotes");
+    } else if (stepId === "privacy") {
+      document.querySelectorAll('input[name="dpoAppointed"]').forEach(function (el) {
+        el.addEventListener("change", function () { state.dpoAppointed = el.value; renderAll(); });
+      });
+      bindArea("dataCategories");
+    } else if (stepId === "roles") {
+      document.querySelectorAll("[data-role]").forEach(function (el) {
+        var evt = el.type === "checkbox" ? "change" : "input";
+        el.addEventListener(evt, function () {
+          var id = el.getAttribute("data-role"), f = el.getAttribute("data-field");
+          state.roles[id][f] = el.type === "checkbox" ? el.checked : el.value;
+          if (f === "unassigned") renderAll(); else updateRailProgress();
+        });
+      });
+    } else if (stepId === "severity") {
+      document.querySelectorAll("[data-sev]").forEach(function (el) {
+        el.addEventListener("input", function () {
+          state.severity[+el.getAttribute("data-sev")][el.getAttribute("data-field")] = el.value;
+          state.severityTouched = true;
+          updateRailProgress();
+        });
+      });
+    } else if (stepId === "detection") {
+      bindArea("detectionSources"); bindArea("reportingChannel");
+    } else if (stepId === "activation") {
+      bindArea("activationCriteria"); bindArea("escalationChain");
+    } else if (stepId === "playbooks") {
+      bindArea("containmentGeneral");
+      document.querySelectorAll("[data-pb]").forEach(function (el) {
+        el.addEventListener("change", function () {
+          state.playbooks[el.getAttribute("data-pb")].on = el.checked;
+          renderAll();
+        });
+      });
+      PLAYBOOK_DEFS.forEach(function (p) {
+        var ta = document.getElementById("pbdetail-" + p.id);
+        if (ta) ta.addEventListener("input", function () { state.playbooks[p.id].detail = ta.value; updateRailProgress(); });
+      });
+    } else if (stepId === "regulatory") {
+      ["npcChainDesc", "dictContact", "lawEnforcementCriteria", "internalComms", "execBriefing", "publicComms"].forEach(bindArea);
+    } else if (stepId === "evidence") {
+      bindArea("evidencePreserve"); bindText("evidenceCustodian"); bindArea("evidenceLogging");
+    } else if (stepId === "postincident") {
+      bindText("reviewTimeline"); bindArea("reviewAttendees");
+    } else if (stepId === "maintenance") {
+      bindText("reviewCycle"); bindArea("drillSchedule"); bindArea("versionControl");
+    } else if (stepId === "notes") {
+      bindArea("notes");
+    } else if (stepId === "review") {
+      document.getElementById("doc-preview").textContent = generateDocument();
+      document.getElementById("btn-download").addEventListener("click", onDownload);
+      document.getElementById("btn-copy").addEventListener("click", onCopy);
+    }
+
+    function bindText(id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener("input", function () { state[id] = el.value; updateRailProgress(); });
+    }
+    function bindArea(id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener("input", function () { state[id] = el.value; updateRailProgress(); });
+    }
+  }
+
+  function onDownload() {
+    var doc = generateDocument();
+    var orgSlug = (state.orgName || "draft").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    var filename = "cirp-draft-" + (orgSlug || "org") + ".md";
+    try {
+      var blob = new Blob([doc], { type: "text/markdown;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      showToast("Draft downloaded.");
+    } catch (e) {
+      showToast("Couldn't download — use Copy to clipboard instead.");
+    }
+  }
+
+  function onCopy() {
+    var doc = generateDocument();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(doc).then(function () { showToast("Copied to clipboard."); })
+        .catch(function () { fallbackCopy(doc); });
+    } else {
+      fallbackCopy(doc);
+    }
+  }
+  function fallbackCopy(doc) {
+    var ta = document.createElement("textarea");
+    ta.value = doc; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); showToast("Copied to clipboard."); } catch (e) { showToast("Copy failed — select the text manually."); }
+    document.body.removeChild(ta);
+  }
+
+  var toastTimer;
+  function showToast(msg) {
+    var t = document.getElementById("toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2600);
+  }
+
+  function updateRailProgress() {
+    // Lightweight: just refresh the rail's done/active classes without a full re-render.
+    var railSteps = document.querySelectorAll(".rail-step");
+    railSteps.forEach(function (el, i) {
+      var complete = STEPS[i].isComplete();
+      el.classList.toggle("done", complete && i !== stepIndex);
+      el.classList.toggle("active", i === stepIndex);
+    });
+  }
+
+  function renderRail() {
+    var rail = document.getElementById("rail");
+    var html = '<div class="rail-brand">Provincial Government of Davao del Norte</div>';
+    html += '<h1 class="rail-title">CIRP Intake Wizard</h1>';
+    html += '<ul class="rail-steps">';
+    STEPS.forEach(function (s, i) {
+      var complete = s.isComplete();
+      var cls = (i === stepIndex ? "active" : "") + (complete && i !== stepIndex ? " done" : "");
+      html += '<li class="rail-step ' + cls + '" data-goto="' + i + '"><span class="rail-num">' + (complete ? "✓" : (i + 1)) + '</span><span class="rail-step-label">' + s.railLabel + '</span></li>';
+    });
+    html += '</ul>';
+    html += '<div class="rail-footer">Built for the Day 2 CIRP drafting workshop. Nothing you type here leaves your browser until you choose to download or copy the draft.</div>';
+    rail.innerHTML = html;
+    rail.querySelectorAll("[data-goto]").forEach(function (el) {
+      el.addEventListener("click", function () { stepIndex = +el.getAttribute("data-goto"); renderAll(); });
+    });
+  }
+
+  function renderMain() {
+    var step = STEPS[stepIndex];
+    var main = document.getElementById("main");
+    var html = "";
+    if (step.eyebrow) html += '<div class="eyebrow">' + step.eyebrow + '</div>';
+    html += '<h2 class="step-title">' + step.title + '</h2>';
+    if (step.help) html += '<p class="step-help">' + step.help + '</p>';
+    html += step.render();
+    html += '<div class="nav-row">';
+    html += stepIndex > 0 ? '<button class="btn-ghost" id="btn-back">Back</button>' : '<span></span>';
+    html += stepIndex < STEPS.length - 1 ? '<button class="btn-primary" id="btn-next">Continue</button>' : '<span></span>';
+    html += '</div>';
+    main.innerHTML = html;
+    bindStepEvents(step.id);
+    var back = document.getElementById("btn-back");
+    var next = document.getElementById("btn-next");
+    if (back) back.addEventListener("click", function () { stepIndex--; renderAll(); window.scrollTo(0, 0); });
+    if (next) next.addEventListener("click", function () { stepIndex++; renderAll(); window.scrollTo(0, 0); });
+  }
+
+  function renderAll() { renderRail(); renderMain(); }
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
