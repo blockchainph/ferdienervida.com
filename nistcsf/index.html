@@ -253,7 +253,7 @@
     <!-- INTRO -->
     <div class="view active" id="view-intro">
       <h1>Sort by Function</h1>
-      <p class="lede">You'll read 8 short situations from real provincial-government operations. For each one, decide which of the six NIST CSF 2.0 Functions it belongs to. Some belong to more than one.</p>
+      <p class="lede">You'll read 20 short situations from real provincial-government operations. For each one, decide which of the six NIST CSF 2.0 Functions it belongs to. Some belong to more than one.</p>
 
       <div class="fn-legend">
         <div class="fn-row"><span class="fn-dot" style="background: var(--gv)"></span><div><b>Govern</b><p>Strategy, policy, and who's responsible.</p></div></div>
@@ -265,8 +265,8 @@
       </div>
 
       <div class="meta-line">
-        <span>⏱ ~15 minutes</span>
-        <span>📋 8 scenarios</span>
+        <span>⏱ ~25 minutes</span>
+        <span>📋 20 scenarios</span>
         <span>🗣 group share-out after</span>
       </div>
 
@@ -302,7 +302,7 @@
     <!-- RESULTS -->
     <div class="view" id="view-results">
       <h1>Here's your read on it</h1>
-      <div class="score-line">You matched the primary function on <span class="num" id="scoreNum">0 / 8</span> scenarios.</div>
+      <div class="score-line">You matched the primary function on <span class="num" id="scoreNum">0 / 20</span> scenarios.</div>
 
       <div class="compare-block">
         <div class="compare-title">Your calls vs. the group's answer key</div>
@@ -364,6 +364,66 @@
       text: "After isolating the infected servers, the IT team later restores the affected files from backup once the malware is fully removed.",
       correct: ["RS", "RC"],
       explain: "This one spans two functions on purpose: isolating the servers is Respond (acting on the detected incident), while restoring the files afterward is Recover (returning to normal). They often run back-to-back, but they're distinct functions with different goals — contain vs. restore."
+    },
+    {
+      text: "During an asset inventory audit, IT discovers a cloud file-sharing tool three departments have been using for months that was never procured or approved.",
+      correct: ["ID"],
+      explain: "This is “shadow IT” — a system in use that the office didn't know it had. Finding it is Identify: you can't manage the risk of an asset you don't know exists."
+    },
+    {
+      text: "Every new hire must complete a cybersecurity awareness module before their network account is activated.",
+      correct: ["PR"],
+      explain: "This is a safeguard built into the onboarding process itself — training people before they touch a system reduces the office's risk. That's Protect."
+    },
+    {
+      text: "Antivirus software automatically quarantines a malicious attachment from a phishing email before the employee can open it.",
+      correct: ["DE"],
+      explain: "The tool found and flagged something abnormal on its own, before anyone acted on it — the classic Detect scenario, even though the software also blocked it in the same motion."
+    },
+    {
+      text: "After a server crash wipes recent changes, the assessor's office rebuilds the lost property records from the most recent verified backup and confirms the data is accurate before reopening public access.",
+      correct: ["RC"],
+      explain: "The incident (data loss) is over — this is entirely about restoring what was affected and getting the service back to a trustworthy state. That's Recover."
+    },
+    {
+      text: "The provincial council approves a dedicated annual budget line for cybersecurity, instead of pulling funds ad hoc whenever something breaks.",
+      correct: ["GV"],
+      explain: "This is a resourcing and prioritization decision made by leadership — committing to cybersecurity as an ongoing line item rather than a reaction. That's Govern."
+    },
+    {
+      text: "A risk assessment ranks the payroll system as the single most critical system to protect, based on what would happen if it went down or was compromised.",
+      correct: ["ID"],
+      explain: "This is about understanding which assets matter most and why — assessing and prioritizing risk across what you have. That's Identify."
+    },
+    {
+      text: "IT configures the financial system to require complex passwords and to lock an account after five failed login attempts.",
+      correct: ["PR"],
+      explain: "These are technical controls actively reducing the chance of unauthorized access — day-to-day safeguards. That's Protect."
+    },
+    {
+      text: "A log-monitoring dashboard shows an unusual spike in failed login attempts against the HR portal overnight and flags it for the on-call officer to review.",
+      correct: ["DE"],
+      explain: "Nothing has been contained or fixed yet — a tool noticed something abnormal and surfaced it for a human to look at. That's Detect."
+    },
+    {
+      text: "The moment a phishing campaign targeting staff is confirmed, IT sends a province-wide alert telling everyone not to click the link and how to report it if they already did.",
+      correct: ["RS"],
+      explain: "This is active containment of a confirmed incident — getting the word out to limit damage while it's still unfolding. That's Respond."
+    },
+    {
+      text: "After a multi-day outage, the province activates its written continuity plan to resume permit processing at a backup site while the primary system is repaired.",
+      correct: ["RC"],
+      explain: "This is about restoring the service residents depend on, using a plan built for exactly this situation. That's Recover."
+    },
+    {
+      text: "Every department head must sign an annual attestation confirming their staff completed the required security-awareness training.",
+      correct: ["GV"],
+      explain: "This is accountability built into a formal, recurring process — leadership confirming responsibilities were actually carried out. That's Govern."
+    },
+    {
+      text: "Before signing a contract with a new cloud vendor, the province requires the vendor to complete a security questionnaire, and the head of IT must formally sign off on the risk before procurement can proceed.",
+      correct: ["GV", "ID"],
+      explain: "This one spans two functions on purpose: assessing the vendor's risk is Identify (understanding what you're taking on), while requiring formal sign-off before the contract proceeds is Govern (a policy gate leadership controls). Vendor and supply-chain risk often needs both."
     }
   ];
 
