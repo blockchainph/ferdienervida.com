@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incident Playbook Creator</title>
+<meta name="description" content="Choose an incident type and generate a Philippine LGU/government incident response playbook, with suggested defaults for every field.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    --paper: #f7f8fa;
+    --panel: #ffffff;
+    --ink: #16233a;
+    --ink-soft: #4b5768;
+    --navy: #1f3a5f;
+    --navy-deep: #0f1d33;
+    --gold: #b8860b;
+    --gold-soft: #e7c874;
+    --line: #dce1e8;
+    --line-soft: #eceff3;
+    --rail-text: #cdd8ea;
+    --rail-text-dim: #8ea0bc;
+    --gate-bad-bg: #fbeaea;
+    --gate-bad-fg: #8b1e1e;
+    --gate-ok-bg: #e9f5ec;
+    --gate-ok-fg: #1f6b3a;
+    --focus: #2f6fb0;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --paper: #10182a;
+      --panel: #16223a;
+      --ink: #e8edf6;
+      --ink-soft: #aab7cc;
+      --line: #2a3752;
+      --line-soft: #202c46;
+      --gate-bad-bg: #3a1f1f;
+      --gate-bad-fg: #f1a3a3;
+      --gate-ok-bg: #1c3527;
+      --gate-ok-fg: #8fd6a8;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #10182a;
+    --panel: #16223a;
+    --ink: #e8edf6;
+    --ink-soft: #aab7cc;
+    --line: #2a3752;
+    --line-soft: #202c46;
+    --gate-bad-bg: #3a1f1f;
+    --gate-bad-fg: #f1a3a3;
+    --gate-ok-bg: #1c3527;
+    --gate-ok-fg: #8fd6a8;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Public Sans', system-ui, sans-serif;
+    margin: 0;
+  }
+  h1, h2, h3, .display {
+    font-family: 'Spectral', Georgia, serif;
+    text-wrap: balance;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .app {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: 100vh;
+  }
+  .app.no-rail { grid-template-columns: 1fr; }
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; }
+    .rail { position: static !important; height: auto !important; }
+  }
+
+  /* ---------- Rail ---------- */
+  .rail {
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+    color: var(--rail-text);
+    padding: 28px 22px 22px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .rail-brand {
+    font-family: 'Spectral', serif;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    margin-bottom: 4px;
+  }
+  .rail-title {
+    font-family: 'Spectral', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 22px;
+    line-height: 1.25;
+  }
+  .rail-change {
+    display: inline-block; margin: -10px 0 18px; font-size: 12.5px; color: var(--gold-soft);
+    cursor: pointer; text-decoration: underline;
+  }
+  .rail-steps { list-style: none; margin: 0; padding: 0; }
+  .rail-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 8px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    line-height: 1.4;
+    color: var(--rail-text-dim);
+    transition: background 0.15s, color 0.15s;
+  }
+  .rail-step:hover { background: rgba(255,255,255,0.06); color: var(--rail-text); }
+  .rail-step.done { color: var(--rail-text); }
+  .rail-step.active { background: rgba(184,134,11,0.16); color: #fff; }
+  .rail-num {
+    flex: 0 0 auto;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--rail-text-dim);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .rail-step.done .rail-num { background: var(--gold); border-color: var(--gold); color: var(--navy-deep); }
+  .rail-step.active .rail-num { border-color: var(--gold); color: var(--gold-soft); }
+  .rail-step-label { padding-top: 2px; }
+  .rail-footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    font-size: 11.5px;
+    color: var(--rail-text-dim);
+    line-height: 1.5;
+  }
+
+  /* ---------- Main ---------- */
+  .main { padding: 48px 56px 80px; max-width: 780px; }
+  @media (max-width: 640px) { .main { padding: 32px 20px 60px; } }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 8px;
+  }
+  .step-title { font-size: 28px; margin: 0 0 10px; }
+  .step-help { color: var(--ink-soft); font-size: 15px; line-height: 1.55; margin: 0 0 30px; max-width: 62ch; }
+
+  .field { margin-bottom: 22px; }
+  .field label.flabel {
+    display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 7px; color: var(--ink);
+  }
+  .field .fhint { font-size: 12.5px; color: var(--ink-soft); margin: -3px 0 8px; }
+  input[type="text"], textarea, select {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14.5px;
+    color: var(--ink);
+    background: var(--panel);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 13px;
+    line-height: 1.5;
+  }
+  textarea { resize: vertical; min-height: 84px; }
+  input:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px rgba(47,111,176,0.16);
+  }
+
+  .default-badge {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700;
+    color: var(--gold); background: rgba(184,134,11,0.12); border-radius: 999px; padding: 3px 10px;
+    margin-left: 8px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 36px; }
+  button {
+    font-family: inherit; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer;
+    padding: 12px 22px; border: none;
+  }
+  .btn-primary { background: var(--navy); color: #fff; }
+  .btn-primary:hover { background: var(--navy-deep); }
+  .btn-ghost { background: transparent; color: var(--ink-soft); border: 1.5px solid var(--line); }
+  .btn-ghost:hover { border-color: var(--ink-soft); color: var(--ink); }
+  .btn-gold { background: var(--gold); color: var(--navy-deep); }
+  .btn-gold:hover { filter: brightness(0.94); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ---------- Picker screen ---------- */
+  .picker-grid { display: grid; gap: 16px; margin-top: 8px; }
+  .type-card {
+    display: block; text-align: left; width: 100%;
+    border: 1.5px solid var(--line); border-radius: 12px; padding: 20px 22px;
+    background: var(--panel); cursor: pointer; transition: border-color 0.15s, transform 0.1s;
+  }
+  .type-card:hover { border-color: var(--navy); transform: translateY(-1px); }
+  .type-card h3 { font-size: 19px; margin: 0 0 6px; }
+  .type-card p { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; margin: 0; }
+
+  /* ---------- Review screen ---------- */
+  .gate-list { list-style: none; margin: 0 0 26px; padding: 0; }
+  .gate-item {
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 13px; border-radius: 8px; margin-bottom: 6px; font-size: 13.5px;
+  }
+  .gate-item.bad { background: var(--gate-bad-bg); color: var(--gate-bad-fg); }
+  .gate-item.ok { background: var(--gate-ok-bg); color: var(--gate-ok-fg); }
+  .gate-item .dot { flex: 0 0 auto; margin-top: 4px; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .gate-summary { font-size: 14.5px; margin-bottom: 4px; font-weight: 600; }
+
+  .preview-pane {
+    background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px;
+    padding: 18px 20px; margin-top: 8px; max-height: 480px; overflow-y: auto;
+  }
+  .preview-pane pre {
+    white-space: pre-wrap; word-wrap: break-word; font-family: 'Public Sans', sans-serif; font-size: 12.5px;
+    color: var(--ink-soft); line-height: 1.6; margin: 0;
+  }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--navy-deep); color: #fff; padding: 11px 20px; border-radius: 8px; font-size: 13.5px;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .toast.show { opacity: 1; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+</head>
+<body>
+
+<div class="app no-rail" id="app">
+  <nav class="rail" id="rail" style="display:none;"></nav>
+  <main class="main" id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Field-level helpers ----------
+
+  function escapeHtml(s) { return (s || "").replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); }
+  function escapeAttr(s) { return escapeHtml(s).replace(/"/g, "&quot;"); }
+  function gap(v) { return v ? escapeHtml(v) : "**[UNRESOLVED]**"; }
+  function gapHtml(v) { return v ? escapeHtml(v) : "<strong>[UNRESOLVED]</strong>"; }
+  function md(v) { return escapeHtml(v).replace(/\n/g, "\n\n"); }
+  function htmlP(v) { return "<p>" + escapeHtml(v).replace(/\n/g, "<br>") + "</p>"; }
+
+  // ---------- Playbook type definitions ----------
+  // Each field: { id, label, hint, rows, required, default }
+  // Fields with no `default` and `required:true` are org-identity fields (start blank).
+  // Fields with a `default` are operational content — pre-filled, editable, never blocking.
+
+  var PLAYBOOK_TYPES = {
+
+    ransomware: {
+      label: "Ransomware",
+      pickerHint: "Encryption, ransom notes, and the backup/recovery decision.",
+      docTitle: "Ransomware Incident Response Playbook",
+      footer: "This document does not certify compliance with RA 10173, RA 10175, NPC Circular 16-03, DICT issuances, or any other law or regulation.",
+      sections: [
+        { id: "identity", title: "Plan Identity & Trigger Definition", railLabel: "Identity & triggers",
+          help: "Name the organization and authority, and confirm what actually counts as a ransomware event for your office.",
+          fields: [
+            { id: "orgName", label: "Organization name", hint: "Full name of the agency / LGU / office this playbook is for.", required: true },
+            { id: "approvingAuthority", label: "Approving authority", hint: "Who signs this playbook into effect, and who must sign off before any ransom-related decision.", required: true },
+            { id: "triggers", label: "What counts as a ransomware event", hint: "Adjust for your environment — add specific tools or systems if you have them.", rows: 5,
+              default: "Ransom note or on-screen message demanding payment; file extensions changed en masse (e.g., .locked, .encrypted); inability to open shared drives, databases, or applications; EDR/antivirus alert flagging ransomware behavior; unusually high disk or CPU activity across multiple machines at once; help desk reports of several users unable to access files at the same time." }
+          ] },
+        { id: "containment", title: "Immediate Containment (First 60 Minutes)", railLabel: "Immediate containment",
+          help: "What happens the moment ransomware is suspected — before anyone starts investigating root cause.",
+          fields: [
+            { id: "isolation", label: "Immediate isolation steps", hint: "The first actions, in order, the moment ransomware is suspected.", rows: 7,
+              default: "1) Disconnect affected devices from the network (unplug Ethernet / disable Wi-Fi) — do NOT power off, to preserve memory evidence.\n2) Disable or restrict shared network drives and file server access organization-wide until scope is known.\n3) Notify the IR Team Lead and Technical/IT Lead immediately.\n4) Do not attempt to pay, negotiate, or communicate with the attacker without Executive Authority and Legal sign-off.\n5) Preserve the ransom note and any attacker contact details as evidence — do not delete it." },
+            { id: "isolationAuthority", label: "Who has authority to isolate systems", hint: "",
+              default: "Technical / IT Lead, with immediate notification to the IR Team Lead" }
+          ] },
+        { id: "backup", title: "Backup Verification & Recovery Decision", railLabel: "Backup & recovery decision",
+          help: "Whether to restore from backup depends entirely on verifying backups first — and who is authorized to make the ransom call.",
+          fields: [
+            { id: "backupVerify", label: "Backup verification steps", hint: "Do this before deciding anything about recovery or payment.", rows: 5,
+              default: "Confirm the most recent successful backup date and exactly which systems/data it covers. Verify the backup is offline, immutable, or otherwise isolated from the compromised network — backups still connected to the network at the time of infection may also be encrypted. Test-restore a small sample before committing to a full recovery." },
+            { id: "ransomPolicy", label: "Ransom payment policy", hint: "Your organization's stance, and who is authorized to decide otherwise.", rows: 7,
+              default: "As a government office, paying a ransom is not authorized as standard practice: the funds involved are public funds subject to COA rules and procurement regulations, payment does not guarantee data recovery or prevent leak of exfiltrated data, and paying may fund further criminal activity. Recovery should proceed from verified clean backups. If backups are unavailable or also compromised, escalate to the Approving Authority and Legal/Compliance before any decision involving outside negotiation — this is not a unilateral IT decision." }
+          ] },
+        { id: "eradication", title: "Eradication", railLabel: "Eradication",
+          help: "Close the entry point and remove attacker access before recovery begins.",
+          fields: [
+            { id: "eradication", label: "Eradication steps", hint: "What must happen before any system is reconnected.", rows: 6,
+              default: "Identify and close the entry vector (phishing email, exposed RDP, unpatched vulnerability, compromised VPN credentials). Rotate ALL domain and administrator credentials, not only accounts on the affected system — ransomware operators frequently achieve domain-wide compromise before triggering encryption. Scan the full network for remaining malware, backdoors, or lateral-movement indicators before beginning recovery. Apply the patch or fix for the identified entry point." }
+          ] },
+        { id: "recovery", title: "Recovery & Validation", railLabel: "Recovery & validation",
+          help: "Restoration order and how you confirm systems are safe before reconnecting them.",
+          fields: [
+            { id: "recovery", label: "Recovery order & validation", hint: "Which systems come back first, and how you confirm they're safe.", rows: 6,
+              default: "Restore in priority order: (1) systems supporting critical public services (payroll, permits, health/social welfare records), (2) core infrastructure (domain controllers, email), (3) remaining office systems. Validate each restored system is malware-free and fully patched before reconnecting it to the network. Monitor restored systems closely for at least 72 hours for signs of reinfection before declaring recovery complete." }
+          ] },
+        { id: "notification", title: "Regulatory & Law Enforcement Notification", railLabel: "Notification",
+          help: "NPC, DICT/CERT-PH, and law enforcement obligations specific to a ransomware event.",
+          fields: [
+            { id: "npcNotify", label: "National Privacy Commission (Data Privacy Act)", hint: "", rows: 4,
+              default: "Ransomware groups increasingly steal data before encrypting it. If personal or sensitive personal data was likely exfiltrated or exposed, treat this as a reportable Data Privacy Act breach: the DPO assesses within 72 hours of discovery and, where the threshold is met, submits to the National Privacy Commission via the DBNMS portal." },
+            { id: "dictNotify", label: "DICT / CERT-PH", hint: "", rows: 3,
+              default: "Report to CERT-PH (cert-ph@dict.gov.ph) and the DICT regional office, especially if the affected system qualifies as Critical Information Infrastructure (DICT MC 005-17: 24-hour reporting window)." },
+            { id: "lawEnforcement", label: "Law enforcement referral", hint: "", rows: 3,
+              default: "Ransomware/extortion is a crime under RA 10175 (computer-related fraud / extortion). Refer to the PNP Anti-Cybercrime Group or NBI Cybercrime Division, particularly if payment is being considered or the attacker has made direct contact." },
+            { id: "publicComms", label: "Public / media statement authorization", hint: "", rows: 4,
+              default: "Only the Approving Authority or designated PIO may speak publicly. Avoid confirming specific technical details, ransom amounts, or attacker identity while the incident is active or under law enforcement review. Prepare a holding statement acknowledging awareness and response without speculation." }
+          ] },
+        { id: "postincident", title: "Post-Incident Review", railLabel: "Post-incident review",
+          help: "What gets reviewed after recovery so the same incident doesn't recur.",
+          fields: [
+            { id: "postIncident", label: "Post-incident review prompts", hint: "", rows: 6,
+              default: "Review: (1) how the attacker gained entry and whether that gap has been closed, (2) whether backups performed as expected and how quickly clean recovery was possible, (3) whether staff followed the reporting/escalation chain correctly, (4) what phishing or security-awareness gaps, if any, contributed. Feed findings back into this playbook and the organization's broader Computer Incident Response Plan." }
+          ] }
+      ]
+    },
+
+    phishing: {
+      label: "Phishing / Credential Compromise",
+      pickerHint: "A user's credentials or mailbox were compromised via phishing.",
+      docTitle: "Phishing / Credential Compromise Incident Response Playbook",
+      footer: "This document does not certify compliance with RA 10173, RA 10175, NPC Circular 16-03, DICT issuances, or any other law or regulation.",
+      sections: [
+        { id: "identity", title: "Plan Identity & Trigger Definition", railLabel: "Identity & triggers",
+          help: "Name the organization and authority, and confirm what actually counts as a phishing/credential-compromise event for your office.",
+          fields: [
+            { id: "orgName", label: "Organization name", hint: "Full name of the agency / LGU / office this playbook is for.", required: true },
+            { id: "approvingAuthority", label: "Approving authority", hint: "Who signs this playbook into effect.", required: true },
+            { id: "triggers", label: "What counts as a phishing / credential-compromise event", hint: "Adjust for your environment.", rows: 5,
+              default: "A user reports a suspicious email, text, or call asking for credentials or urgent action; multiple employees report the same suspicious email; unexpected MFA prompts or password-reset emails the user didn't request; unusual login activity (new location or device, impossible travel, off-hours access); helpdesk reports of an account locked out that the user didn't lock themselves; email rules or forwarding set up without the user's knowledge — a common sign of a compromised mailbox." }
+          ] },
+        { id: "containment", title: "Immediate Containment (First 60 Minutes)", railLabel: "Immediate containment",
+          help: "What happens the moment a compromised account or credential is suspected.",
+          fields: [
+            { id: "isolation", label: "Immediate containment steps", hint: "The first actions, in order.", rows: 7,
+              default: "1) Immediately change the compromised account's password and revoke active sessions/tokens.\n2) Disable or reset MFA if there's any chance the attacker enrolled their own device.\n3) Check and remove any unauthorized mailbox rules, forwarding addresses, or delegate access added to the account.\n4) If a malicious link or attachment was opened, isolate that device from the network pending a malware check.\n5) Search organization-wide for the same phishing email or sender and quarantine or block it before others click." },
+            { id: "isolationAuthority", label: "Who has authority to reset credentials / quarantine email org-wide", hint: "",
+              default: "Technical / IT Lead, with immediate notification to the IR Team Lead" }
+          ] },
+        { id: "scope", title: "Scope Assessment", railLabel: "Scope assessment",
+          help: "What could the attacker actually reach with the compromised credentials.",
+          fields: [
+            { id: "scopeAssess", label: "Scope of access to assess", hint: "", rows: 6,
+              default: "Determine what the attacker could access with the compromised credentials: email content and contacts, file shares, financial or HR systems, VPN or remote access, and any other system using the same password (credential reuse). Check sent-mail and mailbox rules for evidence the account was used to send further phishing internally or to external partners — a common next step once an attacker is inside." }
+          ] },
+        { id: "eradication", title: "Eradication", railLabel: "Eradication",
+          help: "Remove attacker access completely before declaring the account clean.",
+          fields: [
+            { id: "eradication", label: "Eradication steps", hint: "", rows: 6,
+              default: "Rotate credentials for the compromised account and any other account that shared the same password. Remove attacker-added mailbox rules, forwarding, delegates, or OAuth app grants. Block the sender domain, URL, or IP at the email gateway and web proxy. If malware was delivered, run a full scan and reimage the device if compromise is confirmed." }
+          ] },
+        { id: "recovery", title: "Recovery & User Communication", railLabel: "Recovery & communication",
+          help: "Restoring access and making sure downstream contacts aren't caught by the same attack.",
+          fields: [
+            { id: "recovery", label: "Recovery & communication steps", hint: "", rows: 5,
+              default: "Restore normal access once credentials are rotated and MFA is confirmed clean. Notify the affected user(s) of what happened and what changed on their account. If internal or external contacts received phishing emails sent from the compromised account, notify them directly so they don't fall for it too." }
+          ] },
+        { id: "notification", title: "Regulatory & Awareness Notification", railLabel: "Notification",
+          help: "NPC, DICT/CERT-PH, law enforcement, and internal awareness obligations.",
+          fields: [
+            { id: "npcNotify", label: "National Privacy Commission (Data Privacy Act)", hint: "", rows: 4,
+              default: "If the compromised mailbox or account contained personal or sensitive personal information the attacker could have accessed, treat this as a potential Data Privacy Act breach. The DPO assesses within 72 hours of discovery and, where the threshold is met, submits to the National Privacy Commission via the DBNMS portal." },
+            { id: "dictNotify", label: "DICT / CERT-PH", hint: "", rows: 3,
+              default: "Report to CERT-PH (cert-ph@dict.gov.ph) if the compromise affected Critical Information Infrastructure, or if the phishing campaign appears to be targeting multiple government offices — worth flagging so DICT can warn others." },
+            { id: "lawEnforcement", label: "Law enforcement referral", hint: "", rows: 3,
+              default: "If the phishing led to financial loss (e.g., a fraudulent fund transfer) or identity theft, this is computer-related fraud or identity theft under RA 10175 — refer to the PNP Anti-Cybercrime Group or NBI Cybercrime Division." },
+            { id: "internalAwareness", label: "Internal staff awareness alert", hint: "", rows: 3,
+              default: "Send an organization-wide alert describing the phishing email's key characteristics (sender, subject line, link) so staff can identify and report similar attempts, without disclosing granular technical detail that helps the attacker adjust." }
+          ] },
+        { id: "postincident", title: "Post-Incident Review", railLabel: "Post-incident review",
+          help: "What gets reviewed after recovery so the same incident doesn't recur.",
+          fields: [
+            { id: "postIncident", label: "Post-incident review prompts", hint: "", rows: 6,
+              default: "Review: (1) why the phishing email got through filters and whether email security rules need updating, (2) whether the user recognized the attempt and reported it, and if not, whether awareness training needs reinforcement, (3) how quickly containment happened from report to credential rotation, (4) whether MFA was in place, and if not, whether it should be required going forward." }
+          ] }
+      ]
+    },
+
+    databreach: {
+      label: "Data Breach (non-ransomware)",
+      pickerHint: "Personal data exposed, lost, or accessed without authorization.",
+      docTitle: "Data Breach Incident Response Playbook",
+      footer: "This document does not certify compliance with RA 10173, RA 10175, NPC Circular 16-03, DICT issuances, or any other law or regulation.",
+      sections: [
+        { id: "identity", title: "Plan Identity & Trigger Definition", railLabel: "Identity & triggers",
+          help: "Name the organization and authority, and confirm what actually counts as a data breach for your office.",
+          fields: [
+            { id: "orgName", label: "Organization name", hint: "Full name of the agency / LGU / office this playbook is for.", required: true },
+            { id: "approvingAuthority", label: "Approving authority", hint: "Who signs this playbook into effect.", required: true },
+            { id: "triggers", label: "What counts as a data breach event", hint: "Adjust for your environment.", rows: 5,
+              default: "A staff member reports sending personal data to the wrong recipient (misdirected email, wrong printout, wrong mailing); a lost or stolen device or document containing personal data; unauthorized access to a system or file share containing personal data is discovered; a vendor or partner notifies the office of a breach involving data the office shared with them; personal data is found improperly disposed of (e.g., in public trash) or exposed publicly (e.g., an unsecured shared drive or public-facing folder)." }
+          ] },
+        { id: "containment", title: "Immediate Containment", railLabel: "Immediate containment",
+          help: "Stop the exposure and get the Data Protection Officer involved immediately.",
+          fields: [
+            { id: "isolation", label: "Immediate containment steps", hint: "", rows: 7,
+              default: "1) Stop the exposure immediately where possible — recall the email if the platform allows it, remove public access to the exposed file or folder, retrieve or remotely wipe a lost device.\n2) Identify exactly what data was involved and how many individuals are affected — this determines the DPA notification threshold.\n3) Notify the Data Protection Officer immediately; do not wait to have every detail confirmed.\n4) Preserve evidence of the exposure (who accessed it, when, how) before taking further remediation action that might overwrite logs." },
+            { id: "isolationAuthority", label: "Who must be notified immediately", hint: "",
+              default: "Data Protection Officer, with notification to the IR Team Lead" }
+          ] },
+        { id: "threshold", title: "Impact & Threshold Assessment", railLabel: "Threshold assessment",
+          help: "Whether this breach legally requires NPC notification depends on a specific three-part test.",
+          fields: [
+            { id: "thresholdAssess", label: "Threshold assessment", hint: "", rows: 6,
+              default: "The DPO assesses whether this breach meets the National Privacy Commission's notification threshold: (a) sensitive personal information, or information that could enable identity fraud, is involved, AND (b) there is reasonable belief the information may have been acquired by an unauthorized person, AND (c) the breach is likely to give rise to real risk of serious harm to the affected individuals. If all three apply, the 72-hour notification clock starts from the time the office became aware of the breach." }
+          ] },
+        { id: "rootcause", title: "Root Cause Containment", railLabel: "Root cause",
+          help: "Fix the specific gap that caused the exposure, not just the immediate symptom.",
+          fields: [
+            { id: "rootCause", label: "Root cause containment", hint: "", rows: 5,
+              default: "Identify why the exposure happened — human error (wrong recipient, misconfigured sharing), a technical control gap (no access restriction on a shared folder), or malicious access — and fix that specific gap so the same exposure can't recur immediately (e.g., restrict folder permissions, add a send-delay or confirmation step for outbound email of sensitive files)." }
+          ] },
+        { id: "notification", title: "Regulatory Notification & Affected-Party Communication", railLabel: "Notification",
+          help: "NPC, affected individuals, and law enforcement — each with a different notification logic.",
+          fields: [
+            { id: "npcNotify", label: "National Privacy Commission (Data Privacy Act)", hint: "", rows: 4,
+              default: "If the DPO determines the threshold is met, submit the breach notification to the National Privacy Commission via the DBNMS portal within 72 hours of the office becoming aware of the breach, followed by a full report within 5 days as required by NPC Circular 16-03." },
+            { id: "affectedParty", label: "Affected-party communication", hint: "", rows: 4,
+              default: "Where required, notify affected individuals directly (not just a public notice) describing what data was involved, the likely impact, and what the office is doing about it — use the clearest, most direct channel available (letter, SMS, email) rather than assuming they'll see a general announcement." },
+            { id: "lawEnforcement", label: "Law enforcement referral", hint: "", rows: 3,
+              default: "If the breach involved theft, hacking, or malicious insider access, this may also constitute a cybercrime under RA 10175 (illegal access) — refer to the PNP Anti-Cybercrime Group or NBI Cybercrime Division as appropriate." }
+          ] },
+        { id: "postincident", title: "Post-Incident Review", railLabel: "Post-incident review",
+          help: "What gets reviewed after closure so the same exposure doesn't recur.",
+          fields: [
+            { id: "postIncident", label: "Post-incident review prompts", hint: "", rows: 6,
+              default: "Review: (1) how the exposure happened and whether the control gap has actually been closed, (2) how long it took from occurrence to detection, and from detection to DPO notification, (3) whether the 72-hour NPC clock was met if the threshold applied, (4) whether affected individuals were notified appropriately, (5) what policy or training change prevents a repeat (e.g., mandatory encryption for outbound sensitive files, folder permission audits)." }
+          ] }
+      ]
+    }
+
+  };
+
+  var currentType = null;
+  var state = {};
+  var stepIndex = 0;
+  var STEPS = [];
+
+  function initState(typeId) {
+    currentType = typeId;
+    state = {};
+    PLAYBOOK_TYPES[typeId].sections.forEach(function (s) {
+      s.fields.forEach(function (f) { state[f.id] = f.default || ""; });
+    });
+    stepIndex = 0;
+    STEPS = buildSteps(typeId);
+  }
+
+  function buildSteps(typeId) {
+    var sections = PLAYBOOK_TYPES[typeId].sections;
+    var steps = sections.map(function (s, i) {
+      return {
+        id: s.id, title: s.title, railLabel: s.railLabel, help: s.help,
+        eyebrow: "Section " + (i + 1) + " of " + sections.length,
+        section: s,
+        render: function () { return renderSection(s); },
+        isComplete: function () { return s.fields.filter(function (f) { return f.required; }).every(function (f) { return !!state[f.id]; }); }
+      };
+    });
+    steps.push({
+      id: "review", title: "Review & Generate", railLabel: "Review & generate", eyebrow: "Final step", help: "",
+      render: renderReview, isComplete: function () { return true; }
+    });
+    return steps;
+  }
+
+  function field(labelText, hint, inputHtml, hasDefault) {
+    return '<div class="field"><label class="flabel">' + labelText + (hasDefault ? '<span class="default-badge">Suggested default — edit freely</span>' : '') + '</label>' +
+      (hint ? '<div class="fhint">' + hint + '</div>' : '') + inputHtml + '</div>';
+  }
+  function textInput(id, value) {
+    return '<input type="text" id="' + id + '" value="' + escapeAttr(value) + '">';
+  }
+  function textArea(id, value, rows) {
+    return '<textarea id="' + id + '" rows="' + (rows || 4) + '">' + escapeHtml(value) + '</textarea>';
+  }
+
+  function renderSection(section) {
+    return section.fields.map(function (f) {
+      var input = f.rows ? textArea(f.id, state[f.id], f.rows) : textInput(f.id, state[f.id]);
+      return field(escapeHtml(f.label), f.hint, input, !f.required);
+    }).join("");
+  }
+
+  // ---------- Picker screen ----------
+
+  function renderPicker() {
+    document.getElementById("rail").style.display = "none";
+    document.getElementById("app").classList.add("no-rail");
+    var html = '<div class="eyebrow">Incident Playbook Creator</div>';
+    html += '<h2 class="step-title">Which incident are you drafting a playbook for?</h2>';
+    html += '<p class="step-help">Each playbook comes with the full set of sections and suggested defaults already filled in — you can accept them as-is or rewrite anything for your organization.</p>';
+    html += '<div class="picker-grid">';
+    Object.keys(PLAYBOOK_TYPES).forEach(function (id) {
+      var t = PLAYBOOK_TYPES[id];
+      html += '<button class="type-card" type="button" data-type="' + id + '"><h3>' + escapeHtml(t.label) + '</h3><p>' + escapeHtml(t.pickerHint) + '</p></button>';
+    });
+    html += '</div>';
+    document.getElementById("main").innerHTML = html;
+    document.querySelectorAll("[data-type]").forEach(function (el) {
+      el.addEventListener("click", function () {
+        initState(el.getAttribute("data-type"));
+        renderAll();
+      });
+    });
+  }
+
+  // ---------- Completeness gate ----------
+
+  function completenessChecks() {
+    var checks = [];
+    PLAYBOOK_TYPES[currentType].sections.forEach(function (s) {
+      s.fields.forEach(function (f) {
+        if (f.required) checks.push({ label: f.label, ok: !!state[f.id] });
+      });
+    });
+    return checks;
+  }
+
+  // ---------- Document generation ----------
+
+  function generateDocument() {
+    var type = PLAYBOOK_TYPES[currentType];
+    var lines = [];
+    var checks = completenessChecks();
+    var failing = checks.filter(function (c) { return !c.ok; });
+
+    lines.push("# " + type.docTitle);
+    lines.push("");
+    lines.push("**Organization:** " + gap(state.orgName));
+    lines.push("**Approving authority:** " + gap(state.approvingAuthority));
+    lines.push("**Generated:** " + new Date().toISOString().slice(0, 10) + " via Incident Playbook Creator");
+    lines.push("");
+
+    if (failing.length) {
+      lines.push("## Unresolved Items");
+      lines.push("");
+      failing.forEach(function (c) { lines.push("- " + c.label); });
+      lines.push("");
+    }
+
+    type.sections.forEach(function (s, i) {
+      lines.push("## " + (i + 1) + ". " + s.title);
+      lines.push("");
+      s.fields.forEach(function (f) {
+        if (f.id === "orgName" || f.id === "approvingAuthority") return;
+        lines.push("**" + f.label + ":**");
+        lines.push("");
+        lines.push(md(state[f.id]));
+        lines.push("");
+      });
+    });
+
+    lines.push("---");
+    lines.push("");
+    lines.push("*This draft was AI-assisted and has not been legally reviewed. It must be reviewed and formally adopted by the organization's Data Protection Officer, legal/compliance office, and IT/ICT authority before use, and should be read alongside the organization's full Computer Incident Response Plan. " + type.footer + "*");
+
+    return lines.join("\n");
+  }
+
+  function generateDocumentHtml() {
+    var type = PLAYBOOK_TYPES[currentType];
+    var h = [];
+    var checks = completenessChecks();
+    var failing = checks.filter(function (c) { return !c.ok; });
+
+    h.push("<h1>" + escapeHtml(type.docTitle) + "</h1>");
+    h.push("<p><strong>Organization:</strong> " + gapHtml(state.orgName) + "</p>");
+    h.push("<p><strong>Approving authority:</strong> " + gapHtml(state.approvingAuthority) + "</p>");
+    h.push("<p><strong>Generated:</strong> " + new Date().toISOString().slice(0, 10) + " via Incident Playbook Creator</p>");
+
+    if (failing.length) {
+      h.push("<h2>Unresolved Items</h2><ul>");
+      failing.forEach(function (c) { h.push("<li>" + escapeHtml(c.label) + "</li>"); });
+      h.push("</ul>");
+    }
+
+    type.sections.forEach(function (s, i) {
+      h.push("<h2>" + (i + 1) + ". " + escapeHtml(s.title) + "</h2>");
+      s.fields.forEach(function (f) {
+        if (f.id === "orgName" || f.id === "approvingAuthority") return;
+        h.push("<p><strong>" + escapeHtml(f.label) + ":</strong></p>");
+        h.push(htmlP(state[f.id]));
+      });
+    });
+
+    h.push("<hr>");
+    h.push("<p><em>This draft was AI-assisted and has not been legally reviewed. It must be reviewed and formally adopted by the organization's Data Protection Officer, legal/compliance office, and IT/ICT authority before use, and should be read alongside the organization's full Computer Incident Response Plan. " + escapeHtml(type.footer) + "</em></p>");
+
+    return "<!DOCTYPE html><html><head><meta charset='utf-8'><title>" + escapeAttr(type.docTitle) + "</title></head><body>" + h.join("\n") + "</body></html>";
+  }
+
+  // ---------- Review screen ----------
+
+  function renderReview() {
+    var checks = completenessChecks();
+    var failing = checks.filter(function (c) { return !c.ok; });
+    var html = "";
+
+    html += '<div class="gate-summary">' + (failing.length === 0
+      ? '<span style="color:var(--gate-ok-fg);">All completeness checks passed.</span>'
+      : '<span style="color:var(--gate-bad-fg);">' + failing.length + ' item(s) still need attention.</span>') + '</div>';
+    html += '<ul class="gate-list">';
+    checks.forEach(function (c) {
+      html += '<li class="gate-item ' + (c.ok ? "ok" : "bad") + '"><span class="dot"></span>' + escapeHtml(c.label) + (c.ok ? "" : " — not yet provided") + '</li>';
+    });
+    html += '</ul>';
+
+    html += '<div class="fhint" style="margin-bottom:6px;">Every operational section already has a suggested default, so you can generate a usable draft right now and refine it later. Fix organization identity above if needed, then come back here.</div>';
+
+    html += '<div style="display:flex; gap:10px; margin: 18px 0 8px; flex-wrap:wrap;">';
+    html += '<button class="btn-gold" id="btn-download-docx">Download draft (.docx)</button>';
+    html += '<button class="btn-ghost" id="btn-download">Download draft (.md)</button>';
+    html += '<button class="btn-ghost" id="btn-copy">Copy to clipboard</button>';
+    html += '</div>';
+
+    html += '<div class="preview-pane"><pre id="doc-preview"></pre></div>';
+    return html;
+  }
+
+  // ---------- Wiring ----------
+
+  function bindStepEvents(step) {
+    if (step.id === "review") {
+      document.getElementById("doc-preview").textContent = generateDocument();
+      document.getElementById("btn-download").addEventListener("click", onDownload);
+      document.getElementById("btn-download-docx").addEventListener("click", onDownloadDocx);
+      document.getElementById("btn-copy").addEventListener("click", onCopy);
+      return;
+    }
+    step.section.fields.forEach(function (f) {
+      var el = document.getElementById(f.id);
+      if (el) el.addEventListener("input", function () { state[f.id] = el.value; updateRailProgress(); });
+    });
+  }
+
+  function slug() {
+    var t = PLAYBOOK_TYPES[currentType].label;
+    return t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
+
+  function onDownload() {
+    var doc = generateDocument();
+    var orgSlug = (state.orgName || "org").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    var filename = slug() + "-playbook-" + orgSlug + ".md";
+    try {
+      var blob = new Blob([doc], { type: "text/markdown;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      showToast("Draft downloaded.");
+    } catch (e) {
+      showToast("Couldn't download — use Copy to clipboard instead.");
+    }
+  }
+
+  function onDownloadDocx() {
+    var orgSlug = (state.orgName || "org").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    var filename = slug() + "-playbook-" + orgSlug + ".docx";
+    try {
+      var html = generateDocumentHtml();
+      var blob = window.htmlDocx.asBlob(html);
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      showToast("Draft downloaded.");
+    } catch (e) {
+      showToast("Couldn't generate .docx — try Download draft (.md) instead.");
+    }
+  }
+
+  function onCopy() {
+    var doc = generateDocument();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(doc).then(function () { showToast("Copied to clipboard."); })
+        .catch(function () { fallbackCopy(doc); });
+    } else {
+      fallbackCopy(doc);
+    }
+  }
+  function fallbackCopy(doc) {
+    var ta = document.createElement("textarea");
+    ta.value = doc; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); showToast("Copied to clipboard."); } catch (e) { showToast("Copy failed — select the text manually."); }
+    document.body.removeChild(ta);
+  }
+
+  var toastTimer;
+  function showToast(msg) {
+    var t = document.getElementById("toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2600);
+  }
+
+  function updateRailProgress() {
+    var railSteps = document.querySelectorAll(".rail-step");
+    railSteps.forEach(function (el, i) {
+      var complete = STEPS[i].isComplete();
+      el.classList.toggle("done", complete && i !== stepIndex);
+      el.classList.toggle("active", i === stepIndex);
+    });
+  }
+
+  function renderRail() {
+    var rail = document.getElementById("rail");
+    rail.style.display = "";
+    document.getElementById("app").classList.remove("no-rail");
+    var html = '<div class="rail-brand">Government &amp; LGU Cybersecurity</div>';
+    html += '<h1 class="rail-title">' + escapeHtml(PLAYBOOK_TYPES[currentType].label) + ' Playbook</h1>';
+    html += '<div class="rail-change" id="rail-change">&larr; Choose a different playbook</div>';
+    html += '<ul class="rail-steps">';
+    STEPS.forEach(function (s, i) {
+      var complete = s.isComplete();
+      var cls = (i === stepIndex ? "active" : "") + (complete && i !== stepIndex ? " done" : "");
+      html += '<li class="rail-step ' + cls + '" data-goto="' + i + '"><span class="rail-num">' + (complete ? "✓" : (i + 1)) + '</span><span class="rail-step-label">' + s.railLabel + '</span></li>';
+    });
+    html += '</ul>';
+    html += '<div class="rail-footer">Every field starts with a suggested default — accept it or rewrite it for your organization. Nothing you type here leaves your browser until you choose to download or copy the draft.</div>';
+    rail.innerHTML = html;
+    rail.querySelectorAll("[data-goto]").forEach(function (el) {
+      el.addEventListener("click", function () { stepIndex = +el.getAttribute("data-goto"); renderAll(); });
+    });
+    document.getElementById("rail-change").addEventListener("click", function () {
+      currentType = null;
+      renderAll();
+    });
+  }
+
+  function renderMain() {
+    var step = STEPS[stepIndex];
+    var main = document.getElementById("main");
+    var html = "";
+    if (step.eyebrow) html += '<div class="eyebrow">' + step.eyebrow + '</div>';
+    html += '<h2 class="step-title">' + step.title + '</h2>';
+    if (step.help) html += '<p class="step-help">' + step.help + '</p>';
+    html += step.render();
+    html += '<div class="nav-row">';
+    html += stepIndex > 0 ? '<button class="btn-ghost" id="btn-back">Back</button>' : '<span></span>';
+    html += stepIndex < STEPS.length - 1 ? '<button class="btn-primary" id="btn-next">Continue</button>' : '<span></span>';
+    html += '</div>';
+    main.innerHTML = html;
+    bindStepEvents(step);
+    var back = document.getElementById("btn-back");
+    var next = document.getElementById("btn-next");
+    if (back) back.addEventListener("click", function () { stepIndex--; renderAll(); window.scrollTo(0, 0); });
+    if (next) next.addEventListener("click", function () { stepIndex++; renderAll(); window.scrollTo(0, 0); });
+  }
+
+  function renderAll() {
+    if (!currentType) { renderPicker(); return; }
+    renderRail();
+    renderMain();
+  }
+
+  renderAll();
+})();
+</script>
+</body>
+</html>

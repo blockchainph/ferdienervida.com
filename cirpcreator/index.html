@@ -971,7 +971,7 @@
 
   function renderRail() {
     var rail = document.getElementById("rail");
-    var html = '<div class="rail-brand">Provincial Government of Davao del Norte</div>';
+    var html = '<div class="rail-brand">Government &amp; LGU Cybersecurity</div>';
     html += '<h1 class="rail-title">CIRP Intake Wizard</h1>';
     html += '<ul class="rail-steps">';
     STEPS.forEach(function (s, i) {
@@ -980,7 +980,7 @@
       html += '<li class="rail-step ' + cls + '" data-goto="' + i + '"><span class="rail-num">' + (complete ? "✓" : (i + 1)) + '</span><span class="rail-step-label">' + s.railLabel + '</span></li>';
     });
     html += '</ul>';
-    html += '<div class="rail-footer">Built for the Day 2 CIRP drafting workshop. Nothing you type here leaves your browser until you choose to download or copy the draft.</div>';
+    html += '<div class="rail-footer">Built to support CIRP drafting workshops for Philippine government and LGU offices. Nothing you type here leaves your browser until you choose to download or copy the draft.</div>';
     rail.innerHTML = html;
     rail.querySelectorAll("[data-goto]").forEach(function (el) {
       el.addEventListener("click", function () { stepIndex = +el.getAttribute("data-goto"); renderAll(); });
