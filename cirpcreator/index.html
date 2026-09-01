@@ -244,6 +244,7 @@
   }
   .toast.show { opacity: 1; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
 </head>
 <body>
 
@@ -540,6 +541,7 @@
   // ---------- Document generation ----------
 
   function gap(v) { return v ? escapeHtml(v) : "**[UNRESOLVED — see Completeness Gate]**"; }
+  function gapHtml(v) { return v ? escapeHtml(v) : "<strong>[UNRESOLVED — see Completeness Gate]</strong>"; }
 
   function roleLine(id) {
     var def = ROLE_DEFS.filter(function (r) { return r.id === id; })[0];
@@ -547,6 +549,13 @@
     if (v.unassigned) return "- **" + def.label + ":** UNASSIGNED — gap";
     if (!v.name) return "- **" + def.label + ":** " + gap("");
     return "- **" + def.label + ":** " + escapeHtml(v.name) + (v.contact ? " — " + escapeHtml(v.contact) : "");
+  }
+
+  function roleLineHtml(id) {
+    var def = ROLE_DEFS.filter(function (r) { return r.id === id; })[0];
+    var v = state.roles[id];
+    var value = v.unassigned ? "UNASSIGNED — gap" : (v.name ? escapeHtml(v.name) + (v.contact ? " — " + escapeHtml(v.contact) : "") : gapHtml(""));
+    return "<li><strong>" + escapeHtml(def.label) + ":</strong> " + value + "</li>";
   }
 
   function generateDocument() {
@@ -688,6 +697,104 @@
     return lines.join("\n");
   }
 
+  function generateDocumentHtml() {
+    var h = [];
+    var checks = completenessChecks();
+    var failing = checks.filter(function (c) { return !c.ok; });
+
+    h.push("<h1>Computer Incident Response Plan</h1>");
+    h.push("<p><strong>Organization:</strong> " + gapHtml(state.orgName) + "</p>");
+    h.push("<p><strong>Classification:</strong> " + gapHtml(state.orgType) + "</p>");
+    h.push("<p><strong>Generated:</strong> " + new Date().toISOString().slice(0, 10) + " via CIRP Intake Wizard</p>");
+
+    if (failing.length) {
+      h.push("<h2>Completeness Gate — Unresolved Items</h2>");
+      h.push("<p>This draft has " + failing.length + " unresolved item(s). Resolve these before formal adoption:</p>");
+      h.push("<ul>");
+      failing.forEach(function (c) { h.push("<li>" + escapeHtml(c.label) + "</li>"); });
+      h.push("</ul>");
+    }
+
+    h.push("<h2>1. Purpose, Scope &amp; Authority</h2>");
+    h.push("<p><strong>Mandate / legal authority:</strong> " + gapHtml(state.orgMandate) + "</p>");
+    h.push("<p><strong>Approving authority:</strong> " + gapHtml(state.approvingAuthority) + "</p>");
+    h.push("<p><strong>Scope:</strong> " + gapHtml(state.scope) + "</p>");
+    h.push("<p><strong>CII status:</strong> " + gapHtml(state.ciiStatus) + (state.ciiNotes ? " — " + escapeHtml(state.ciiNotes) : "") + "</p>");
+
+    h.push("<h2>2. Definitions &amp; Severity Classification</h2>");
+    h.push("<table border='1' cellpadding='6' cellspacing='0' style='width:100%;border-collapse:collapse;'>");
+    h.push("<tr><th>Level</th><th>Definition</th><th>Example</th><th>Target Response Time</th></tr>");
+    state.severity.forEach(function (row) {
+      h.push("<tr><td>" + escapeHtml(row.level) + "</td><td>" + gapHtml(row.def) + "</td><td>" + gapHtml(row.example) + "</td><td>" + gapHtml(row.response) + "</td></tr>");
+    });
+    h.push("</table>");
+
+    h.push("<h2>3. Roles, Responsibilities &amp; RACI</h2>");
+    h.push("<p><strong>Data privacy governance:</strong> " + gapHtml(state.dpoAppointed) + "</p>");
+    h.push("<p><strong>Personal data categories processed:</strong> " + gapHtml(state.dataCategories) + "</p>");
+    h.push("<ul>");
+    ROLE_DEFS.forEach(function (r) { h.push(roleLineHtml(r.id)); });
+    h.push("</ul>");
+
+    h.push("<h2>4. Detection &amp; Reporting Procedures</h2>");
+    h.push("<p><strong>Detection sources:</strong> " + gapHtml(state.detectionSources) + "</p>");
+    h.push("<p><strong>Reporting channel:</strong> " + gapHtml(state.reportingChannel) + "</p>");
+
+    h.push("<h2>5. Activation Criteria &amp; Escalation</h2>");
+    h.push("<p><strong>Activation criteria:</strong> " + gapHtml(state.activationCriteria) + "</p>");
+    h.push("<p><strong>Escalation chain:</strong> " + gapHtml(state.escalationChain) + "</p>");
+
+    h.push("<h2>6. Containment / Eradication / Recovery</h2>");
+    h.push("<p><strong>General procedure:</strong> " + gapHtml(state.containmentGeneral) + "</p>");
+    var anyPlaybookHtml = false;
+    PLAYBOOK_DEFS.forEach(function (p) {
+      var v = state.playbooks[p.id];
+      if (v.on) {
+        anyPlaybookHtml = true;
+        h.push("<h3>Playbook Annex — " + escapeHtml(p.label) + "</h3>");
+        h.push("<p>" + gapHtml(v.detail) + "</p>");
+      }
+    });
+    if (!anyPlaybookHtml) { h.push("<p><em>No incident-specific playbook annexes selected.</em></p>"); }
+
+    h.push("<h2>7. Communications Plan</h2>");
+    h.push("<p><strong>NPC Circular 16-03 breach-notification chain:</strong> " + gapHtml(state.npcChainDesc) + "</p>");
+    h.push("<p><strong>DICT / CERT-PH coordination:</strong> " + gapHtml(state.dictContact) + "</p>");
+    h.push("<p><strong>Law enforcement referral criteria:</strong> " + gapHtml(state.lawEnforcementCriteria) + "</p>");
+    h.push("<p><strong>Internal staff communication:</strong> " + gapHtml(state.internalComms) + "</p>");
+    h.push("<p><strong>Executive briefing cadence:</strong> " + gapHtml(state.execBriefing) + "</p>");
+    h.push("<p><strong>Public / media statement authorization:</strong> " + gapHtml(state.publicComms) + "</p>");
+
+    h.push("<h2>8. Evidence Handling &amp; Chain of Custody</h2>");
+    h.push("<p><strong>What must be preserved:</strong> " + gapHtml(state.evidencePreserve) + "</p>");
+    h.push("<p><strong>Evidence custodian:</strong> " + gapHtml(state.evidenceCustodian) + "</p>");
+    h.push("<p><strong>Logging process:</strong> " + gapHtml(state.evidenceLogging) + "</p>");
+
+    h.push("<h2>9. Post-Incident Review</h2>");
+    h.push("<p><strong>Review timeline:</strong> " + gapHtml(state.reviewTimeline) + "</p>");
+    h.push("<p><strong>Attendees &amp; feedback loop:</strong> " + gapHtml(state.reviewAttendees) + "</p>");
+
+    h.push("<h2>10. Plan Maintenance &amp; Testing</h2>");
+    h.push("<p><strong>Review cycle:</strong> " + gapHtml(state.reviewCycle) + "</p>");
+    h.push("<p><strong>Drill / tabletop schedule:</strong> " + gapHtml(state.drillSchedule) + "</p>");
+    h.push("<p><strong>Version control:</strong> " + gapHtml(state.versionControl) + "</p>");
+
+    h.push("<h2>11. Appendices (contacts, flowcharts, playbooks)</h2>");
+    h.push("<ul>");
+    h.push("<li>Contact tree — build from the named roles in Section 3</li>");
+    h.push("<li>Escalation flowchart — build from Section 5</li>");
+    h.push("<li>Playbook annexes — see Section 6</li>");
+    h.push("</ul>");
+    if (state.notes) {
+      h.push("<p><strong>Additional notes:</strong> " + escapeHtml(state.notes) + "</p>");
+    }
+
+    h.push("<hr>");
+    h.push("<p><em>This draft was AI-assisted and has not been legally reviewed. It must be reviewed and formally adopted by the organization's Data Protection Officer, legal/compliance office, and IT/ICT authority (e.g., PICTO) before use. This document does not certify compliance with RA 10173, NPC Circular 16-03, DICT issuances, or any other law or regulation. The classic four-phase IR lifecycle referenced in facilitation materials for this plan traces to NIST SP 800-61 Rev. 2 (2012, withdrawn April 2025); current NIST guidance is SP 800-61 Rev. 3.</em></p>");
+
+    return "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Computer Incident Response Plan</title></head><body>" + h.join("\n") + "</body></html>";
+  }
+
   // ---------- Review screen ----------
 
   function renderReview() {
@@ -707,7 +814,8 @@
     html += '<div class="fhint" style="margin-bottom:6px;">You can generate the draft now regardless — unresolved items are flagged inline in the document rather than silently omitted. Fix anything above by using the steps on the left, then come back here.</div>';
 
     html += '<div style="display:flex; gap:10px; margin: 18px 0 8px; flex-wrap:wrap;">';
-    html += '<button class="btn-gold" id="btn-download">Download draft (.md)</button>';
+    html += '<button class="btn-gold" id="btn-download-docx">Download draft (.docx)</button>';
+    html += '<button class="btn-ghost" id="btn-download">Download draft (.md)</button>';
     html += '<button class="btn-ghost" id="btn-copy">Copy to clipboard</button>';
     html += '</div>';
 
@@ -778,6 +886,7 @@
     } else if (stepId === "review") {
       document.getElementById("doc-preview").textContent = generateDocument();
       document.getElementById("btn-download").addEventListener("click", onDownload);
+      document.getElementById("btn-download-docx").addEventListener("click", onDownloadDocx);
       document.getElementById("btn-copy").addEventListener("click", onCopy);
     }
 
@@ -805,6 +914,23 @@
       showToast("Draft downloaded.");
     } catch (e) {
       showToast("Couldn't download — use Copy to clipboard instead.");
+    }
+  }
+
+  function onDownloadDocx() {
+    var orgSlug = (state.orgName || "draft").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    var filename = "cirp-draft-" + (orgSlug || "org") + ".docx";
+    try {
+      var html = generateDocumentHtml();
+      var blob = window.htmlDocx.asBlob(html);
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      showToast("Draft downloaded.");
+    } catch (e) {
+      showToast("Couldn't generate .docx — try Download draft (.md) instead.");
     }
   }
 
