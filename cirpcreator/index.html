@@ -320,50 +320,38 @@
   var stepIndex = 0;
 
   var STEPS = [
-    { id: "orgType", title: "Organization Classification", eyebrow: "Step 1 of 15", railLabel: "Organization type",
-      help: "This determines which regulatory questions apply for the rest of this intake — it's the first thing a CIRP has to get right.",
-      render: renderOrgType, isComplete: function () { return !!state.orgType; } },
-    { id: "orgIdentity", title: "Organization Identity & Authority", eyebrow: "Step 2 of 15", railLabel: "Identity & authority",
-      help: "Who is this plan for, and who has the authority to approve and formally invoke it?",
-      render: renderOrgIdentity, isComplete: function () { return !!(state.orgName && state.approvingAuthority); } },
-    { id: "scope", title: "Scope", eyebrow: "Step 3 of 15", railLabel: "Scope",
-      help: "Which offices, systems, platforms, and data does this plan cover?",
-      render: renderScope, isComplete: function () { return !!state.scope; } },
-    { id: "cii", title: "Critical Information Infrastructure Status", eyebrow: "Step 4 of 15", railLabel: "CII status",
-      help: "Under DICT Memorandum Circular No. 005. If you're not sure, say so — don't guess.",
-      render: renderCII, isComplete: function () { return !!state.ciiStatus; } },
-    { id: "privacy", title: "Data Privacy Governance", eyebrow: "Step 5 of 15", railLabel: "Privacy governance",
-      help: "For any Philippine government entity, RA 10173 applies by default. This step establishes who owns that and what data is at stake.",
-      render: renderPrivacy, isComplete: function () { return !!state.dpoAppointed; } },
-    { id: "roles", title: "Named Roles", eyebrow: "Step 6 of 15", railLabel: "Named roles",
-      help: "A role with no name attached fails during an actual incident. Mark a role “Unassigned” rather than leaving it blank — that gap needs to be visible, not hidden.",
-      render: renderRoles, isComplete: function () { return ROLE_DEFS.filter(function (r) { return r.critical; }).every(function (r) { return state.roles[r.id].unassigned || state.roles[r.id].name; }); } },
-    { id: "severity", title: "Severity Classification", eyebrow: "Step 7 of 15", railLabel: "Severity",
+    { id: "purpose", title: "Purpose, Scope & Authority", eyebrow: "Section 1 of 11", railLabel: "Purpose, scope & authority",
+      help: "Classify the organization, name the plan authority, define scope, and record CII status in the same section trainees use in the deck.",
+      render: renderPurposeScopeAuthority, isComplete: function () { return !!(state.orgType && state.orgName && state.approvingAuthority && state.scope && state.ciiStatus); } },
+    { id: "severity", title: "Definitions & Severity Classification", eyebrow: "Section 2 of 11", railLabel: "Definitions & severity",
       help: "Defaults are pre-filled. Adjust the examples and target response times for your organization — don't ship the generic version unreviewed.",
       render: renderSeverity, isComplete: function () { return state.severityTouched; } },
-    { id: "detection", title: "Detection & Reporting", eyebrow: "Step 8 of 15", railLabel: "Detection & reporting",
+    { id: "roles", title: "Roles, Responsibilities & RACI", eyebrow: "Section 3 of 11", railLabel: "Roles & RACI",
+      help: "Record data privacy governance and assign named owners. A role with no name attached fails during an actual incident; mark it Unassigned rather than hiding the gap.",
+      render: renderRolesAndRaci, isComplete: function () { return !!state.dpoAppointed && ROLE_DEFS.filter(function (r) { return r.critical; }).every(function (r) { return state.roles[r.id].unassigned || state.roles[r.id].name; }); } },
+    { id: "detection", title: "Detection & Reporting Procedures", eyebrow: "Section 4 of 11", railLabel: "Detection & reporting",
       help: "How incidents get noticed, and how staff report a suspected one.",
       render: renderDetection, isComplete: function () { return !!(state.detectionSources && state.reportingChannel); } },
-    { id: "activation", title: "Activation Criteria & Escalation", eyebrow: "Step 9 of 15", railLabel: "Activation & escalation",
+    { id: "activation", title: "Activation Criteria & Escalation", eyebrow: "Section 5 of 11", railLabel: "Activation & escalation",
       help: "What triggers formal IR team activation, and the full escalation chain in order.",
       render: renderActivation, isComplete: function () { return !!(state.activationCriteria && state.escalationChain); } },
-    { id: "playbooks", title: "Containment, Eradication & Recovery", eyebrow: "Step 10 of 15", railLabel: "Containment & playbooks",
+    { id: "playbooks", title: "Containment / Eradication / Recovery", eyebrow: "Section 6 of 11", railLabel: "Containment / recovery",
       help: "General procedures, plus which incident types need a dedicated playbook annex.",
       render: renderPlaybooks, isComplete: function () { return !!state.containmentGeneral; } },
-    { id: "regulatory", title: "Regulatory & Communications", eyebrow: "Step 11 of 15", railLabel: "Regulatory & comms",
+    { id: "communications", title: "Communications Plan", eyebrow: "Section 7 of 11", railLabel: "Communications plan",
       help: "The NPC Circular 16-03 breach-notification chain, DICT/CERT-PH coordination, and who communicates with whom.",
       render: renderRegulatory, isComplete: function () { return !!(state.npcChainDesc && state.publicComms); } },
-    { id: "evidence", title: "Evidence Handling & Chain of Custody", eyebrow: "Step 12 of 15", railLabel: "Evidence & custody",
+    { id: "evidence", title: "Evidence Handling & Chain of Custody", eyebrow: "Section 8 of 11", railLabel: "Evidence & custody",
       help: "Decide this before an incident, not during one.",
       render: renderEvidence, isComplete: function () { return !!state.evidenceCustodian; } },
-    { id: "postincident", title: "Post-Incident Review", eyebrow: "Step 13 of 15", railLabel: "Post-incident review",
+    { id: "postincident", title: "Post-Incident Review", eyebrow: "Section 9 of 11", railLabel: "Post-incident review",
       help: "A review that never happens is the most common reason the same incident recurs.",
       render: renderPostIncident, isComplete: function () { return !!state.reviewTimeline; } },
-    { id: "maintenance", title: "Maintenance, Testing & Version Control", eyebrow: "Step 14 of 15", railLabel: "Maintenance & testing",
+    { id: "maintenance", title: "Plan Maintenance & Testing", eyebrow: "Section 10 of 11", railLabel: "Maintenance & testing",
       help: "A plan that's never rehearsed will fail the first time it's needed.",
       render: renderMaintenance, isComplete: function () { return !!state.reviewCycle; } },
-    { id: "notes", title: "Anything Else?", eyebrow: "Step 15 of 15", railLabel: "Additional notes",
-      help: "Optional — any other process, detail, or note worth including.",
+    { id: "appendices", title: "Appendices (contacts, flowcharts, playbooks)", eyebrow: "Section 11 of 11", railLabel: "Appendices",
+      help: "Use this final CIRP section for contact-tree notes, flowchart notes, playbook annex notes, or other supporting details.",
       render: renderNotes, isComplete: function () { return true; } },
     { id: "review", title: "Review & Generate", eyebrow: "Final step", railLabel: "Review & generate",
       help: "", render: renderReview, isComplete: function () { return true; } }
@@ -384,6 +372,20 @@
   function escapeAttr(s) { return escapeHtml(s).replace(/"/g, "&quot;"); }
 
   // ---------- Step renderers ----------
+
+  function sectionGroup(title, body) {
+    return '<section class="playbook-card on" style="margin-bottom:14px;">' +
+      '<div class="flabel" style="margin-bottom:10px;">' + title + '</div>' +
+      body +
+      '</section>';
+  }
+
+  function renderPurposeScopeAuthority() {
+    return sectionGroup("1A. Organization classification", renderOrgType()) +
+      sectionGroup("1B. Organization identity & authority", renderOrgIdentity()) +
+      sectionGroup("1C. Scope", renderScope()) +
+      sectionGroup("1D. Critical Information Infrastructure status", renderCII());
+  }
 
   function renderOrgType() {
     var opts = ["National government agency", "Provincial government", "City government", "Municipal government", "Barangay", "GOCC", "CII operator", "Private-sector organization", "Other"];
@@ -426,6 +428,11 @@
     html += '<div class="fhint" style="margin-top:6px;">The DPO\'s name and contact are collected in the Named Roles step next.</div>';
     html += field("Data categories", "What personal or sensitive personal information does the organization process? (e.g., constituent names, addresses, TINs, property records)", textArea("dataCategories", state.dataCategories, "", 4));
     return html;
+  }
+
+  function renderRolesAndRaci() {
+    return sectionGroup("3A. Data Protection Officer and data privacy governance", renderPrivacy()) +
+      sectionGroup("3B. Named incident response roles", renderRoles());
   }
 
   function renderRoles() {
@@ -507,24 +514,26 @@
   }
 
   function renderNotes() {
-    return field("Additional notes", "", textArea("notes", state.notes, "", 5));
+    return field("Appendix notes", "Optional notes for supporting materials: contact tree, escalation flowchart, incident-specific playbook annexes, templates, or other references.", textArea("notes", state.notes, "", 5));
   }
 
   // ---------- Completeness gate ----------
 
   function completenessChecks() {
     var checks = [];
-    checks.push({ label: "Organization classification", ok: !!state.orgType });
-    checks.push({ label: "Approving authority named", ok: !!state.approvingAuthority });
-    checks.push({ label: "DPO status recorded", ok: !!state.dpoAppointed });
+    checks.push({ label: "Section 1: Organization classification", ok: !!state.orgType });
+    checks.push({ label: "Section 1: Approving authority named", ok: !!state.approvingAuthority });
+    checks.push({ label: "Section 1: Scope defined", ok: !!state.scope });
+    checks.push({ label: "Section 1: CII status recorded", ok: !!state.ciiStatus });
+    checks.push({ label: "Section 3: DPO status recorded", ok: !!state.dpoAppointed });
     ["exec", "irLead", "techLead"].forEach(function (id) {
       var def = ROLE_DEFS.filter(function (r) { return r.id === id; })[0];
       var v = state.roles[id];
-      checks.push({ label: def.label + " has a named owner", ok: !!(v.unassigned || v.name) });
+      checks.push({ label: "Section 3: " + def.label + " has a named owner", ok: !!(v.unassigned || v.name) });
     });
-    checks.push({ label: "Severity table reviewed for this organization", ok: state.severityTouched });
-    checks.push({ label: "NPC 72-hour notification chain described", ok: !!state.npcChainDesc });
-    checks.push({ label: "Evidence custodian named", ok: !!state.evidenceCustodian });
+    checks.push({ label: "Section 2: Severity table reviewed for this organization", ok: state.severityTouched });
+    checks.push({ label: "Section 7: NPC 72-hour notification chain described", ok: !!state.npcChainDesc });
+    checks.push({ label: "Section 8: Evidence custodian named", ok: !!state.evidenceCustodian });
     return checks;
   }
 
@@ -604,7 +613,7 @@
     lines.push("**Escalation chain:** " + gap(state.escalationChain));
     lines.push("");
 
-    lines.push("## 6. Containment, Eradication & Recovery");
+    lines.push("## 6. Containment / Eradication / Recovery");
     lines.push("");
     lines.push("**General procedure:** " + gap(state.containmentGeneral));
     lines.push("");
@@ -661,7 +670,7 @@
     lines.push("**Version control:** " + gap(state.versionControl));
     lines.push("");
 
-    lines.push("## 11. Appendices");
+    lines.push("## 11. Appendices (contacts, flowcharts, playbooks)");
     lines.push("");
     lines.push("- Contact tree — build from the named roles in Section 3");
     lines.push("- Escalation flowchart — build from Section 5");
@@ -709,25 +718,21 @@
   // ---------- Wiring ----------
 
   function bindStepEvents(stepId) {
-    if (stepId === "orgType") {
+    if (stepId === "purpose") {
       document.querySelectorAll('input[name="orgType"]').forEach(function (el) {
         el.addEventListener("change", function () { state.orgType = el.value; renderAll(); });
       });
-    } else if (stepId === "orgIdentity") {
       bindText("orgName"); bindArea("orgMandate"); bindText("approvingAuthority");
-    } else if (stepId === "scope") {
       bindArea("scope");
-    } else if (stepId === "cii") {
       document.querySelectorAll('input[name="ciiStatus"]').forEach(function (el) {
         el.addEventListener("change", function () { state.ciiStatus = el.value; renderAll(); });
       });
       bindArea("ciiNotes");
-    } else if (stepId === "privacy") {
+    } else if (stepId === "roles") {
       document.querySelectorAll('input[name="dpoAppointed"]').forEach(function (el) {
         el.addEventListener("change", function () { state.dpoAppointed = el.value; renderAll(); });
       });
       bindArea("dataCategories");
-    } else if (stepId === "roles") {
       document.querySelectorAll("[data-role]").forEach(function (el) {
         var evt = el.type === "checkbox" ? "change" : "input";
         el.addEventListener(evt, function () {
@@ -760,7 +765,7 @@
         var ta = document.getElementById("pbdetail-" + p.id);
         if (ta) ta.addEventListener("input", function () { state.playbooks[p.id].detail = ta.value; updateRailProgress(); });
       });
-    } else if (stepId === "regulatory") {
+    } else if (stepId === "communications") {
       ["npcChainDesc", "dictContact", "lawEnforcementCriteria", "internalComms", "execBriefing", "publicComms"].forEach(bindArea);
     } else if (stepId === "evidence") {
       bindArea("evidencePreserve"); bindText("evidenceCustodian"); bindArea("evidenceLogging");
@@ -768,7 +773,7 @@
       bindText("reviewTimeline"); bindArea("reviewAttendees");
     } else if (stepId === "maintenance") {
       bindText("reviewCycle"); bindArea("drillSchedule"); bindArea("versionControl");
-    } else if (stepId === "notes") {
+    } else if (stepId === "appendices") {
       bindArea("notes");
     } else if (stepId === "review") {
       document.getElementById("doc-preview").textContent = generateDocument();
