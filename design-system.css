@@ -357,6 +357,29 @@ body.ds-page {
 .ds-pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0; }
 .ds-pill { font-size: 13px; font-weight: 600; padding: 8px 14px; border: 1px solid var(--ds-hairline); border-radius: 999px; color: var(--ds-text-secondary); }
 
+/* Certificate search (training resource pages) */
+.ds-cert-search { max-width: 620px; }
+.ds-cert-search label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+.ds-cert-input-wrap { position: relative; }
+.ds-cert-input {
+  width: 100%; padding: 16px 46px 16px 18px; border: 1px solid var(--ds-hairline);
+  background: var(--ds-bg); color: var(--ds-text); font: inherit; font-size: 1rem;
+}
+.ds-cert-input:focus { outline: 2px solid var(--ds-accent); border-color: var(--ds-accent); }
+.ds-cert-input-wrap .ds-cert-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--ds-text-muted); }
+.ds-cert-results { margin-top: 18px; display: grid; gap: 10px; }
+.ds-cert-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 16px 18px; border: 1px solid var(--ds-hairline);
+}
+.ds-cert-row .ds-cert-name { font-weight: 600; }
+.ds-cert-row .ds-cert-name mark { background: color-mix(in srgb, var(--ds-accent) 25%, transparent); color: var(--ds-text); border-radius: 3px; padding: 0 2px; }
+.ds-cert-row a.ds-cert-dl { flex: 0 0 auto; }
+.ds-cert-empty, .ds-cert-nomatch { color: var(--ds-text-muted); font-size: 0.95rem; padding: 4px 0; }
+@media (max-width: 520px) {
+  .ds-cert-row { flex-direction: column; align-items: stretch; }
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .ds-nav { flex-direction: column; align-items: flex-start; gap: 16px; }
