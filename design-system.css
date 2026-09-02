@@ -380,6 +380,18 @@ body.ds-page {
   .ds-cert-row { flex-direction: column; align-items: stretch; }
 }
 
+/* Per-day slides: view + download (training resource pages) */
+.ds-slide-days { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
+.ds-slide-day {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 10px 10px 16px; border: 1px solid var(--ds-hairline);
+}
+.ds-slide-day-label { font-size: 14px; font-weight: 600; white-space: nowrap; }
+.ds-slide-day-actions { display: flex; gap: 8px; }
+@media (max-width: 520px) {
+  .ds-slide-day { flex-direction: column; align-items: stretch; }
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .ds-nav { flex-direction: column; align-items: flex-start; gap: 16px; }
