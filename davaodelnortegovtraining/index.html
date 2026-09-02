@@ -63,7 +63,8 @@
     <section class="ds-section" id="lookup">
         <p class="ds-eyebrow">Certificates</p>
         <h2 style="font-size:28px;margin-bottom:8px">Find your certificate</h2>
-        <p style="font-size:15px;color:var(--ds-text-secondary);margin-bottom:26px">Type any part of your first name, last name, or full name.</p>
+        <p style="font-size:15px;color:var(--ds-text-secondary);margin-bottom:10px">Congratulations on completing the Public Sector Cybersecurity Certification! Type any part of your first name, last name, or full name below to find and download your certificate.</p>
+        <p style="font-size:15px;color:var(--ds-text-secondary);margin-bottom:26px">Feel free to share your achievement with your network — tag <a href="https://www.linkedin.com/in/ferdiejamesnervida/" target="_blank" rel="noopener">Ferdie on LinkedIn</a> or <a href="https://www.facebook.com/ferdiejamesnervida" target="_blank" rel="noopener">on Facebook</a> when you post!</p>
         <div class="ds-cert-search">
             <label for="nameSearch">Search your name</label>
             <div class="ds-cert-input-wrap">
@@ -176,11 +177,15 @@
         }
 
         matches.forEach(function (m) {
+          var pngFile = m.file.replace(/\.pdf$/, '.png');
           var row = document.createElement('div');
           row.className = 'ds-cert-row';
           row.innerHTML =
             '<span class="ds-cert-name">' + highlight(m.name, q) + '</span>' +
-            '<a class="ds-btn ds-btn-fill ds-cert-dl" href="certificates/' + m.file + '" download>Download Certificate</a>';
+            '<div class="ds-cert-dl-group">' +
+              '<a class="ds-btn ds-btn-fill ds-cert-dl" href="certificates/' + m.file + '" download>Download PDF</a>' +
+              '<a class="ds-btn ds-btn-text ds-cert-dl" href="certificates-png/' + pngFile + '" download>Download PNG (for sharing)</a>' +
+            '</div>';
           results.appendChild(row);
         });
       }

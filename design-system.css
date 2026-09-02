@@ -375,9 +375,11 @@ body.ds-page {
 .ds-cert-row .ds-cert-name { font-weight: 600; }
 .ds-cert-row .ds-cert-name mark { background: color-mix(in srgb, var(--ds-accent) 25%, transparent); color: var(--ds-text); border-radius: 3px; padding: 0 2px; }
 .ds-cert-row a.ds-cert-dl { flex: 0 0 auto; }
+.ds-cert-dl-group { display: flex; align-items: center; gap: 16px; flex: 0 0 auto; }
 .ds-cert-empty, .ds-cert-nomatch { color: var(--ds-text-muted); font-size: 0.95rem; padding: 4px 0; }
 @media (max-width: 520px) {
   .ds-cert-row { flex-direction: column; align-items: stretch; }
+  .ds-cert-dl-group { flex-direction: column; align-items: stretch; gap: 10px; }
 }
 
 /* Per-day slides: view + download (training resource pages) */
