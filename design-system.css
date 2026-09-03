@@ -2,7 +2,7 @@
    Tokens sourced from the design handoff README (OKLCH values). */
 
 :root {
-  --ds-bg: oklch(98% 0.008 75);
+  --ds-bg: oklch(94% 0.012 75);
   --ds-text: oklch(19% 0.015 65);
   --ds-text-secondary: oklch(40% 0.02 65);
   --ds-text-muted: oklch(55% 0.01 65);
