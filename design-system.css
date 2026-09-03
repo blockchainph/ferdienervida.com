@@ -205,6 +205,20 @@ body.ds-page {
 .ds-logo-cell { flex: 1; height: 84px; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--ds-hairline); border-bottom: 1px solid var(--ds-hairline); padding: 12px; }
 .ds-logo-cell img { max-height: 40px; max-width: 100%; object-fit: contain; }
 
+/* Marquee (auto-scrolling logo / badge strip) */
+.ds-marquee { overflow: hidden; position: relative; padding: 22px 0; border-top: 1px solid var(--ds-hairline); border-bottom: 1px solid var(--ds-hairline); -webkit-mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent); mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent); }
+.ds-marquee-track { display: flex; align-items: center; gap: 20px; width: max-content; animation: ds-marquee-scroll 32s linear infinite; }
+.ds-marquee:hover .ds-marquee-track { animation-play-state: paused; }
+.ds-marquee-item { flex: 0 0 auto; height: 104px; display: flex; align-items: center; justify-content: center; padding: 12px 26px; border: 1px solid var(--ds-hairline); background: var(--ds-bg); }
+.ds-marquee-item img { max-height: 100%; max-width: 210px; object-fit: contain; }
+@keyframes ds-marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-marquee-track { animation: none; }
+}
+
 /* Reviews */
 .ds-reviews-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 64px; }
 .ds-review-featured { border-top: 2px solid var(--ds-text); padding-top: 28px; }
