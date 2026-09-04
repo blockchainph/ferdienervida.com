@@ -35,6 +35,25 @@ if (navToggle && navMenu) {
     });
 }
 
+// Mobile nav toggle for the ds-nav header (editorial pages)
+document.querySelectorAll('.ds-nav').forEach((nav) => {
+    const toggle = nav.querySelector('.ds-nav-toggle');
+    const links = nav.querySelector('.ds-nav-links');
+    if (!toggle || !links) return;
+
+    toggle.addEventListener('click', () => {
+        const isOpen = links.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    links.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+            links.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+        });
+    });
+});
+
 // Smooth scrolling for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {

@@ -89,7 +89,7 @@
       "@keyframes bounce{0%,80%,100%{transform:scale(.7);opacity:.55}40%{transform:scale(1);opacity:1}}",
       "@keyframes ping{0%{box-shadow:0 0 0 0 rgba(255,181,156,.55)}70%{box-shadow:0 0 0 10px rgba(255,181,156,0)}100%{box-shadow:0 0 0 0 rgba(255,181,156,0)}}",
       "@keyframes slideIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}",
-      "@media (max-width:640px){.wrap{right:12px;bottom:12px}.panel{width:calc(100vw - 24px);height:min(72vh,620px)}.bubble{width:58px;height:58px}.chat-nudge{padding:9px 12px;font-size:12px}}",
+      "@media (max-width:640px){.wrap{right:12px;bottom:12px}.panel{width:calc(100vw - 24px);height:min(72vh,620px)}.bubble{width:50px;height:50px}.chat-nudge{display:none}}",
     ].join("");
 
     var wrap = document.createElement("div");
