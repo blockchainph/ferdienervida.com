@@ -1,33 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
-    const themeToggle = document.getElementById('themeToggle');
-    const html = document.documentElement;
-    const navbar = document.querySelector('.navbar');
+    document.querySelectorAll('.ds-nav').forEach((nav) => {
+        const toggle = nav.querySelector('.ds-nav-toggle');
+        const links = nav.querySelector('.ds-nav-links');
+        if (!toggle || !links) return;
 
-    if (navbar && !document.querySelector('.blog-proposal-banner')) {
-        const banner = document.createElement('div');
-        banner.className = 'blog-proposal-banner';
-        banner.innerHTML = `
-            <div class="blog-proposal-banner__inner">
-                <span class="blog-proposal-banner__copy">Need cybersecurity training or a speaker?</span>
-                <a class="blog-proposal-banner__link" href="https://ferdienervida.com/book/">Request a Proposal</a>
-            </div>
-        `;
-        navbar.insertAdjacentElement('afterend', banner);
-    }
-
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navMenu.classList.toggle('active');
-        });
-    }
-
-    document.querySelectorAll('.nav-link').forEach((link) => {
-        link.addEventListener('click', () => {
-            hamburger?.classList.remove('active');
-            navMenu?.classList.remove('active');
+        toggle.addEventListener('click', () => {
+            const isOpen = links.classList.toggle('is-open');
+            toggle.setAttribute('aria-expanded', String(isOpen));
         });
     });
 
@@ -38,27 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
-    });
-
-    window.addEventListener('scroll', () => {
-        if (!navbar) return;
-        if (window.scrollY > 50) {
-            navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.08)';
-        } else {
-            navbar.style.boxShadow = 'none';
-        }
-    });
-
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    html.setAttribute('data-theme', savedTheme);
-    updateThemeButton(savedTheme);
-
-    themeToggle?.addEventListener('click', () => {
-        const currentTheme = html.getAttribute('data-theme');
-        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        html.setAttribute('data-theme', nextTheme);
-        localStorage.setItem('theme', nextTheme);
-        updateThemeButton(nextTheme);
     });
 
     const article = document.querySelector('.article-page-card .post-content');
@@ -78,20 +36,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
-function updateThemeButton(theme) {
-    const themeToggle = document.getElementById('themeToggle');
-    if (!themeToggle) return;
-    const sunIcon = themeToggle.querySelector('.sun-icon');
-    const moonIcon = themeToggle.querySelector('.moon-icon');
-
-    if (theme === 'dark') {
-        if (sunIcon) sunIcon.style.display = 'block';
-        if (moonIcon) moonIcon.style.display = 'none';
-        themeToggle.setAttribute('aria-label', 'Switch to light mode');
-    } else {
-        if (sunIcon) sunIcon.style.display = 'none';
-        if (moonIcon) moonIcon.style.display = 'block';
-        themeToggle.setAttribute('aria-label', 'Switch to dark mode');
-    }
-}
