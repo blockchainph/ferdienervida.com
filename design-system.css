@@ -311,7 +311,9 @@ body.ds-page {
 .ds-footer-contact p { font-size: 14.5px; color: var(--ds-text-secondary); margin: 0 0 8px; max-width: none; }
 .ds-footer-contact a { font-size: 14.5px; font-weight: 600; }
 .ds-footer-contact .ds-response { font-size: 13.5px; color: var(--ds-text-muted); margin: 14px 0 0; }
-.ds-copyright { padding: 20px var(--ds-gutter); border-top: 1px solid var(--ds-hairline); font-size: 13px; color: var(--ds-text-muted); }
+.ds-copyright { padding: 20px var(--ds-gutter); border-top: 1px solid var(--ds-hairline); font-size: 13px; color: var(--ds-text-muted); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.ds-bir-badge { display: block; flex: 0 0 auto; background: #fff; border: 1px solid var(--ds-hairline); padding: 6px 10px; }
+.ds-bir-badge img { display: block; width: 300px; max-width: 100%; height: auto; }
 
 /* Simple footer (Services / Past Engagements pattern) */
 .ds-footer-simple { padding: 40px var(--ds-gutter); border-top: 1px solid var(--ds-hairline); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--ds-text-muted); }
