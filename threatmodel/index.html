@@ -356,8 +356,8 @@
       </div>
       <p class="careful"><b>Keep it general.</b> Don't include passwords, the real names of staff, or exact weaknesses someone could misuse. Your file will be sent by email.</p>
       <label for="ownAnswer" class="sr-only">Your written answer</label>
-      <textarea id="ownAnswer" maxlength="3000" placeholder="Write your answer in two short paragraphs…" aria-describedby="wordCount"></textarea>
-      <p class="wordcount" id="wordCount"><span><b id="wc">0</b> of <span id="wcMin">60</span> words minimum</span><span id="wcState">Keep going</span></p>
+      <textarea id="ownAnswer" maxlength="3000" placeholder="Write your answer in two short paragraphs…" required aria-describedby="wordCount"></textarea>
+      <p class="wordcount" id="wordCount"><span><b id="wc">0</b> words</span><span id="wcState">Required</span></p>
     </div>
 
     <div class="convert">
@@ -650,15 +650,14 @@
 
   function cleanText(s) { return String(s == null ? "" : s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").trim(); }
 
-  var MIN_WORDS = 60;
+  var MIN_WORDS = 1; // no length minimum: any non-empty answer unlocks the button
   function countWords(t) { var m = cleanText(t).match(/\S+/g); return m ? m.length : 0; }
 
   function refreshWordCount() {
     var n = countWords($("ownAnswer").value), ok = n >= MIN_WORDS;
     $("wc").textContent = n;
-    $("wcMin").textContent = MIN_WORDS;
     $("wordCount").className = "wordcount" + (ok ? " ok" : "");
-    $("wcState").textContent = ok ? "Good length" : (MIN_WORDS - n) + " more to go";
+    $("wcState").textContent = ok ? "Thanks" : "Required";
   }
 
   function refreshDocBtn() {
@@ -670,7 +669,7 @@
     btn.disabled = !(allCorrect && longEnough && named && docxState === "ready");
     msg.className = "msg";
     if (!allCorrect) msg.textContent = "Place all 12 answers correctly to unlock this.";
-    else if (!longEnough) msg.textContent = "Write at least " + MIN_WORDS + " words about your own office (" + words + " so far) to unlock the button.";
+    else if (!longEnough) msg.textContent = "Write your answer about your own office to unlock the button.";
     else if (!named) msg.textContent = "Type your full name to unlock the button.";
     else if (docxState === "failed") { msg.className = "msg error"; msg.textContent = "The Word builder did not load. Refresh the page and try again."; }
     else if (docxState !== "ready") msg.textContent = "Getting ready…";
