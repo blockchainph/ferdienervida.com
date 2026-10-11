@@ -192,6 +192,9 @@
   }
   .ctl:hover { border-color: var(--navy); }
   .ctl:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .ctl.shake { animation: shake 0.45s ease; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+  .box.reject { border-style: solid; border-color: var(--crit); background: color-mix(in srgb, var(--crit) 14%, var(--surface)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--crit) 30%, transparent); }
   .ctl.selected { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 16%, var(--surface)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cyan) 30%, transparent); }
   .ctl.dragging { opacity: 0.35; }
   .box .ctl { width: 100%; font-size: 0.9rem; padding: 0.5rem 0.55rem; }
@@ -314,7 +317,7 @@
 
   <section class="card intro" aria-labelledby="introTitle">
     <h1 id="introTitle">Module 3: Configure an Office</h1>
-    <p class="lede">Put twelve security controls where they belong, then find the one gap that is left. This is a practice activity and it is not graded.</p>
+    <p class="lede">Put twelve security controls where they belong, then find the one gap that is left.</p>
     <details class="scenario" open>
       <summary>City Treasurer's Office (practice)</summary>
       <p>This fictional office has: a payroll database, 40 staff laptops, citizen records on paper, a vendor with remote access, one shared admin password, and backups that were never tested.</p>
@@ -335,10 +338,10 @@
   <!-- STAGE 1 -->
   <section class="card stage" id="stage1" aria-labelledby="h1s">
     <div class="stage-head"><h2 id="h1s">Stage 1: Place the controls</h2><span class="time">About 15 minutes</span></div>
-    <p class="help">Drag each card into a box, or tap a card and then tap a box. You can move a card as often as you like until you press Check my answers.</p>
+    <p class="help">Drag each card into a box, or tap a card and then tap a box. You find out straight away if a card is right. A wrong card goes back to the tray, and after two retries the answer is shown.</p>
 
     <div class="status" id="status" role="status" aria-live="polite">Pick a control card and put it in the box where it belongs.</div>
-    <p class="counter"><b id="placedNum">0</b> of <span id="totalNum">12</span> cards placed</p>
+    <p class="counter"><b id="placedNum">0</b> of <span id="totalNum">12</span> cards in the right box</p>
 
     <div class="boxes" id="boxes">
       <div class="box" data-box="road" tabindex="0" role="button" aria-label="The road, network box">
@@ -371,17 +374,15 @@
       </div>
     </div>
 
-    <div class="tray-wrap" id="trayWrap" tabindex="0" role="button" aria-label="Control cards tray. Choose to send the selected card back here.">
+    <div class="tray-wrap" id="trayWrap">
       <p class="tray-label">Control cards</p>
       <div class="tray" id="tray"></div>
       <p class="tray-empty" id="trayEmpty" hidden>No cards left in the tray.</p>
     </div>
 
     <div class="row-actions">
-      <button type="button" class="btn btn-primary" id="check" disabled>Check my answers</button>
       <button type="button" class="btn btn-ghost" id="startOver">Start over</button>
     </div>
-    <p class="msg" id="checkMsg">Place all twelve cards in boxes to check your answers.</p>
 
     <div class="results" id="results" hidden aria-live="polite">
       <h3>Your results</h3>
@@ -430,7 +431,6 @@
     <button type="button" data-box="vault">The vault</button>
     <button type="button" data-box="door">The door</button>
     <button type="button" data-box="idcard">The ID card</button>
-    <button type="button" class="tray-btn" data-box="tray" id="placebarTray" hidden>Back to the tray</button>
   </div>
 </div>
 
@@ -494,7 +494,6 @@
   // ---------- State (kept in memory only; nothing is stored or sent) ----------
   var cards = [];                 // { def, el, at, locked, revealed, wrongs, retry }
   var selected = null;            // the selected card object
-  var round = 0;                  // how many times "Check my answers" was pressed
   var stage1Done = false, gapSaved = false, downloaded = false;
 
   function byEl(el) { for (var i = 0; i < cards.length; i++) if (cards[i].el === el) return cards[i]; return null; }
@@ -514,7 +513,7 @@
       tray.appendChild(el);
       return c;
     });
-    selected = null; round = 0; stage1Done = false; gapSaved = false; downloaded = false;
+    selected = null; stage1Done = false; gapSaved = false; downloaded = false;
     $("results").hidden = true; $("resBody").innerHTML = ""; $("resSum").textContent = "";
     $("gap").value = ""; $("fullName").value = "";
     setLocked("stage2", true); setLocked("stage3", true);
@@ -551,14 +550,6 @@
       var n = cards.filter(function (c) { return c.at === k; }).length;
       boxEls[k].setAttribute("aria-label", BOXES[k].name + " box, " + n + (n === 1 ? " card" : " cards") + " placed");
     });
-    var open = cards.filter(function (c) { return !c.locked; });
-    var ready = !stage1Done && open.length > 0 && open.every(function (c) { return c.at; });
-    $("check").disabled = !ready;
-    $("check").textContent = round === 0 ? "Check my answers" : "Check again";
-    $("check").hidden = stage1Done;
-    if (stage1Done) $("checkMsg").textContent = "Stage 1 is complete.";
-    else if (ready) $("checkMsg").textContent = round === 0 ? "Happy with your boxes? Press Check my answers." : "Press Check again when every card is back in a box.";
-    else $("checkMsg").textContent = round === 0 ? "Place all twelve cards in boxes to check your answers." : "Put each returned card in a box, then check again.";
     updateProgress();
   }
 
@@ -576,36 +567,54 @@
   }
 
   // ---------- Placing and moving ----------
+  function lockInBox(c, revealed) {
+    var key = c.def.box;
+    c.at = key; c.locked = true; c.revealed = revealed; c.retry = false;
+    c.el.classList.remove("selected", "dragging", "shake");
+    paint(c);
+    var li = document.createElement("li"); li.appendChild(c.el);
+    boxEls[key].querySelector("[data-placed]").appendChild(li);
+  }
+  function flash(c, boxEl) {                      // shake the card and turn the box red for a moment
+    c.el.classList.remove("shake"); void c.el.offsetWidth; c.el.classList.add("shake");
+    boxEl.classList.add("reject");
+    setTimeout(function () { c.el.classList.remove("shake"); boxEl.classList.remove("reject"); }, 700);
+  }
+
+  // Every placement is judged the moment it happens.
   function place(c, key) {
     if (c.locked) return;
-    c.at = key; c.retry = false; c.el.classList.remove("selected", "dragging");
-    var li = document.createElement("li");
-    c.el.parentNode && c.el.parentNode.tagName === "LI" && c.el.parentNode.remove();
-    paint(c);
-    li.appendChild(c.el);
-    boxEls[key].querySelector("[data-placed]").appendChild(li);
+    c.el.classList.remove("selected", "dragging");
     clearSelection();
-    say("Placed in " + BOXES[key].name + ". Move it any time before you check.");
+    var msg, kind;
+    if (c.def.box === key) {                                   // right box: lock it in and say why
+      lockInBox(c, false);
+      msg = "Correct! " + c.def.why; kind = "good";
+    } else {
+      c.wrongs++;
+      if (c.wrongs >= MAX_WRONG) {                             // two retries used up: show the answer
+        flash(c, boxEls[key]);
+        lockInBox(c, true);
+        msg = "That was the third wrong try, so here is the answer: \u201C" + c.def.text + "\u201D belongs in " + BOXES[c.def.box].name + ". " + c.def.why; kind = "bad";
+      } else {                                                 // stays in the tray, flagged, with its retries counted
+        c.retry = true; paint(c);
+        flash(c, boxEls[key]);
+        var left = MAX_WRONG - c.wrongs;
+        msg = "Not right. \u201C" + c.def.text + "\u201D does not belong in " + BOXES[key].name + ". " + left + (left === 1 ? " retry" : " retries") + " left. Try another box."; kind = "bad";
+      }
+    }
+    renderResults();
+    stage1Done = cards.every(function (x) { return x.locked; });
     refreshAll();
-  }
-  function toTray(c) {
-    if (c.locked) return;
-    if (c.el.parentNode && c.el.parentNode.tagName === "LI") c.el.parentNode.remove();
-    c.at = null; c.el.classList.remove("selected", "dragging");
-    paint(c);
-    tray.appendChild(c.el);
-    clearSelection();
-    say("Back in the tray.");
-    refreshAll();
+    if (stage1Done) { say(msg + " Stage 1 is complete. Stage 2 is now open.", kind); finishStage1(); }
+    else say(msg, kind);
   }
 
   // ---------- Selection (tap a card, then tap a box) ----------
   function setArmed(on) {
     BOX_ORDER.forEach(function (k) { boxEls[k].classList.toggle("armed", on); });
-    trayWrap.classList.toggle("armed", !!(on && selected && selected.at));
     document.body.classList.toggle("has-selection", !!(on && selected));
     $("placebarLabel").textContent = on && selected ? "Move “" + selected.def.text + "” to:" : "";
-    $("placebarTray").hidden = !(on && selected && selected.at);
   }
   function clearSelection() {
     if (selected) selected.el.classList.remove("selected");
@@ -628,23 +637,19 @@
     if (c && boxEl && selected && selected !== c) { place(selected, boxEl.getAttribute("data-box")); return; }   // tapped a card inside a box while another card is selected
     if (c) { if (!stage1Done) select(c); return; }
     if (boxEl && selected) { place(selected, boxEl.getAttribute("data-box")); return; }
-    if (e.target.closest("#trayWrap") && selected && selected.at) toTray(selected);
   });
 
   $("placebar").addEventListener("click", function (e) {
     var btn = e.target.closest("button[data-box]");
     if (!btn || !selected) return;
-    var key = btn.getAttribute("data-box");
-    if (key === "tray") toTray(selected); else place(selected, key);
+    place(selected, btn.getAttribute("data-box"));
   });
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && selected) { clearSelection(); say("Selection cleared."); return; }
     if (e.key !== "Enter" && e.key !== " ") return;
     var boxEl = e.target.classList && e.target.classList.contains("box") ? e.target : null;
-    var trayEl = e.target === trayWrap ? e.target : null;
     if (boxEl) { e.preventDefault(); if (selected) place(selected, boxEl.getAttribute("data-box")); else say("First pick a control card, then come back to this box."); }
-    else if (trayEl) { e.preventDefault(); if (selected && selected.at) toTray(selected); else say("Select a card that is in a box to send it back to the tray."); }
   });
 
   // ---------- Pointer dragging (mouse, touch and pen) ----------
@@ -652,9 +657,9 @@
 
   function targetAt(x, y) {
     var el = document.elementFromPoint(x, y);
-    return el ? el.closest(".box, #trayWrap") : null;
+    return el ? el.closest(".box") : null;
   }
-  function clearOver() { BOX_ORDER.forEach(function (k) { boxEls[k].classList.remove("over"); }); trayWrap.classList.remove("over"); }
+  function clearOver() { BOX_ORDER.forEach(function (k) { boxEls[k].classList.remove("over"); }); }
 
   document.addEventListener("pointerdown", function (e) {
     var cardEl = e.target.closest(".ctl");
@@ -707,64 +712,29 @@
     var t = d.active ? targetAt(e.clientX, e.clientY) : null;
     endDrag(); drag = null;
     if (!d.active) return;                               // a plain tap: the click handler selects the card
-    if (t && t.id === "trayWrap") toTray(d.c);
-    else if (t) place(d.c, t.getAttribute("data-box"));
+    if (t) place(d.c, t.getAttribute("data-box"));
     else say("Dropped outside a box. Try again.");
     d.c.el.setAttribute("data-dragged", "1");            // swallow the click that follows a drag
     setTimeout(function () { d.c.el.removeAttribute("data-dragged"); }, 0);
   }
   function onCancel() { endDrag(); drag = null; }
 
-  // ---------- Check my answers ----------
-  $("check").addEventListener("click", function () {
-    if ($("check").disabled) return;
-    round++;
-    var rightNow = 0, back = 0, shown = 0, checked = 0;
-    cards.filter(function (c) { return !c.locked; }).forEach(function (c) {
-      checked++;
-      if (c.at === c.def.box) { c.locked = true; c.retry = false; rightNow++; paint(c); return; }
-      c.wrongs++;
-      if (c.wrongs >= MAX_WRONG) {                       // two retries used up: reveal the right box
-        if (c.el.parentNode && c.el.parentNode.tagName === "LI") c.el.parentNode.remove();
-        c.at = c.def.box; c.locked = true; c.revealed = true; c.retry = false; shown++;
-        paint(c);
-        var li = document.createElement("li"); li.appendChild(c.el);
-        boxEls[c.at].querySelector("[data-placed]").appendChild(li);
-      } else {                                           // back to the tray to try again
-        if (c.el.parentNode && c.el.parentNode.tagName === "LI") c.el.parentNode.remove();
-        c.at = null; c.retry = true; paint(c);
-        tray.appendChild(c.el); back++;
-      }
-    });
-    clearSelection();
-    renderResults(rightNow, checked, back, shown);
-    stage1Done = cards.every(function (c) { return c.locked; });
-    refreshAll();
-    if (stage1Done) finishStage1();
-    else say(rightNow + " of " + checked + " cards were right this round. " + back + (back === 1 ? " card went" : " cards went") + " back to the tray. Place " + (back === 1 ? "it" : "them") + " again.", back ? "bad" : "good");
-  });
-
   function score() { return cards.filter(function (c) { return c.locked && !c.revealed; }).length; }
 
-  function renderResults(rightNow, checked, back, shown) {
+  // Shows, live, why each card that is already in its box belongs there.
+  function renderResults() {
     var res = $("results"), body = $("resBody");
-    res.hidden = false;
-    $("resSum").textContent = "Check " + round + ": " + rightNow + " of " + checked + " cards were right this round. Score so far: " + score() + " of " + TOTAL + ". The score is only feedback and never blocks you.";
+    var done = cards.filter(function (c) { return c.locked; });
+    res.hidden = done.length === 0;
+    $("resSum").textContent = "Score so far: " + score() + " of " + TOTAL + ". The score is only feedback and never blocks you.";
     body.innerHTML = "";
     BOX_ORDER.forEach(function (k) {
-      var done = cards.filter(function (c) { return c.locked && c.def.box === k; });
-      if (!done.length) return;
-      body.appendChild(group(BOXES[k].name, done.map(function (c) {
+      var here = done.filter(function (c) { return c.def.box === k; });
+      if (!here.length) return;
+      body.appendChild(group(BOXES[k].name, here.map(function (c) {
         return item(c.revealed ? "shown" : "ok", c.revealed ? "Answer shown" : "Correct", c.def.text, c.def.why);
       })));
     });
-    var again = cards.filter(function (c) { return !c.locked; });
-    if (again.length) {
-      body.appendChild(group("Try again", again.map(function (c) {
-        var left = MAX_WRONG - c.wrongs;
-        return item("retry", "Try again", c.def.text, left + (left === 1 ? " retry" : " retries") + " left before the answer is shown.");
-      })));
-    }
   }
   function group(title, items) {
     var d = document.createElement("div"); d.className = "res-group";
