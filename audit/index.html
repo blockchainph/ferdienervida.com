@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 4: Security Best Practices Audit</title>
+<meta name="description" content="Practice audit on a fake website: find the weaknesses, fix who can see what, and write a short report.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root {
+    --bg: #f5f7fc;
+    --surface: #ffffff;
+    --surface-2: #eef1fa;
+    --surface-3: #e4e9f8;
+    --ink: #14172b;
+    --ink-dim: #565b78;
+    --navy: #1e2761;
+    --navy-ink: #ffffff;
+    --cyan: #0090ac;
+    --low: #2e9e6b;
+    --med: #c98a12;
+    --high: #d9631e;
+    --crit: #c62839;
+    --border: #dde2f2;
+    --shadow: 30 40 100;
+    --focus: #0090ac;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d1024;
+      --surface: #161a36;
+      --surface-2: #1e2344;
+      --surface-3: #262c52;
+      --ink: #edeffb;
+      --ink-dim: #a7acd4;
+      --navy: #7c8ff2;
+      --navy-ink: #0d1024;
+      --cyan: #57d6ef;
+      --low: #4fe3b9;
+      --med: #ffcf5c;
+      --high: #ffb35e;
+      --crit: #ff6b81;
+      --border: #2b3162;
+      --focus: #57d6ef;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0d1024;
+    --surface: #161a36;
+    --surface-2: #1e2344;
+    --surface-3: #262c52;
+    --ink: #edeffb;
+    --ink-dim: #a7acd4;
+    --navy: #7c8ff2;
+    --navy-ink: #0d1024;
+    --cyan: #57d6ef;
+    --low: #4fe3b9;
+    --med: #ffcf5c;
+    --high: #ffb35e;
+    --crit: #ff6b81;
+    --border: #2b3162;
+    --focus: #57d6ef;
+  }
+
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; margin: 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+  #canvas-bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+  .shell { position: relative; z-index: 1; width: 100%; max-width: 48rem; margin: 0 auto; }
+  .app { padding: 0.9rem 1rem 2.2rem; }
+
+  /* --- Permanent practice banner (stays on screen on every stage) --- */
+  .topstick { position: sticky; top: 0; z-index: 200; box-shadow: 0 6px 18px -10px rgba(var(--shadow) / 0.6); }
+  .banner {
+    background: #ffd33d; color: #14172b; text-align: center; font-weight: 800; letter-spacing: 0.04em;
+    font-size: 0.82rem; line-height: 1.2; padding: 0.55rem 0.8rem; text-transform: uppercase;
+    border-bottom: 2px solid #14172b;
+  }
+  .topline { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.4rem max(0.9rem, calc((100% - 46rem) / 2)); font-size: 0.85rem; font-weight: 600; color: var(--ink-dim); display: flex; justify-content: space-between; gap: 0.6rem; }
+  .topline b { color: var(--ink); font-family: 'IBM Plex Mono', monospace; }
+
+  header.topbar { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.1rem; }
+  .badge-mark { flex-shrink: 0; }
+  .topbar-text { line-height: 1.15; }
+  .topbar-text .eyebrow { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-dim); }
+  .topbar-text .title { font-size: 1rem; font-weight: 600; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1.1rem;
+    padding: 1.3rem 1.1rem 1.2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 2px rgba(var(--shadow) / 0.06), 0 12px 32px -16px rgba(var(--shadow) / 0.28);
+  }
+  .intro h1 { font-size: 1.8rem; line-height: 1.15; margin-bottom: 0.6rem; }
+  .intro .lede { color: var(--ink-dim); margin: 0 0 1rem; }
+
+  .rule {
+    margin: 0 0 0.9rem; padding: 0.8rem 0.95rem; border-radius: 0.8rem; border: 2px solid var(--crit);
+    background: color-mix(in srgb, var(--crit) 9%, var(--surface)); font-size: 1rem; line-height: 1.5;
+  }
+  .rule b { font-weight: 700; }
+  .rule .why { display: block; margin-top: 0.35rem; font-size: 0.92rem; color: var(--ink-dim); }
+
+  details.scenario { background: var(--surface-2); border: 1px solid var(--border); border-radius: 0.8rem; padding: 0.2rem 1rem; }
+  details.scenario summary {
+    cursor: pointer; font-weight: 600; padding: 0.7rem 0; list-style: none; min-height: 2.75rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+  }
+  details.scenario summary::-webkit-details-marker { display: none; }
+  details.scenario summary::after { content: "\25BE"; color: var(--ink-dim); transition: transform 0.15s; }
+  details.scenario[open] summary::after { transform: rotate(180deg); }
+  details.scenario summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 0.4rem; }
+  details.scenario p { margin: 0 0 0.8rem; font-size: 1.02rem; line-height: 1.55; }
+
+  /* --- Progress --- */
+  .progress { margin: 0 0 1rem; }
+  .steps { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin: 0 0 0.55rem; padding: 0; }
+  .steps li { font-size: 0.8rem; font-weight: 600; color: var(--ink-dim); line-height: 1.25; display: flex; gap: 0.4rem; align-items: flex-start; }
+  .steps .n { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; width: 1.5rem; height: 1.5rem; flex: 0 0 1.5rem; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; background: var(--surface); }
+  .steps li.current { color: var(--ink); }
+  .steps li.current .n { border-color: var(--cyan); color: var(--cyan); }
+  .steps li.done { color: var(--ink); }
+  .steps li.done .n { background: var(--low); border-color: var(--low); color: #14172b; }
+  .progress-track { height: 0.5rem; background: var(--surface-2); border-radius: 999px; overflow: hidden; border: 1px solid var(--border); }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--navy)); border-radius: 999px; transition: width 0.35s ease; }
+
+  .stage-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.3rem; }
+  .stage h2 { font-size: 1.35rem; line-height: 1.2; }
+  .time { font-size: 0.85rem; color: var(--ink-dim); font-weight: 600; }
+  .help { margin: 0 0 0.9rem; color: var(--ink-dim); font-size: 0.98rem; }
+  .stage[data-locked="true"] { opacity: 0.55; }
+  .lock-note { display: none; margin: 0.6rem 0 0; font-size: 0.95rem; font-weight: 600; color: var(--ink-dim); }
+  .stage[data-locked="true"] .lock-note { display: block; }
+  .stage[data-locked="true"] .stage-body { display: none; }
+
+  .status {
+    min-height: 3rem; margin: 0 0 0.9rem; padding: 0.6rem 0.9rem; border-radius: 0.7rem;
+    background: var(--surface-2); border: 1px solid var(--border); font-size: 0.98rem; color: var(--ink-dim);
+  }
+  .status.good { color: color-mix(in srgb, var(--low) 58%, var(--ink)); border-color: var(--low); font-weight: 600; }
+  .status.bad { color: color-mix(in srgb, var(--crit) 62%, var(--ink)); border-color: var(--crit); font-weight: 600; }
+
+  .btn {
+    border: none; border-radius: 0.7rem; padding: 0.8rem 1.1rem; font-size: 1rem; font-weight: 600; min-height: 2.75rem;
+    font-family: 'IBM Plex Sans', sans-serif; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .btn-primary { background: var(--navy); color: var(--navy-ink); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--border); }
+  .row-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+  .row-actions .btn-primary { flex: 1 1 12rem; }
+  .msg { margin: 0.7rem 0 0; font-size: 0.95rem; color: var(--ink-dim); }
+  .msg.ready { color: color-mix(in srgb, var(--low) 58%, var(--ink)); font-weight: 600; }
+  .msg.error { color: color-mix(in srgb, var(--crit) 62%, var(--ink)); font-weight: 600; }
+  .confirm { margin: 0.8rem 0 0; padding: 0.8rem 0.9rem; border-radius: 0.8rem; border: 1.5px solid var(--cyan); background: var(--surface-2); }
+  .confirm[hidden] { display: none; }
+  .confirm p { margin: 0 0 0.6rem; font-weight: 600; }
+
+  /* ================= The fake website (always light, so it looks like a real page) ================= */
+  .browser { border: 2px solid #9aa3bd; border-radius: 0.9rem; overflow: hidden; background: #fff; color: #1b2230; margin: 0 0 0.8rem; box-shadow: 0 10px 28px -16px rgba(var(--shadow) / 0.6); }
+  .chrome { background: #e6e9f2; padding: 0.5rem 0.6rem; display: flex; gap: 0.5rem; align-items: center; border-bottom: 1px solid #c3c9dc; }
+  .dots { display: flex; gap: 0.25rem; flex: 0 0 auto; }
+  .dots i { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: #aab1c8; display: block; }
+  .addr { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; background: #fff; border: 1px solid #b9c0d6; border-radius: 0.6rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #1b2230; overflow: hidden; }
+  .addr .scheme { flex: 0 0 auto; display: flex; align-items: center; gap: 0.35rem; padding: 0 0.5rem; min-height: 2.75rem; background: #f4f6fb; border-right: 1px solid #d3d8e8; white-space: nowrap; }
+  .addr .tag { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 0.7rem; color: #8a1c2a; }
+  .addr .path { padding: 0 0.5rem; white-space: normal; word-break: break-all; line-height: 1.25; font-size: 0.72rem; }
+  .ribbon { background: #fff4c2; color: #4a3b00; text-align: center; font-weight: 700; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.25rem; border-bottom: 1px solid #e6d27a; }
+  .site-head { padding: 0.7rem 0.8rem 0; background: #17376b; color: #fff; }
+  .site-title { font-weight: 700; font-size: 1.05rem; margin: 0 0 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .site-title svg { width: 1.4rem; height: 1.4rem; flex: 0 0 1.4rem; }
+  .tabs { display: flex; gap: 0.15rem; }
+  .tabs button {
+    font: inherit; font-size: 0.95rem; font-weight: 600; color: #cfd9f0; background: transparent; border: 0; border-bottom: 3px solid transparent;
+    padding: 0.5rem 0.2rem; min-height: 2.75rem; cursor: pointer; white-space: nowrap; flex: 1 1 0; text-align: center;
+  }
+  .tabs button[aria-selected="true"] { color: #fff; border-bottom-color: #ffd33d; background: rgba(255,255,255,0.1); }
+  .tabs button:focus-visible { outline: 2px solid #ffd33d; outline-offset: -2px; }
+  .site-body { padding: 0.9rem 0.8rem 0.4rem; font-size: 1rem; line-height: 1.5; }
+  .site-body h3 { font-family: 'IBM Plex Sans', sans-serif; font-size: 1.15rem; font-weight: 700; margin: 0 0 0.5rem; color: #17376b; }
+  .site-body p { margin: 0 0 0.7rem; }
+  .screen[hidden] { display: none; }
+  .fakefield { display: block; margin: 0 0 0.7rem; }
+  .fakefield span { display: block; font-size: 0.85rem; font-weight: 700; color: #3a4560; margin-bottom: 0.2rem; }
+  .fakefield .box { border: 1.5px solid #b9c0d6; border-radius: 0.5rem; padding: 0.6rem 0.7rem; background: #f8f9fd; font-family: 'IBM Plex Mono', monospace; font-size: 0.95rem; min-height: 2.75rem; display: flex; align-items: center; }
+  .fakebtn { display: inline-flex; align-items: center; justify-content: center; min-height: 2.75rem; padding: 0.5rem 1rem; border-radius: 0.5rem; background: #17376b; color: #fff; font-weight: 700; font-size: 0.95rem; }
+  .fakebtn.light { background: #e3e8f6; color: #17376b; }
+  .strip { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; justify-content: space-between; background: #eef1f9; border: 1px solid #cdd4e8; border-radius: 0.6rem; padding: 0.3rem 0.4rem; margin: 0 0 0.8rem; }
+  .record { border: 1px solid #cdd4e8; border-radius: 0.7rem; padding: 0.7rem 0.8rem; margin: 0 0 0.7rem; background: #fcfdff; }
+  .record dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.8rem; }
+  .record dt { font-weight: 700; color: #3a4560; }
+  .record dd { margin: 0; }
+  .tiles { display: grid; grid-template-columns: 1fr; gap: 0.5rem; margin: 0 0 0.7rem; }
+  .tile { border: 1px solid #cdd4e8; border-radius: 0.6rem; padding: 0.7rem 0.8rem; background: #f4f6fb; font-weight: 600; }
+  .errbox { border: 2px solid #b4232f; background: #fdecee; color: #6d1019; border-radius: 0.6rem; padding: 0.6rem 0.8rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; line-height: 1.45; }
+  .site-foot { border-top: 1px solid #d3d8e8; background: #f4f6fb; padding: 0.4rem 0.8rem 0.6rem; font-size: 0.9rem; color: #3a4560; display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; align-items: center; justify-content: space-between; }
+  .minor { font-size: 0.88rem; color: #3a4560; }
+
+  /* Things the participant can tap to flag */
+  .flaggable {
+    position: relative; display: block; cursor: pointer; border-radius: 0.5rem; padding: 0.35rem 0.45rem; min-height: 2.75rem;
+    outline: 2px dashed transparent; outline-offset: 1px; transition: outline-color 0.12s, background-color 0.12s;
+    -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
+  }
+  .flaggable.inline { display: inline-flex; align-items: center; }
+  .flaggable:hover { outline-color: #8a93ad; }
+  .flaggable:focus-visible { outline: 3px solid #2457d6; outline-offset: 2px; }
+  .flaggable.flagged { outline: 3px solid #d12a3a; outline-offset: 1px; background: rgba(209, 42, 58, 0.09); }
+  .flaggable.flagged::after {
+    content: "FLAGGED"; position: absolute; top: -0.55rem; right: 0.3rem; background: #d12a3a; color: #fff; font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em; padding: 0.1rem 0.4rem; border-radius: 0.3rem; line-height: 1.2;
+  }
+  .flaggable.found { outline: 3px solid #1f8a56; background: rgba(31, 138, 86, 0.1); cursor: default; }
+  .flaggable.found::after { content: "FOUND"; background: #1f8a56; }
+  .flaggable.missed { outline: 3px dashed #c47b00; background: rgba(196, 123, 0, 0.12); cursor: default; }
+  .flaggable.missed::after { content: "MISSED"; position: absolute; top: -0.55rem; right: 0.3rem; background: #c47b00; color: #fff; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em; padding: 0.1rem 0.4rem; border-radius: 0.3rem; line-height: 1.2; }
+  .flaggable.fine-flag { outline: 3px solid #5f6b8c; background: rgba(95, 107, 140, 0.1); cursor: default; }
+  .flaggable.fine-flag::after { content: "FINE"; background: #5f6b8c; }
+  .flaggable.pulse { animation: pulse 0.9s ease 2; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(36, 87, 214, 0); } 50% { box-shadow: 0 0 0 8px rgba(36, 87, 214, 0.35); } }
+  .locked-flags .flaggable { cursor: default; }
+
+  .counter { font-size: 0.95rem; font-weight: 600; color: var(--ink-dim); margin: 0 0 0.6rem; }
+  .counter b { font-family: 'IBM Plex Mono', monospace; color: var(--ink); }
+
+  /* --- Stage 1 results --- */
+  .results { margin-top: 1.1rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+  .results[hidden] { display: none; }
+  .results h3 { font-size: 1.15rem; margin-bottom: 0.3rem; }
+  .scorebox { margin: 0 0 0.9rem; padding: 0.7rem 0.9rem; border-radius: 0.7rem; background: color-mix(in srgb, var(--low) 12%, var(--surface)); border: 1px solid var(--low); font-weight: 600; }
+  .res-group { margin: 0 0 0.9rem; }
+  .res-group h4 { margin: 0 0 0.5rem; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim); }
+  .res-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+  .res-list li { padding: 0.75rem 0.85rem; border-radius: 0.8rem; background: var(--surface-2); border: 1px solid var(--border); font-size: 0.98rem; line-height: 1.5; }
+  .res-list .head { display: flex; flex-wrap: wrap; gap: 0.4rem 0.6rem; align-items: center; margin-bottom: 0.35rem; }
+  .res-list .name { font-weight: 700; }
+  .res-list .lab { font-weight: 700; color: var(--ink); }
+  .res-list p { margin: 0 0 0.3rem; }
+  .res-list p:last-of-type { margin-bottom: 0.5rem; }
+  .badge { display: inline-block; padding: 0.05rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #14172b; }
+  .badge.found { background: var(--low); }
+  .badge.missed { background: var(--med); }
+  .badge.fine { background: var(--surface-3); color: var(--ink); border: 1px solid var(--border); }
+  .showme { font: inherit; font-size: 0.9rem; font-weight: 600; min-height: 2.75rem; padding: 0.3rem 0.8rem; border-radius: 0.6rem; border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .showme:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  /* --- Stage 2: access grid --- */
+  .reminder { margin: 0 0 0.9rem; padding: 0.6rem 0.85rem; border-radius: 0.7rem; background: color-mix(in srgb, var(--cyan) 10%, var(--surface)); border: 1px solid var(--cyan); font-weight: 600; }
+  table.grid { width: 100%; border-collapse: separate; border-spacing: 4px; table-layout: fixed; }
+  table.grid th.role { width: 19%; }
+  table.grid th { font-size: 0.85rem; font-weight: 700; color: var(--ink-dim); text-align: center; padding: 0.3rem 0.2rem; vertical-align: bottom; }
+  table.grid th.role { text-align: left; color: var(--ink); font-size: 0.95rem; padding-right: 0.5rem; }
+  table.grid td { padding: 0; }
+  .cell {
+    width: 100%; min-height: 2.75rem; font: inherit; font-size: 0.95rem; font-weight: 700; border-radius: 0.55rem; cursor: pointer;
+    border: 2px solid transparent; color: #14172b;
+  }
+  .cell:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .cell[data-v="0"] { background: #dfe3ee; border-color: #aeb6cc; }
+  .cell[data-v="1"] { background: #bfdcf7; border-color: #7fb2e3; }
+  .cell[data-v="2"] { background: #f9cf9f; border-color: #e09a4f; }
+  .cell.wrong { border-color: #d12a3a; box-shadow: 0 0 0 3px rgba(209, 42, 58, 0.45); }
+  .cell:disabled { cursor: default; }
+  .legend-line { margin: 0.7rem 0 0.9rem; font-size: 0.9rem; color: var(--ink-dim); }
+  .hints { margin: 0.8rem 0 0; padding: 0.7rem 0.9rem; border-radius: 0.7rem; background: var(--surface-2); border: 1px solid var(--border); }
+  .hints[hidden] { display: none; }
+  .hints h4 { margin: 0 0 0.4rem; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim); }
+  .hints ul { margin: 0; padding-left: 1.2rem; }
+  .hints li { margin: 0 0 0.25rem; }
+  .score-line { margin: 0.8rem 0 0; font-weight: 700; }
+
+  /* --- Stage 3 --- */
+  label.fld { display: block; font-weight: 600; font-size: 0.98rem; margin: 0 0 0.4rem; }
+  .req { color: var(--crit); }
+  textarea, input[type="text"] {
+    width: 100%; font: inherit; font-size: 1.0625rem; line-height: 1.5; color: var(--ink); background: var(--surface-2);
+    border: 1.5px solid var(--border); border-radius: 0.65rem; padding: 0.7rem 0.8rem;
+  }
+  textarea { min-height: 6.5rem; resize: vertical; }
+  textarea:focus-visible, input[type="text"]:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
+  .count-line { display: flex; justify-content: flex-end; margin: 0.3rem 0 1rem; font-size: 0.85rem; color: var(--ink-dim); }
+  .count-line b { font-family: 'IBM Plex Mono', monospace; color: var(--ink); }
+  .careful { margin: 0 0 0.9rem; padding: 0.6rem 0.85rem; border-radius: 0.7rem; background: color-mix(in srgb, var(--med) 14%, var(--surface)); border: 1px solid var(--med); font-size: 0.92rem; line-height: 1.45; }
+  .summary { margin: 0 0 1rem; padding: 0.8rem 0.95rem; border-radius: 0.8rem; background: var(--surface-2); border: 1px solid var(--border); font-weight: 600; line-height: 1.7; }
+
+  footer.foot { margin: 1.2rem 0 0; text-align: center; font-size: 0.85rem; color: var(--ink-dim); }
+
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  /* Phones: turn the access grid into one card per role, so every button stays large and labelled */
+  @media (max-width: 700px) {
+    table.grid, table.grid tbody, table.grid tr, table.grid th, table.grid td { display: block; }
+    table.grid thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+    table.grid tr { border: 1px solid var(--border); border-radius: 0.9rem; background: var(--surface-2); padding: 0.6rem 0.7rem 0.7rem; margin-bottom: 0.7rem; }
+    table.grid th.role { font-size: 1.05rem; padding: 0 0 0.5rem; font-family: 'Fraunces', Georgia, serif; }
+    table.grid td { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; padding: 0.15rem 0; }
+    table.grid td::before { content: attr(data-label); font-size: 0.95rem; font-weight: 600; flex: 1; }
+    .cell { width: 7rem; flex: 0 0 7rem; }
+  }
+  @media (min-width: 701px) {
+    .tiles { grid-template-columns: repeat(3, 1fr); }
+    .card { padding: 1.6rem 1.6rem 1.5rem; }
+    .app { padding-top: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas-bg" aria-hidden="true"></canvas>
+
+  <div class="topstick">
+    <div class="banner" role="note">PRACTICE SITE. Fake data. Safe to explore.</div>
+    <div class="topline"><span id="topLeft">Stage 1 of 3</span><span id="topRight"></span></div>
+  </div>
+
+<div class="shell">
+
+
+  <div class="app">
+
+    <header class="topbar">
+      <svg class="badge-mark" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+        <circle cx="15" cy="15" r="9" fill="none" stroke="var(--navy)" stroke-width="3.2"></circle>
+        <path d="m22 22 8 8" stroke="var(--navy)" stroke-width="3.6" stroke-linecap="round"></path>
+        <path d="m11.5 15 2.6 2.6 4.8-5.2" fill="none" stroke="var(--navy)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+      <div class="topbar-text">
+        <div class="eyebrow">Module 4 Activity</div>
+        <div class="title">Security Best Practices Audit</div>
+      </div>
+    </header>
+
+    <section class="card intro" aria-labelledby="introTitle">
+      <h1 id="introTitle">Module 4: Security Best Practices Audit</h1>
+      <p class="lede">You are the auditor. A small city office has a fake permit website. Look for what is unsafe, fix who can see what, then write a short report. You find weaknesses by looking, not by hacking.</p>
+      <p class="rule"><b>Practice only here. Probing a real website without permission is illegal (RA 10175, illegal access).</b>
+        <span class="why">RA 10175 is the Cybercrime Prevention Act. Illegal access means getting into a system you were not allowed to enter.</span></p>
+      <details class="scenario" open>
+        <summary>What you will do</summary>
+        <p><b>Stage 1.</b> Tap anything on the fake website that looks unsafe.</p>
+        <p><b>Stage 2.</b> Set who can view or change each kind of record.</p>
+        <p><b>Stage 3.</b> Write three short notes, then download your report as a Word file.</p>
+      </details>
+    </section>
+
+    <div class="progress" aria-label="Progress">
+      <ol class="steps" id="steps">
+        <li class="current" data-step="1"><span class="n">1</span><span>Find the weaknesses</span></li>
+        <li data-step="2"><span class="n">2</span><span>Fix the access</span></li>
+        <li data-step="3"><span class="n">3</span><span>Report</span></li>
+      </ol>
+      <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="fill"></div></div>
+      <p class="sr-only" id="progressSr" aria-live="polite"></p>
+    </div>
+
+    <!-- ============ STAGE 1 ============ -->
+    <section class="card stage" id="stage1" aria-labelledby="h1s">
+      <div class="stage-head"><h2 id="h1s">Stage 1: Find the weaknesses</h2><span class="time">About 20 minutes</span></div>
+      <p class="help">Tap anything on the fake website that looks unsafe. It gets a red flag. Tap again to remove the flag. Use the four tabs to visit each screen. You will see the answers only after you press Submit findings.</p>
+      <p class="counter"><b id="flagCount">0</b> items flagged</p>
+      <div class="status" id="status1" role="status" aria-live="polite">Start on the Home tab, then visit Login, Records and Admin.</div>
+
+      <div class="browser" id="browser" aria-label="Fake website: City Permit Portal (practice)">
+        <div class="chrome">
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <div class="addr">
+            <span class="scheme flaggable inline" role="button" tabindex="0" aria-pressed="false" data-item="w1"><span>http://</span><span class="tag">Not secure</span></span>
+            <span class="path" id="addrPath">permits.exampleville.test/</span>
+          </div>
+        </div>
+        <div class="ribbon">Practice site. Fake data.</div>
+        <div class="site-head">
+          <p class="site-title"><svg viewBox="0 0 24 24" fill="none" stroke="#ffd33d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg>City Permit Portal (practice)</p>
+          <div class="tabs" role="tablist" aria-label="Screens of the fake website">
+            <button type="button" role="tab" id="tab-home" aria-selected="true" aria-controls="screen-home" data-screen="home">Home</button>
+            <button type="button" role="tab" id="tab-login" aria-selected="false" aria-controls="screen-login" data-screen="login" tabindex="-1">Login</button>
+            <button type="button" role="tab" id="tab-records" aria-selected="false" aria-controls="screen-records" data-screen="records" tabindex="-1">Records</button>
+            <button type="button" role="tab" id="tab-admin" aria-selected="false" aria-controls="screen-admin" data-screen="admin" tabindex="-1">Admin</button>
+          </div>
+        </div>
+
+        <div class="site-body">
+          <!-- HOME -->
+          <div class="screen" id="screen-home" role="tabpanel" aria-labelledby="tab-home">
+            <h3>Welcome to the City Permit Portal</h3>
+            <p>Apply for a business permit, or track one you have already sent in. All names and numbers here are invented.</p>
+            <label class="fakefield"><span>Track a permit</span><span class="box">PRM-0000</span></label>
+            <p><span class="fakebtn">Track</span></p>
+            <div class="flaggable" role="button" tabindex="0" aria-pressed="false" data-item="w7">
+              <div class="errbox">Database error on server db01, user 'sa', table 'citizens'</div>
+            </div>
+          </div>
+
+          <!-- LOGIN -->
+          <div class="screen" id="screen-login" role="tabpanel" aria-labelledby="tab-login" hidden>
+            <h3>Staff login</h3>
+            <div class="flaggable" role="button" tabindex="0" aria-pressed="false" data-item="w2">Admin? The default login is admin / admin.</div>
+            <label class="fakefield" style="margin-top:0.6rem"><span>Username</span><span class="box">clerk01</span></label>
+            <label class="fakefield"><span>Password</span><span class="box">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span></label>
+            <div class="flaggable" role="button" tabindex="0" aria-pressed="false" data-item="w3">Password only. No second step.</div>
+            <p style="margin-top:0.6rem"><span class="fakebtn">Log in</span></p>
+            <div class="flaggable" role="button" tabindex="0" aria-pressed="false" data-item="w4">Forgot password? We will email you your current password.</div>
+            <div class="flaggable minor" role="button" tabindex="0" aria-pressed="false" data-item="d3">Session ends after 10 minutes of inactivity</div>
+          </div>
+
+          <!-- RECORDS -->
+          <div class="screen" id="screen-records" role="tabpanel" aria-labelledby="tab-records" hidden>
+            <div class="strip">
+              <span class="flaggable inline" role="button" tabindex="0" aria-pressed="false" data-item="w6">Logged in as: clerk01 (Records clerk)</span>
+              <span class="flaggable inline" role="button" tabindex="0" aria-pressed="false" data-item="d2">Log out</span>
+            </div>
+            <h3>Citizen record</h3>
+            <div class="record">
+              <dl>
+                <dt>Name</dt><dd>Maria Sample (practice)</dd>
+                <dt>Record</dt><dd>1042</dd>
+                <dt>Address</dt><dd>12 Sample Street, Exampleville</dd>
+                <dt>Phone</dt><dd>0000-000-0000</dd>
+                <dt>Permit</dt><dd>Sample permit, pending</dd>
+              </dl>
+            </div>
+            <div class="flaggable" role="button" tabindex="0" aria-pressed="false" data-item="w5">
+              <p class="minor" style="margin:0 0 0.4rem">This record is at the address: <b>...records?id=1042</b></p>
+              <span class="fakebtn light">Next record</span>
+              <p class="minor" style="margin:0.4rem 0 0">Opens the next citizen's record (id=1043) for the same staff account.</p>
+            </div>
+          </div>
+
+          <!-- ADMIN -->
+          <div class="screen" id="screen-admin" role="tabpanel" aria-labelledby="tab-admin" hidden>
+            <div class="strip">
+              <span class="flaggable inline" role="button" tabindex="0" aria-pressed="false" data-item="w6">Logged in as: clerk01 (Records clerk)</span>
+              <span class="flaggable inline" role="button" tabindex="0" aria-pressed="false" data-item="d2">Log out</span>
+            </div>
+            <h3>Admin panel</h3>
+            <p>The page opened without any warning.</p>
+            <div class="tiles">
+              <div class="tile">Manage staff accounts</div>
+              <div class="tile">Server settings</div>
+              <div class="tile">View audit logs</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="site-foot">
+          <span class="flaggable inline" role="button" tabindex="0" aria-pressed="false" data-item="w8">Powered by PermitSystem v2.1, 2014</span>
+          <span class="flaggable inline" role="button" tabindex="0" aria-pressed="false" data-item="d1">Privacy notice</span>
+        </div>
+      </div>
+
+      <div class="row-actions">
+        <button type="button" class="btn btn-primary" id="submit1" disabled>Submit findings</button>
+      </div>
+      <div class="confirm" id="confirm1" hidden>
+        <p>Submit now? You cannot change your flags after this.</p>
+        <div class="row-actions">
+          <button type="button" class="btn btn-primary" id="yes1">Yes, submit</button>
+          <button type="button" class="btn btn-ghost" id="no1">Keep looking</button>
+        </div>
+      </div>
+      <p class="msg" id="submitMsg">Flag at least one item to unlock Submit findings.</p>
+
+      <div class="results" id="results1" hidden aria-live="polite">
+        <h3>Your results</h3>
+        <p class="scorebox" id="score1"></p>
+        <div id="resBody"></div>
+      </div>
+    </section>
+
+    <!-- ============ STAGE 2 ============ -->
+    <section class="card stage" id="stage2" data-locked="true" aria-labelledby="h2s">
+      <div class="stage-head"><h2 id="h2s">Stage 2: Fix the access</h2><span class="time">About 20 minutes</span></div>
+      <p class="lock-note">Locked. Submit your findings in Stage 1 to open this stage.</p>
+      <div class="stage-body">
+        <p class="help">Right now every role can change every record. That is the unsafe starting point. Tap a box to change it: None, then View, then Edit, then back to None. None means no access. View means look only. Edit means look and change.</p>
+        <p class="reminder">Give each role only what the job needs.</p>
+        <div class="status" id="status2" role="status" aria-live="polite">Change the boxes, then press Check my settings.</div>
+        <table class="grid" id="grid">
+          <thead><tr><th scope="col"><span class="sr-only">Role</span></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="legend-line">Tap to cycle: None, View, Edit.</p>
+        <div class="row-actions">
+          <button type="button" class="btn btn-ghost" id="check2">Check my settings</button>
+          <button type="button" class="btn btn-primary" id="submit2" disabled>Submit my settings</button>
+        </div>
+        <div class="confirm" id="confirm2" hidden>
+          <p>Submit your settings now? You cannot change them after this.</p>
+          <div class="row-actions">
+            <button type="button" class="btn btn-primary" id="yes2">Yes, submit</button>
+            <button type="button" class="btn btn-ghost" id="no2">Keep working</button>
+          </div>
+        </div>
+        <p class="msg" id="submit2Msg">Check your settings at least once to unlock Submit my settings.</p>
+        <div class="hints" id="hints" hidden><h4>Hints</h4><ul id="hintList"></ul></div>
+        <p class="score-line" id="score2" hidden></p>
+      </div>
+    </section>
+
+    <!-- ============ STAGE 3 ============ -->
+    <section class="card stage" id="stage3" data-locked="true" aria-labelledby="h3s">
+      <div class="stage-head"><h2 id="h3s">Stage 3: Report</h2><span class="time">About 15 minutes</span></div>
+      <p class="lock-note">Locked. Submit Stages 1 and 2 to open this stage.</p>
+      <div class="stage-body">
+        <p class="help">Pick any three weaknesses from the fake website. For each one, say what is wrong and how to fix it. One or two sentences each, in your own words.</p>
+        <p class="careful"><b>Keep it general.</b> No real passwords and no real staff names.</p>
+
+        <label for="r1" class="fld">Weakness 1 and the fix <span class="req" aria-hidden="true">*</span></label>
+        <textarea id="r1" maxlength="300" data-report></textarea>
+        <p class="count-line"><span><b data-count-for="r1">0</b> of 300 characters</span></p>
+
+        <label for="r2" class="fld">Weakness 2 and the fix <span class="req" aria-hidden="true">*</span></label>
+        <textarea id="r2" maxlength="300" data-report></textarea>
+        <p class="count-line"><span><b data-count-for="r2">0</b> of 300 characters</span></p>
+
+        <label for="r3" class="fld">Weakness 3 and the fix <span class="req" aria-hidden="true">*</span></label>
+        <textarea id="r3" maxlength="300" data-report></textarea>
+        <p class="count-line"><span><b data-count-for="r3">0</b> of 300 characters</span></p>
+
+        <div class="summary" id="sumBox"></div>
+
+        <label for="fullName" class="fld">Full name <span class="req" aria-hidden="true">*</span></label>
+        <input type="text" id="fullName" maxlength="120" autocomplete="name" aria-describedby="dlMsg">
+        <div class="row-actions" style="margin-top:0.9rem">
+          <button type="button" class="btn btn-primary" id="dlBtn" disabled>Download as Word</button>
+        </div>
+        <p class="msg" id="dlMsg" role="status" aria-live="polite">Fill in all three notes and your name to unlock the button.</p>
+      </div>
+    </section>
+
+    <footer class="foot">Practice site. Fake data. Nothing you type leaves your device.</footer>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Content ----------
+  // The 8 real weaknesses (w) and the 3 harmless decoys (d). "what" and "fix" are shown after submitting.
+  var ITEMS = [
+    { id: "w1", type: "weak", screen: "home", title: "No encryption (http, Not secure)",
+      what: "The address starts with http:// and says Not secure, so anyone on the same network could read what you send.",
+      fix: "Use https:// (the padlock), which scrambles the data on its way." },
+    { id: "w2", type: "weak", screen: "login", title: "Default login shown on the page",
+      what: "The page tells everyone the default login, so anyone can try admin and admin.",
+      fix: "Change default passwords before launch and never show them on the page." },
+    { id: "w3", type: "weak", screen: "login", title: "Password only, no second step",
+      what: "A password alone is easy to steal or guess, and nothing else protects the account.",
+      fix: "Add a second step, such as a code from an authenticator app. This is called MFA (multi-factor authentication)." },
+    { id: "w4", type: "weak", screen: "login", title: "Forgot password sends the current password",
+      what: "If the site can email your current password, it keeps passwords in a readable form, and anyone who sees that email learns it.",
+      fix: "Send a one-time reset link instead, and store passwords only in scrambled form (called hashing)." },
+    { id: "w5", type: "weak", screen: "records", title: "Records open by changing a number",
+      what: "Any logged-in user can read other citizens' records just by changing the number in the address.",
+      fix: "Check on the server that this person is allowed to see each record, not only that they are logged in." },
+    { id: "w6", type: "weak", screen: "admin", title: "A clerk can open the Admin page",
+      what: "A records clerk reached the admin page, so access depends on the tab and not on the person's job.",
+      fix: "Allow admin pages only for admin roles, and check this every time. This is called least privilege: only what the job needs." },
+    { id: "w7", type: "weak", screen: "home", title: "Error message gives away server details",
+      what: "The error shows the server name, the database user and the table name, which helps an attacker plan.",
+      fix: "Show users a short, friendly message and keep the technical details in a private log." },
+    { id: "w8", type: "weak", screen: "home", title: "Old software (2014)",
+      what: "Software from 2014 no longer gets security fixes, so known holes stay open.",
+      fix: "Update or replace it, and install security fixes (called patching) on a regular schedule." },
+    { id: "d1", type: "decoy", screen: "home", title: "Privacy notice link",
+      fine: "It tells citizens how their data is used. That is good practice." },
+    { id: "d2", type: "decoy", screen: "records", title: "Log out button",
+      fine: "It lets people end their session safely, especially on a shared computer." },
+    { id: "d3", type: "decoy", screen: "login", title: "Session ends after 10 minutes of inactivity",
+      fine: "An unattended, logged-in screen is a risk, so closing it after a short time protects the account." }
+  ];
+  var WEAK = ITEMS.filter(function (i) { return i.type === "weak"; });
+  var POINTS_PER = 5;                 // 8 weaknesses x 5 = 40
+  var S1_MAX = WEAK.length * POINTS_PER;
+  var S2_MAX = 30, CELLS = 25, AUTO_MAX = S1_MAX + S2_MAX;   // 70
+
+  var PATHS = { home: "permits.exampleville.test/", login: "permits.exampleville.test/login", records: "permits.exampleville.test/records?id=1042", admin: "permits.exampleville.test/admin" };
+
+  var ROLES = ["Records clerk", "Permit officer", "HR officer", "IT admin", "Auditor"];
+  var RECS = ["Citizen records", "Permit approvals", "Payroll", "Server settings", "Audit logs"];
+  var WHO = ["a records clerk", "a permit officer", "an HR officer", "an IT admin", "an auditor"];   // for the hint questions
+  var VAL = ["None", "View", "Edit"];
+  // Least privilege: 0 None, 1 View, 2 Edit
+  var CORRECT = [
+    [2, 1, 0, 0, 0],   // Records clerk
+    [1, 2, 0, 0, 0],   // Permit officer
+    [0, 0, 2, 0, 0],   // HR officer
+    [0, 0, 0, 2, 1],   // IT admin
+    [1, 1, 1, 0, 1]    // Auditor
+  ];
+
+  // ---------- Helpers ----------
+  function $(id) { return document.getElementById(id); }
+  function clean(s) { return String(s == null ? "" : s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").trim(); }
+  function reduceMotion() { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function say(id, msg, kind) { var s = $(id); s.textContent = msg; s.className = "status" + (kind ? " " + kind : ""); }
+
+  // ---------- State (in memory only; a reload simply restarts the activity) ----------
+  var flags = {};                  // item id -> true
+  var s1Done = false, s2Done = false, downloaded = false;
+  var found = 0, s1Points = 0;
+  var grid = [], lastChecked = null, checks = 0, changedSince = true, s2Correct = 0, s2Points = 0;
+  var currentScreen = "home";
+
+  // =====================================================================
+  // STAGE 1: the fake website
+  // =====================================================================
+  function allFlaggables() { return document.querySelectorAll("#browser [data-item]"); }
+
+  function renderFlags() {
+    var n = 0;
+    Object.keys(flags).forEach(function (k) { if (flags[k]) n++; });
+    [].forEach.call(allFlaggables(), function (e) {
+      var on = !!flags[e.getAttribute("data-item")];
+      e.classList.toggle("flagged", on && !s1Done);
+      e.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    $("flagCount").textContent = n;
+    $("submit1").disabled = s1Done || n === 0;
+    $("submitMsg").textContent = s1Done ? "Findings submitted." : (n === 0 ? "Flag at least one item to unlock Submit findings." : "Ready when you are. Press Submit findings to see the answers.");
+    updateTop(); updateProgress();
+  }
+
+  function toggleFlag(e) {
+    if (s1Done) return;
+    var id = e.getAttribute("data-item");
+    flags[id] = !flags[id];
+    renderFlags();
+    say("status1", flags[id] ? "Flagged. Tap it again to remove the flag." : "Flag removed.");
+  }
+  $("browser").addEventListener("click", function (ev) {
+    var t = ev.target.closest("[data-item]");
+    if (t) toggleFlag(t);
+  });
+  $("browser").addEventListener("keydown", function (ev) {
+    if (ev.key !== "Enter" && ev.key !== " ") return;
+    var t = ev.target.closest && ev.target.closest("[data-item]");
+    if (t && ev.target === t) { ev.preventDefault(); toggleFlag(t); }
+  });
+
+  // tabs
+  function showScreen(name, focusTab) {
+    currentScreen = name;
+    ["home", "login", "records", "admin"].forEach(function (s) {
+      $("screen-" + s).hidden = s !== name;
+      var tab = $("tab-" + s);
+      tab.setAttribute("aria-selected", s === name ? "true" : "false");
+      tab.tabIndex = s === name ? 0 : -1;
+    });
+    $("addrPath").textContent = PATHS[name];
+    if (focusTab) $("tab-" + name).focus();
+  }
+  [].forEach.call(document.querySelectorAll(".tabs button"), function (b) {
+    b.addEventListener("click", function () { showScreen(b.getAttribute("data-screen")); });
+    b.addEventListener("keydown", function (ev) {
+      var order = ["home", "login", "records", "admin"], i = order.indexOf(currentScreen);
+      if (ev.key === "ArrowRight") { ev.preventDefault(); showScreen(order[(i + 1) % 4], true); }
+      if (ev.key === "ArrowLeft") { ev.preventDefault(); showScreen(order[(i + 3) % 4], true); }
+    });
+  });
+
+  // submit findings (two steps, so nobody submits by accident)
+  $("submit1").addEventListener("click", function () { if (!$("submit1").disabled) { $("confirm1").hidden = false; $("yes1").focus(); } });
+  $("no1").addEventListener("click", function () { $("confirm1").hidden = true; $("submit1").focus(); });
+  $("yes1").addEventListener("click", function () { $("confirm1").hidden = true; gradeStage1(); });
+
+  function gradeStage1() {
+    s1Done = true;
+    found = WEAK.filter(function (w) { return flags[w.id]; }).length;
+    s1Points = found * POINTS_PER;
+    document.querySelector("#stage1 .browser").classList.add("locked-flags");
+    [].forEach.call(allFlaggables(), function (e) {
+      var id = e.getAttribute("data-item"), item = ITEMS.filter(function (i) { return i.id === id; })[0];
+      e.classList.remove("flagged", "found", "missed", "fine-flag");
+      if (item.type === "weak") e.classList.add(flags[id] ? "found" : "missed");
+      else if (flags[id]) e.classList.add("fine-flag");
+    });
+    renderResults();
+    $("submit1").disabled = true;
+    $("submitMsg").textContent = "Findings submitted.";
+    say("status1", "You found " + found + " of " + WEAK.length + " weaknesses. Read the results below, then go on to Stage 2.", found === WEAK.length ? "good" : "");
+    setLocked("stage2", false);
+    buildGrid();
+    updateTop(); updateProgress();
+    $("results1").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+  }
+
+  function renderResults() {
+    var res = $("results1"), body = $("resBody");
+    res.hidden = false; body.innerHTML = "";
+    $("score1").textContent = "Weaknesses found: " + found + " of " + WEAK.length + " (" + s1Points + " of " + S1_MAX + " points).";
+
+    var g1 = el("div", "res-group"); g1.appendChild(el("h4", null, "The 8 weaknesses"));
+    var ul1 = el("ul", "res-list");
+    WEAK.forEach(function (w, i) {
+      var ok = !!flags[w.id];
+      var li = el("li");
+      var head = el("div", "head");
+      head.appendChild(el("span", "badge " + (ok ? "found" : "missed"), ok ? "Found" : "Missed"));
+      head.appendChild(el("span", "name", (i + 1) + ". " + w.title));
+      li.appendChild(head);
+      var p1 = el("p"); p1.appendChild(el("span", "lab", "What is wrong: ")); p1.appendChild(document.createTextNode(w.what)); li.appendChild(p1);
+      var p2 = el("p"); p2.appendChild(el("span", "lab", "Fix: ")); p2.appendChild(document.createTextNode(w.fix)); li.appendChild(p2);
+      var b = el("button", "showme", "Show me on the site"); b.type = "button"; b.setAttribute("data-show", w.id);
+      li.appendChild(b);
+      ul1.appendChild(li);
+    });
+    g1.appendChild(ul1); body.appendChild(g1);
+
+    var g2 = el("div", "res-group"); g2.appendChild(el("h4", null, "These were fine"));
+    var ul2 = el("ul", "res-list");
+    ITEMS.filter(function (i) { return i.type === "decoy"; }).forEach(function (d) {
+      var li = el("li");
+      var head = el("div", "head");
+      head.appendChild(el("span", "badge fine", flags[d.id] ? "You flagged it" : "Not flagged"));
+      head.appendChild(el("span", "name", d.title));
+      li.appendChild(head);
+      var p = el("p", null, "This one is fine because " + d.fine.charAt(0).toLowerCase() + d.fine.slice(1) + (flags[d.id] ? " Flagging it costs you nothing." : ""));
+      li.appendChild(p);
+      var b = el("button", "showme", "Show me on the site"); b.type = "button"; b.setAttribute("data-show", d.id);
+      li.appendChild(b);
+      ul2.appendChild(li);
+    });
+    g2.appendChild(ul2); body.appendChild(g2);
+  }
+
+  // "Show me": jump to the right tab and pulse the item
+  $("resBody").addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-show]");
+    if (!b) return;
+    var id = b.getAttribute("data-show"), item = ITEMS.filter(function (i) { return i.id === id; })[0];
+    showScreen(item.screen);
+    var target = null;
+    [].forEach.call(document.querySelectorAll('#browser [data-item="' + id + '"]'), function (e) { if (e.offsetParent !== null) target = e; });
+    if (!target) return;
+    $("browser").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "center" });
+    target.classList.remove("pulse"); void target.offsetWidth; target.classList.add("pulse");
+    setTimeout(function () { target.classList.remove("pulse"); }, 2000);
+  });
+
+  // =====================================================================
+  // STAGE 2: who can see and change what
+  // =====================================================================
+  function buildGrid() {
+    var thead = $("grid").querySelector("thead tr"), tbody = $("grid").querySelector("tbody");
+    thead.innerHTML = ""; tbody.innerHTML = "";
+    var corner = el("th"); corner.scope = "col"; corner.appendChild(el("span", "sr-only", "Role")); thead.appendChild(corner);
+    RECS.forEach(function (r) { var th = el("th", null, r); th.scope = "col"; thead.appendChild(th); });
+    grid = []; lastChecked = null; checks = 0; changedSince = true;
+    ROLES.forEach(function (role, ri) {
+      grid.push([2, 2, 2, 2, 2]);                      // the unsafe starting point: everyone can edit everything
+      var tr = el("tr");
+      var th = el("th", "role", role); th.scope = "row"; tr.appendChild(th);
+      RECS.forEach(function (rec, ci) {
+        var td = el("td"); td.setAttribute("data-label", rec);
+        var b = el("button", "cell"); b.type = "button"; b.setAttribute("data-r", ri); b.setAttribute("data-c", ci);
+        td.appendChild(b); tr.appendChild(td);
+        paintCell(b);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+  function paintCell(b) {
+    var r = +b.getAttribute("data-r"), c = +b.getAttribute("data-c"), v = grid[r][c];
+    b.textContent = VAL[v]; b.setAttribute("data-v", v);
+    b.setAttribute("aria-label", ROLES[r] + ", " + RECS[c] + ": " + VAL[v] + ". Tap to change.");
+  }
+  $("grid").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".cell");
+    if (!b || s2Done) return;
+    var r = +b.getAttribute("data-r"), c = +b.getAttribute("data-c");
+    grid[r][c] = (grid[r][c] + 1) % 3;
+    b.classList.remove("wrong");                       // a changed box is no longer judged until the next check
+    paintCell(b); changedSince = true;
+    say("status2", ROLES[r] + " on " + RECS[c] + ": " + VAL[grid[r][c]] + ".");
+  });
+
+  function countCorrect() {
+    var n = 0;
+    for (var r = 0; r < 5; r++) for (var c = 0; c < 5; c++) if (grid[r][c] === CORRECT[r][c]) n++;
+    return n;
+  }
+
+  // A hint is a question. It points at the problem without giving the right value.
+  function hintFor(r, c) {
+    var who = WHO[r], rec = RECS[c].toLowerCase(), cur = grid[r][c], want = CORRECT[r][c];
+    if (want === 0) return "Does " + who + " need to " + (cur === 2 ? "see or change " : "see ") + rec + " to do the job?";
+    if (want === 1 && cur === 2) return "Should " + who + " be able to change " + rec + ", or only look?";
+    if (want === 1 && cur === 0) return "Can " + who + " do the job without being able to look at " + rec + "?";
+    if (want === 2 && cur === 1) return "Can " + who + " do the job if they cannot change " + rec + "?";
+    return "Can " + who + " do the job without any access to " + rec + "?";
+  }
+
+  $("check2").addEventListener("click", function () {
+    if (s2Done) return;
+    var withHints = checks >= 1;
+    if (checks >= 1 && !changedSince) { say("status2", "Change at least one box first, then check again.", "bad"); return; }
+    checks++; changedSince = false;
+    var wrongCells = [];
+    [].forEach.call(document.querySelectorAll("#grid .cell"), function (b) {
+      var r = +b.getAttribute("data-r"), c = +b.getAttribute("data-c");
+      var bad = grid[r][c] !== CORRECT[r][c];
+      b.classList.toggle("wrong", bad);
+      if (bad) wrongCells.push([r, c]);
+    });
+    var n = CELLS - wrongCells.length;
+    var pts = Math.round(S2_MAX * n / CELLS);
+    say("status2", n + " of " + CELLS + " boxes are correct (" + pts + " of " + S2_MAX + " points if you submit now). " + (n === CELLS ? "Every box is right. Press Submit my settings." : "Red boxes are not right yet."), n === CELLS ? "good" : "bad");
+    var box = $("hints"), list = $("hintList"); list.innerHTML = "";
+    if (withHints && wrongCells.length) {
+      // up to three hints, spread across different roles, so the answer is never handed over
+      var seen = {}, picked = [];
+      wrongCells.forEach(function (w) { if (picked.length < 3 && !seen[w[0]]) { seen[w[0]] = 1; picked.push(w); } });
+      wrongCells.forEach(function (w) { if (picked.length < 3 && picked.indexOf(w) < 0) picked.push(w); });
+      picked.forEach(function (w) { list.appendChild(el("li", null, hintFor(w[0], w[1]))); });
+      box.hidden = false;
+    } else box.hidden = true;
+    $("submit2").disabled = false;
+    $("submit2Msg").textContent = "Ready when you are. Press Submit my settings to lock in your score.";
+    updateProgress();
+  });
+
+  $("submit2").addEventListener("click", function () { if (!$("submit2").disabled && !s2Done) { $("confirm2").hidden = false; $("yes2").focus(); } });
+  $("no2").addEventListener("click", function () { $("confirm2").hidden = true; });
+  $("yes2").addEventListener("click", function () {
+    $("confirm2").hidden = true;
+    s2Done = true;
+    s2Correct = countCorrect();
+    s2Points = Math.round(S2_MAX * s2Correct / CELLS);
+    [].forEach.call(document.querySelectorAll("#grid .cell"), function (b) {
+      var r = +b.getAttribute("data-r"), c = +b.getAttribute("data-c");
+      b.classList.toggle("wrong", grid[r][c] !== CORRECT[r][c]);
+      b.disabled = true;
+    });
+    $("check2").disabled = true; $("submit2").disabled = true;
+    $("submit2Msg").textContent = "Settings submitted.";
+    $("hints").hidden = true;
+    $("score2").hidden = false;
+    $("score2").textContent = "Access settings correct: " + s2Correct + " of " + CELLS + " (" + s2Points + " of " + S2_MAX + " points).";
+    say("status2", "Settings submitted. Stage 3 is now open.", "good");
+    setLocked("stage3", false);
+    refreshSummary(); refreshDownload();
+    updateTop(); updateProgress();
+    $("stage3").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+  });
+
+  // =====================================================================
+  // STAGE 3: report and Word file
+  // =====================================================================
+  function setLocked(id, locked) {
+    var e = $(id);
+    e.setAttribute("data-locked", locked ? "true" : "false");
+    e.setAttribute("aria-disabled", locked ? "true" : "false");
+    if (locked) e.setAttribute("inert", ""); else e.removeAttribute("inert");
+  }
+
+  function refreshSummary() {
+    $("sumBox").textContent = "";
+    var a = el("div", null, "Weaknesses found: " + found + " of " + WEAK.length + " (" + s1Points + " points)");
+    var b = el("div", null, "Access settings correct: " + s2Correct + " of " + CELLS + " (" + s2Points + " points)");
+    var c = el("div", null, "Automatic score so far: " + (s1Points + s2Points) + " of " + AUTO_MAX + ". Your trainer will mark the written notes out of 30.");
+    $("sumBox").appendChild(a); $("sumBox").appendChild(b); $("sumBox").appendChild(c);
+  }
+
+  [].forEach.call(document.querySelectorAll("[data-report]"), function (t) {
+    t.addEventListener("input", function () {
+      var n = document.querySelector('[data-count-for="' + t.id + '"]'); if (n) n.textContent = t.value.length;
+      refreshDownload(); updateProgress();
+    });
+  });
+  $("fullName").addEventListener("input", function () { refreshDownload(); updateProgress(); });
+
+  // Uses the .docx library already bundled for /threatmodel/. It loads once Stage 3 opens and makes
+  // no request except for that one local file.
+  var DOCX_SRC = "../threatmodel/vendor/docx.iife.js";
+  var docxState = "idle";            // idle | loading | ready | failed
+  function loadDocx() {
+    if (window.docx) { docxState = "ready"; refreshDownload(); return; }
+    if (docxState === "loading") return;
+    docxState = "loading";
+    var sc = document.createElement("script");
+    sc.src = DOCX_SRC;
+    sc.onload = function () { docxState = window.docx ? "ready" : "failed"; refreshDownload(); };
+    sc.onerror = function () { docxState = "failed"; refreshDownload(); };
+    document.head.appendChild(sc);
+  }
+
+  function reportsFilled() { return ["r1", "r2", "r3"].every(function (id) { return clean($(id).value).length > 0; }); }
+
+  function refreshDownload() {
+    var named = clean($("fullName").value).length > 0, filled = reportsFilled();
+    var ok = s1Done && s2Done && filled && named && docxState === "ready";
+    $("dlBtn").disabled = !ok;
+    var m = $("dlMsg"); m.className = "msg";
+    if (!s1Done || !s2Done) m.textContent = "Finish Stages 1 and 2 first.";
+    else if (!filled) m.textContent = "Write all three notes to unlock the button.";
+    else if (!named) m.textContent = "Type your full name to unlock the button.";
+    else if (docxState === "failed") { m.className = "msg error"; m.textContent = "The Word builder did not load. Refresh the page and try again."; }
+    else if (docxState !== "ready") m.textContent = "Getting ready...";
+    else { m.className = "msg ready"; m.textContent = "Ready. Your file is made on this device and is not uploaded anywhere."; }
+  }
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function lastName(full) {
+    var parts = clean(full).split(/\s+/).filter(Boolean);
+    while (parts.length > 1 && /^(jr|sr|ii|iii|iv|v)\.?$/i.test(parts[parts.length - 1])) parts.pop();
+    var w = (parts[parts.length - 1] || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]/g, "");
+    return w ? w.charAt(0).toUpperCase() + w.slice(1) : "Participant";
+  }
+
+  function buildDoc(fullName) {
+    var d = window.docx;
+    var Document = d.Document, Packer = d.Packer, Paragraph = d.Paragraph, TextRun = d.TextRun, Table = d.Table,
+        TableRow = d.TableRow, TableCell = d.TableCell, WidthType = d.WidthType, ShadingType = d.ShadingType,
+        VerticalAlign = d.VerticalAlign, HeadingLevel = d.HeadingLevel, TableLayoutType = d.TableLayoutType,
+        Footer = d.Footer, AlignmentType = d.AlignmentType;
+    var INK = "14172B", DIM = "565B78", NAVY = "1E2761", HEAD_FILL = "E4E9F8", W = 9360;
+    var now = new Date();
+    var dateStr = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate());
+    var autoScore = s1Points + s2Points;
+
+    function run(t, o) { o = o || {}; return new TextRun({ text: t, bold: o.bold, italics: o.italics, color: o.color || INK, size: o.size, shading: o.fill ? { type: ShadingType.CLEAR, fill: o.fill, color: "auto" } : undefined }); }
+    function para(parts, o) {
+      o = o || {};
+      parts = Array.isArray(parts) ? parts : [[parts, o]];
+      return new Paragraph({ spacing: { after: o.after == null ? 80 : o.after, before: o.before || 0, line: o.line }, indent: o.indent, children: parts.map(function (p) { return run(p[0], p[1]); }) });
+    }
+    function h1(t) { return new Paragraph({ heading: HeadingLevel.HEADING_1, spacing: { before: 300, after: 120 }, children: [new TextRun({ text: t, bold: true, color: NAVY, size: 30, font: "Georgia" })] }); }
+    function cell(t, w, o) {
+      o = o || {};
+      return new TableCell({
+        width: { size: w, type: WidthType.DXA }, verticalAlign: VerticalAlign.CENTER,
+        shading: o.fill ? { type: ShadingType.CLEAR, fill: o.fill, color: "auto" } : undefined,
+        margins: { top: 80, bottom: 80, left: 120, right: 120 },
+        children: [new Paragraph({ alignment: o.align, spacing: { after: 0 }, children: [run(t, { bold: o.bold, color: o.color, size: o.size || 22 })] })]
+      });
+    }
+
+    var children = [];
+    children.push(new Paragraph({ heading: HeadingLevel.TITLE, spacing: { after: 60 }, children: [new TextRun({ text: "Module 4: Security Best Practices Audit", bold: true, color: NAVY, size: 44, font: "Georgia" })] }));
+    children.push(para("Practice audit of a fake website: City Permit Portal (practice). Fake data only.", { color: DIM, size: 22, after: 200 }));
+
+    var iw = [2400, W - 2400];
+    function row(a, b, fill) { return new TableRow({ children: [cell(a, iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell(b, iw[1], { fill: fill })] }); }
+    children.push(new Table({
+      width: { size: W, type: WidthType.DXA }, columnWidths: iw, layout: TableLayoutType.FIXED,
+      rows: [
+        row("Name", fullName),
+        row("Date", dateStr),
+        row("Weaknesses found", found + " of " + WEAK.length + " (" + s1Points + " points)"),
+        row("Access settings correct", s2Correct + " of " + CELLS + " (" + s2Points + " points)")
+      ]
+    }));
+
+    children.push(h1("The 8 weaknesses (study sheet)"));
+    WEAK.forEach(function (w, i) {
+      var ok = !!flags[w.id];
+      children.push(new Paragraph({ spacing: { before: 160, after: 40 }, keepNext: true, children: [
+        run((i + 1) + ". " + w.title + "  ", { bold: true, color: NAVY, size: 23 }),
+        run(ok ? " Found " : " Missed ", { bold: true, size: 18, fill: ok ? "BFE5CF" : "F5DC85" })
+      ] }));
+      children.push(para([["What is wrong: ", { bold: true }], [w.what, {}]], { after: 40, indent: { left: 240 } }));
+      children.push(para([["Fix: ", { bold: true }], [w.fix, {}]], { after: 100, indent: { left: 240 } }));
+    });
+
+    children.push(h1("My access settings"));
+    var cw = [1560, 1560, 1560, 1560, 1560, 1560];
+    var FILL = ["DFE3EE", "BFDCF7", "F9CF9F"];
+    var hdr = new TableRow({ tableHeader: true, children: [cell("", cw[0], { fill: HEAD_FILL })].concat(RECS.map(function (r, i) { return cell(r, cw[i + 1], { bold: true, fill: HEAD_FILL, color: NAVY, size: 18, align: AlignmentType.CENTER }); })) });
+    var rows = [hdr];
+    ROLES.forEach(function (role, ri) {
+      rows.push(new TableRow({ cantSplit: true, children: [cell(role, cw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 19 })].concat(RECS.map(function (r, ci) { return cell(VAL[grid[ri][ci]], cw[ci + 1], { align: AlignmentType.CENTER, fill: FILL[grid[ri][ci]], size: 20, bold: true }); })) }));
+    });
+    children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: cw, layout: TableLayoutType.FIXED, rows: rows }));
+    children.push(para("None means no access. View means look only. Edit means look and change.", { italics: true, color: DIM, size: 20, before: 100 }));
+
+    children.push(h1("My report"));
+    [["Weakness 1 and the fix", "r1"], ["Weakness 2 and the fix", "r2"], ["Weakness 3 and the fix", "r3"]].forEach(function (p) {
+      children.push(para(p[0], { bold: true, color: NAVY, size: 24, before: 160, after: 60 }));
+      String($(p[1]).value).split(/\r?\n/).forEach(function (line) {
+        var t = clean(line);
+        if (t) children.push(para(t, { after: 100, line: 300 }));
+      });
+    });
+
+    children.push(new Paragraph({ spacing: { before: 360, after: 60 }, border: { top: { style: d.BorderStyle.SINGLE, size: 6, color: "9AA3BD", space: 8 } }, children: [
+      run("Automatic score: " + autoScore + " of " + AUTO_MAX + ".", { bold: true })
+    ] }));
+    children.push(para("Trainer review of the written answers: ____ of 30.", { bold: true }));
+
+    var doc = new Document({
+      creator: "Module 4 activity", title: "Module 4: Security Best Practices Audit",
+      styles: {
+        default: { document: { run: { font: "Calibri", size: 22, color: INK } } },
+        paragraphStyles: [
+          { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 30, bold: true, color: NAVY, font: "Georgia" }, paragraph: { spacing: { before: 300, after: 120 }, outlineLevel: 0 } },
+          { id: "Title", name: "Title", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 44, bold: true, color: NAVY, font: "Georgia" } }
+        ]
+      },
+      sections: [{
+        properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1440, right: 1440, bottom: 1300, left: 1440 } } },
+        footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Practice site. Fake data.", color: DIM, size: 18 })] })] }) },
+        children: children
+      }]
+    });
+    return Packer.toBlob(doc).then(function (blob) { return { blob: blob, name: "Module4_Audit_" + lastName(fullName) + ".docx" }; });
+  }
+
+  $("dlBtn").addEventListener("click", function () {
+    var name = clean($("fullName").value);
+    if (!s1Done || !s2Done || !name || !reportsFilled() || !window.docx) return;
+    var btn = $("dlBtn"), msg = $("dlMsg");
+    btn.disabled = true; msg.className = "msg"; msg.textContent = "Building your file...";
+    buildDoc(name).then(function (res) {
+      var url = URL.createObjectURL(res.blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = res.name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      downloaded = true; updateProgress(); refreshDownload(); updateTop();
+      msg.className = "msg ready"; msg.textContent = "Downloaded " + res.name + ". Send this file to your trainer.";
+    }).catch(function (err) {
+      msg.className = "msg error"; msg.textContent = "Something went wrong building the file. Please try again.";
+      if (window.console) console.error(err);
+      refreshDownload();
+    });
+  });
+
+  // ---------- Progress, top line, leaving the page ----------
+  function currentStage() { return !s1Done ? 1 : (!s2Done ? 2 : 3); }
+
+  function updateTop() {
+    var st = currentStage();
+    $("topLeft").textContent = "Stage " + st + " of 3";
+    var n = Object.keys(flags).filter(function (k) { return flags[k]; }).length;
+    if (st === 1) $("topRight").innerHTML = "Flagged: <b>" + n + "</b>";
+    else if (st === 2) $("topRight").innerHTML = "Stage 1 points: <b>" + s1Points + "</b> of " + S1_MAX;
+    else $("topRight").innerHTML = "Points so far: <b>" + (s1Points + s2Points) + "</b> of " + AUTO_MAX;
+  }
+
+  function updateProgress() {
+    var n = Object.keys(flags).filter(function (k) { return flags[k]; }).length;
+    var p1 = s1Done ? 1 : Math.min(n / WEAK.length, 1) * 0.8;
+    var p2 = s2Done ? 1 : (checks > 0 ? 0.6 : 0);
+    var filled = ["r1", "r2", "r3"].filter(function (id) { return clean($(id).value); }).length + (clean($("fullName").value) ? 1 : 0);
+    var p3 = downloaded ? 1 : (s2Done ? (filled / 4) * 0.8 : 0);
+    var p = (p1 + p2 + p3) / 3;
+    $("fill").style.width = (p * 100) + "%";
+    var cur = currentStage();
+    [].forEach.call($("steps").children, function (li) {
+      var k = +li.getAttribute("data-step");
+      li.classList.toggle("done", (k === 1 && s1Done) || (k === 2 && s2Done) || (k === 3 && downloaded));
+      li.classList.toggle("current", k === cur && !(k === 3 && downloaded));
+    });
+    $("progressSr").textContent = "Stage " + cur + " of 3. " + Math.round(p * 100) + " percent complete.";
+    if (s1Done && s2Done && docxState === "idle") loadDocx();
+  }
+
+  window.addEventListener("beforeunload", function (e) {
+    var started = Object.keys(flags).some(function (k) { return flags[k]; }) || s1Done;
+    if (started && !downloaded) { e.preventDefault(); e.returnValue = ""; }
+  });
+
+  // ---------- Start ----------
+  setLocked("stage2", true); setLocked("stage3", true);
+  renderFlags(); updateTop(); updateProgress(); refreshDownload();
+
+  // Ambient network/circuit canvas background , subtle, theme-aware (same as the other activity pages)
+  (function () {
+    var canvas = $("canvas-bg");
+    var ctx = canvas.getContext("2d");
+    var w, h, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var nodes = [];
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function isDark() {
+      var t = document.documentElement.getAttribute("data-theme");
+      if (t === "dark") return true;
+      if (t === "light") return false;
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+
+    function resize() {
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      canvas.style.width = w + "px"; canvas.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var count = Math.round((w * h) / 26000);
+      nodes = [];
+      for (var i = 0; i < count; i++) {
+        nodes.push({
+          x: Math.random() * w, y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.12, vy: (Math.random() - 0.5) * 0.12,
+          r: 1 + Math.random() * 1.2
+        });
+      }
+    }
+
+    function step() {
+      ctx.clearRect(0, 0, w, h);
+      var dark = isDark();
+      var dot = dark ? "rgba(124,143,242,0.35)" : "rgba(30,39,97,0.16)";
+      var line = dark ? "rgba(87,214,239,0.10)" : "rgba(30,39,97,0.055)";
+
+      nodes.forEach(function (n) {
+        if (!reduceMotion) {
+          n.x += n.vx; n.y += n.vy;
+          if (n.x < 0 || n.x > w) n.vx *= -1;
+          if (n.y < 0 || n.y > h) n.vy *= -1;
+        }
+      });
+
+      for (var i = 0; i < nodes.length; i++) {
+        for (var j = i + 1; j < nodes.length; j++) {
+          var dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+          if (dx * dx + dy * dy < 130 * 130) {
+            ctx.strokeStyle = line;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      nodes.forEach(function (n) {
+        ctx.fillStyle = dot;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      if (!reduceMotion) requestAnimationFrame(step);
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+    step();
+  })();
+})();
+</script>
+</body>
+</html>
