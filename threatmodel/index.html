@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Threat Model Worksheet</title>
-<meta name="description" content="Guided group worksheet: threat model a fictional City Treasurer's Office, then download your answers as a Word file.">
+<title>Threat Model Game</title>
+<meta name="description" content="Drag each answer into the right box to build a threat model for a fictional City Treasurer's Office.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -73,7 +73,7 @@
     color: var(--ink);
     font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
     font-size: 1.0625rem;
-    line-height: 1.55;
+    line-height: 1.5;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -82,24 +82,16 @@
 
   h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; margin: 0; }
   .mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+  .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
   #canvas-bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 
-  .app {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 44rem;
-    padding: 1.1rem 1.1rem 2.4rem;
-  }
+  .app { position: relative; z-index: 1; width: 100%; max-width: 46rem; padding: 1.1rem 1.1rem 2.4rem; }
 
   header.topbar { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.1rem; }
   .badge-mark { flex-shrink: 0; }
   .topbar-text { line-height: 1.15; }
-  .topbar-text .eyebrow {
-    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
-    color: var(--ink-dim);
-  }
+  .topbar-text .eyebrow { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-dim); }
   .topbar-text .title { font-size: 1rem; font-weight: 600; }
 
   .card {
@@ -111,24 +103,10 @@
     box-shadow: 0 1px 2px rgba(var(--shadow) / 0.06), 0 12px 32px -16px rgba(var(--shadow) / 0.28);
   }
 
-  .sec-head { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.35rem; }
-  .sec-num {
-    font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 0.9rem;
-    color: var(--navy-ink); background: var(--navy);
-    width: 2rem; height: 2rem; border-radius: 0.55rem;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
-  .card h2 { font-size: 1.35rem; line-height: 1.2; }
-  .help { margin: 0 0 1rem; color: var(--ink-dim); font-size: 0.98rem; }
-
-  /* --- Intro / scenario --- */
   .intro h1 { font-size: 1.85rem; line-height: 1.15; margin-bottom: 0.6rem; }
   .intro .lede { color: var(--ink-dim); margin: 0 0 1.1rem; }
 
-  details.scenario {
-    background: var(--surface-2); border: 1px solid var(--border); border-radius: 0.8rem;
-    padding: 0.2rem 1rem; margin-bottom: 1.1rem;
-  }
+  details.scenario { background: var(--surface-2); border: 1px solid var(--border); border-radius: 0.8rem; padding: 0.2rem 1rem; }
   details.scenario summary {
     cursor: pointer; font-weight: 600; padding: 0.7rem 0; list-style: none;
     display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
@@ -139,129 +117,158 @@
   details.scenario summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 0.4rem; }
   details.scenario p { margin: 0 0 0.9rem; font-size: 1.08rem; line-height: 1.55; font-weight: 500; }
 
-  /* --- Fields --- */
-  label.fld { display: block; font-weight: 600; font-size: 0.98rem; margin-bottom: 0.4rem; }
-  .req { color: var(--crit); }
-  .opt { font-weight: 400; color: var(--ink-dim); }
-  .fld-note { font-size: 0.88rem; color: var(--ink-dim); margin: 0.35rem 0 0; }
-  .field-gap { margin-top: 1rem; }
+  /* --- Progress --- */
+  .progress { display: flex; align-items: center; gap: 0.8rem; margin: 0 0 0.9rem; }
+  .progress-track { flex: 1; height: 0.5rem; background: var(--surface-2); border-radius: 999px; overflow: hidden; border: 1px solid var(--border); }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--navy)); border-radius: 999px; transition: width 0.35s ease; }
+  .progress-text { font-size: 0.9rem; font-weight: 600; color: var(--ink-dim); white-space: nowrap; }
+  .progress-text b { color: var(--ink); font-family: 'IBM Plex Mono', monospace; }
 
-  .txt, select, textarea.txt {
-    width: 100%;
-    font: inherit; font-size: 1.0625rem; /* >=16px so phones do not zoom on focus */
-    color: var(--ink); background: var(--surface-2);
-    border: 1.5px solid var(--border); border-radius: 0.65rem;
-    padding: 0.65rem 0.8rem;
+  .status {
+    min-height: 3rem; margin: 0 0 0.9rem; padding: 0.6rem 0.9rem; border-radius: 0.7rem;
+    background: var(--surface-2); border: 1px solid var(--border); font-size: 0.98rem; color: var(--ink-dim);
   }
-  textarea.txt { resize: vertical; min-height: 3.4rem; }
-  .txt::placeholder { color: var(--ink-dim); opacity: 0.8; }
-  .txt:focus-visible, select:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
-  select { appearance: auto; padding-right: 0.4rem; }
+  .status.good { color: var(--low); border-color: var(--low); font-weight: 600; }
+  .status.bad { color: var(--crit); border-color: var(--crit); font-weight: 600; }
+  .status.sel { color: var(--ink); border-color: var(--cyan); }
 
-  /* --- List rows --- */
-  ol.rows { list-style: none; margin: 0 0 0.8rem; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
-  .row { display: flex; align-items: center; gap: 0.6rem; }
-  .idx {
-    font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 0.85rem;
-    color: var(--ink-dim); background: var(--surface-3); border-radius: 0.45rem;
-    min-width: 1.9rem; height: 1.9rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  /* --- Boxes --- */
+  .boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-bottom: 1rem; }
+  .box {
+    --accent: var(--cyan);
+    background: var(--surface); border: 1.5px dashed var(--border); border-top: 4px solid var(--accent);
+    border-radius: 0.9rem; padding: 0.75rem 0.75rem 0.8rem; min-height: 11rem;
+    display: flex; flex-direction: column; gap: 0.45rem;
+    transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+    box-shadow: 0 1px 2px rgba(var(--shadow) / 0.06);
   }
-  .rm {
-    flex-shrink: 0; width: 2.4rem; height: 2.4rem; border-radius: 0.6rem; cursor: pointer;
-    border: 1px solid var(--border); background: transparent; color: var(--ink-dim); font-size: 1.2rem; line-height: 1;
+  .box[data-box="assets"]  { --accent: var(--cyan); }
+  .box[data-box="threats"] { --accent: var(--high); }
+  .box[data-box="risks"]   { --accent: var(--crit); }
+  .box[data-box="fixes"]   { --accent: var(--low); }
+  .box:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .box.armed { border-color: var(--accent); cursor: pointer; }
+  .box.over { border-style: solid; border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent); }
+  .box.complete { border-style: solid; border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+  .box-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
+  .box-title { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 1.08rem; line-height: 1.2; }
+  .box-count { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 600; color: var(--ink-dim); white-space: nowrap; }
+  .box.complete .box-count { color: var(--low); }
+  .box-hint { margin: 0; font-size: 0.82rem; line-height: 1.35; color: var(--ink-dim); }
+  .placed { list-style: none; margin: 0.15rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+
+  /* --- Chips --- */
+  .pool-card h2 { font-size: 1.15rem; margin-bottom: 0.2rem; }
+  .pool-help { margin: 0 0 0.9rem; font-size: 0.92rem; color: var(--ink-dim); }
+  .pool { display: flex; flex-wrap: wrap; gap: 0.55rem; min-height: 3rem; }
+  .chip {
+    font: inherit; font-size: 0.98rem; font-weight: 500; line-height: 1.3; text-align: left; color: var(--ink);
+    background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 0.7rem;
+    padding: 0.65rem 0.9rem; min-height: 2.75rem; cursor: grab;
+    touch-action: none; user-select: none; -webkit-user-select: none;
+    transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
   }
-  .rm:hover:not(:disabled) { color: var(--crit); border-color: var(--crit); }
-  .rm:disabled { opacity: 0.3; cursor: not-allowed; }
-  .rm:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .chip:hover { border-color: var(--navy); }
+  .chip:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .chip.selected { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 16%, var(--surface)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cyan) 30%, transparent); }
+  .chip.dragging { opacity: 0.35; }
+  .chip.shake { animation: shake 0.4s ease; border-color: var(--crit); }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+  .chip.locked {
+    cursor: default; touch-action: auto; font-size: 0.88rem; padding: 0.45rem 0.65rem; min-height: 0;
+    background: color-mix(in srgb, var(--accent, var(--low)) 20%, var(--surface)); border-color: var(--accent, var(--low));
+    display: flex; gap: 0.4rem; align-items: flex-start;
+  }
+  .chip.locked::before { content: "✓"; font-weight: 700; color: var(--accent, var(--low)); }
+  .ghost {
+    position: fixed; z-index: 1000; pointer-events: none; margin: 0; max-width: 16rem;
+    background: var(--surface); border: 1.5px solid var(--navy); border-radius: 0.7rem; padding: 0.65rem 0.9rem;
+    font-size: 0.98rem; font-weight: 500; line-height: 1.3; color: var(--ink);
+    box-shadow: 0 14px 30px -8px rgba(var(--shadow) / 0.5); transform: rotate(-2deg);
+  }
+  .pool-empty { color: var(--ink-dim); font-size: 0.95rem; }
 
   .btn {
-    border: none; border-radius: 0.7rem; padding: 0.85rem 1.1rem; font-size: 1rem; font-weight: 600;
-    font-family: 'IBM Plex Sans', sans-serif; cursor: pointer;
-    transition: opacity 0.15s ease, transform 0.1s ease;
+    border: none; border-radius: 0.7rem; padding: 0.8rem 1.1rem; font-size: 1rem; font-weight: 600; min-height: 2.75rem;
+    font-family: 'IBM Plex Sans', sans-serif; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
   }
-  .btn:active:not(:disabled) { transform: scale(0.985); }
   .btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-  .btn-primary { background: var(--navy); color: var(--navy-ink); width: 100%; }
+  .btn-primary { background: var(--navy); color: var(--navy-ink); }
+  .btn-ghost { background: transparent; color: var(--ink-dim); border: 1px solid var(--border); }
+  .row-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+  /* --- Success --- */
+  .win { border: 2px solid var(--low); }
+  .win[hidden] { display: none; }
+  .win h2 { font-size: 1.6rem; line-height: 1.15; margin-bottom: 0.5rem; }
+  .win .tries { color: var(--ink-dim); margin: 0 0 1rem; }
+  .recap { list-style: none; margin: 0 0 1.2rem; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+  .recap li { padding: 0.65rem 0.8rem; border-radius: 0.7rem; background: var(--surface-2); border: 1px solid var(--border); font-size: 0.98rem; }
+  .recap b { font-family: 'Fraunces', Georgia, serif; }
+
+  /* --- Own-office written answer (win screen) --- */
+  .reflect { border-top: 1px solid var(--border); padding-top: 1.1rem; margin: 0 0 1.2rem; }
+  .reflect h3 { font-size: 1.1rem; margin-bottom: 0.4rem; }
+  .reflect .q { background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--cyan); border-radius: 0.7rem; padding: 0.8rem 0.95rem; margin: 0 0 0.8rem; font-size: 1rem; line-height: 1.55; }
+  .reflect .q p { margin: 0 0 0.55rem; }
+  .reflect .q p:last-child { margin-bottom: 0; }
+  .reflect .careful { margin: 0 0 0.8rem; padding: 0.6rem 0.85rem; border-radius: 0.7rem; background: color-mix(in srgb, var(--med) 14%, var(--surface)); border: 1px solid var(--med); font-size: 0.92rem; line-height: 1.45; }
+  .reflect textarea {
+    width: 100%; font: inherit; font-size: 1.0625rem; line-height: 1.5; color: var(--ink); background: var(--surface-2);
+    border: 1.5px solid var(--border); border-radius: 0.65rem; padding: 0.7rem 0.8rem; min-height: 14rem; resize: vertical;
+  }
+  .reflect textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
+  .wordcount { display: flex; justify-content: space-between; gap: 0.6rem; margin: 0.4rem 0 0; font-size: 0.9rem; color: var(--ink-dim); }
+  .wordcount b { font-family: 'IBM Plex Mono', monospace; color: var(--ink); }
+  .wordcount.ok b, .wordcount.ok { color: var(--low); }
+
+  /* --- Convert to .docx (win screen) --- */
+  .convert { border-top: 1px solid var(--border); padding-top: 1.1rem; margin: 0 0 1.2rem; }
+  .convert h3 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+  .convert .help { margin: 0 0 0.8rem; font-size: 0.95rem; color: var(--ink-dim); }
+  .convert label { display: block; font-weight: 600; font-size: 0.98rem; margin-bottom: 0.4rem; }
+  .convert input[type="text"] {
+    width: 100%; font: inherit; font-size: 1.0625rem; color: var(--ink); background: var(--surface-2);
+    border: 1.5px solid var(--border); border-radius: 0.65rem; padding: 0.65rem 0.8rem; margin-bottom: 0.8rem;
+  }
+  .convert input[type="text"]:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
+  .convert .btn-primary { width: 100%; }
   .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-add { background: transparent; color: var(--navy); border: 1.5px dashed var(--border); }
-  .btn-add:hover:not(:disabled) { border-color: var(--navy); }
-  .btn-add:disabled { opacity: 0.45; cursor: not-allowed; }
-  .count { display: inline-block; margin-left: 0.7rem; font-size: 0.88rem; color: var(--ink-dim); }
+  .convert .msg { margin: 0.6rem 0 0; font-size: 0.95rem; color: var(--ink-dim); text-align: center; }
+  .convert .msg.ready { color: var(--low); font-weight: 600; }
+  .convert .msg.error { color: var(--crit); font-weight: 600; }
 
-  /* --- Risks --- */
-  .risk {
-    border: 1px solid var(--border); background: var(--surface-2);
-    border-radius: 0.85rem; padding: 0.8rem; display: flex; flex-direction: column; gap: 0.7rem;
+  /* --- Phone helper: bottom bar with the four boxes, shown while an answer is selected --- */
+  .placebar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: none;
+    padding: 0.7rem 0.9rem calc(0.7rem + env(safe-area-inset-bottom));
+    background: var(--surface); border-top: 1px solid var(--border);
+    box-shadow: 0 -10px 30px -12px rgba(var(--shadow) / 0.45);
   }
-  .risk-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
-  .risk-scores label, .why, .score-box { font-size: 0.82rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-dim); }
-  .risk-scores label select, .why .txt { margin-top: 0.3rem; text-transform: none; letter-spacing: 0; font-weight: 400; }
-  .score-box { display: flex; flex-direction: column; gap: 0.3rem; }
-  .score-val {
-    font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 1.15rem; color: var(--ink);
-    background: var(--surface); border: 1.5px solid var(--border); border-radius: 0.65rem;
-    padding: 0.5rem 0.8rem; text-transform: none; letter-spacing: 0;
+  .placebar-label { margin: 0 0 0.5rem; font-size: 0.9rem; font-weight: 600; }
+  .placebar-label span { color: var(--ink-dim); font-weight: 500; }
+  .placebar-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .placebar-btns button {
+    font: inherit; font-size: 0.95rem; font-weight: 600; color: var(--ink); cursor: pointer; min-height: 2.75rem;
+    background: var(--surface-2); border: 1.5px solid var(--border); border-top: 4px solid var(--accent, var(--cyan)); border-radius: 0.65rem; padding: 0.4rem 0.5rem;
   }
-  .rate {
-    display: flex; align-items: center; justify-content: center; text-align: center;
-    font-weight: 700; font-size: 1rem; text-transform: none; letter-spacing: 0;
-    border-radius: 0.65rem; padding: 0.5rem 0.8rem; border: 1.5px dashed var(--border); color: var(--ink-dim);
-    min-height: 2.75rem;
+  .placebar-btns button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .placebar-btns button[data-box="assets"]  { --accent: var(--cyan); }
+  .placebar-btns button[data-box="threats"] { --accent: var(--high); }
+  .placebar-btns button[data-box="risks"]   { --accent: var(--crit); }
+  .placebar-btns button[data-box="fixes"]   { --accent: var(--low); }
+  @media (max-width: 640px) {
+    body.has-selection .placebar { display: block; }
+    body.has-selection .app { padding-bottom: 11rem; }
+    .status { position: sticky; top: 0.5rem; z-index: 40; box-shadow: 0 6px 18px -10px rgba(var(--shadow) / 0.5); }
   }
-  .rate[data-band] { border-style: solid; border-color: transparent; color: #14172b; }
-  .rate[data-band="low"]  { background: var(--low); }
-  .rate[data-band="med"]  { background: var(--med); }
-  .rate[data-band="high"] { background: var(--high); }
-  .rate[data-band="crit"] { background: var(--crit); color: #fff; }
-  :root[data-theme="dark"] .rate[data-band="crit"] { color: #14172b; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rate[data-band="crit"] { color: #14172b; } }
-
-  .band-note { font-size: 0.88rem; color: var(--ink-dim); margin: 0.2rem 0 0; }
-
-  /* --- Fixes --- */
-  .fix { align-items: flex-start; }
-  .fix .idx { margin-top: 0.3rem; }
-  .fix-body { flex: 1; display: flex; flex-direction: column; gap: 0.7rem; min-width: 0; }
-  .fix-body label { font-size: 0.88rem; font-weight: 600; color: var(--ink-dim); display: block; }
-  .fix-body label .txt, .fix-body label select { margin-top: 0.3rem; }
-
-  /* --- Matrix --- */
-  .matrix-wrap { display: flex; gap: 0.5rem; align-items: stretch; max-width: 26rem; margin: 0.4rem auto 0; }
-  .y-title {
-    writing-mode: vertical-rl; transform: rotate(180deg); text-align: center;
-    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim);
-  }
-  .matrix-main { flex: 1; min-width: 0; }
-  .matrix { display: grid; grid-template-columns: 1.5rem repeat(5, 1fr); gap: 3px; }
-  .axis { display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; font-weight: 600; color: var(--ink-dim); }
-  .mcell {
-    aspect-ratio: 1; min-height: 2.9rem; border-radius: 0.35rem; padding: 2px;
-    display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 2px;
-    background: var(--surface-2);
-  }
-  .mcell[data-band="low"]  { background: color-mix(in srgb, var(--low) 42%, var(--surface)); }
-  .mcell[data-band="med"]  { background: color-mix(in srgb, var(--med) 42%, var(--surface)); }
-  .mcell[data-band="high"] { background: color-mix(in srgb, var(--high) 42%, var(--surface)); }
-  .mcell[data-band="crit"] { background: color-mix(in srgb, var(--crit) 42%, var(--surface)); }
-  .dot {
-    font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 0.72rem; line-height: 1;
-    width: 1.3rem; height: 1.3rem; border-radius: 50%;
-    background: var(--ink); color: var(--surface);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .x-title { text-align: center; margin-top: 0.4rem; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim); }
-  .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem 1rem; margin: 0.9rem 0 0; font-size: 0.85rem; color: var(--ink-dim); }
-  .legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
-  .legend i { width: 0.85rem; height: 0.85rem; border-radius: 0.2rem; display: inline-block; }
-
-  /* --- Download --- */
-  .dl-msg { margin: 0.7rem 0 0; font-size: 0.95rem; color: var(--ink-dim); text-align: center; }
-  .dl-msg.ready { color: var(--low); font-weight: 600; }
-  .dl-msg.error { color: var(--crit); font-weight: 600; }
 
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
-  @media (min-width: 640px) { .app { padding-top: 2.4rem; } .card { padding: 1.6rem 1.6rem 1.5rem; } }
-  @media (max-width: 380px) { .risk-scores { grid-template-columns: 1fr; } }
+  @media (min-width: 640px) {
+    .app { padding-top: 2.4rem; }
+    .card { padding: 1.6rem 1.6rem 1.5rem; }
+    .box { min-height: 13rem; padding: 0.9rem 0.9rem 1rem; }
+  }
 </style>
 </head>
 <body>
@@ -272,660 +279,514 @@
 
   <header class="topbar">
     <svg class="badge-mark" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
-      <rect x="3"  y="3"  width="8" height="8" rx="1.5" fill="var(--med)"></rect>
-      <rect x="13" y="3"  width="8" height="8" rx="1.5" fill="var(--high)"></rect>
-      <rect x="23" y="3"  width="8" height="8" rx="1.5" fill="var(--crit)"></rect>
-      <rect x="3"  y="13" width="8" height="8" rx="1.5" fill="var(--low)"></rect>
-      <rect x="13" y="13" width="8" height="8" rx="1.5" fill="var(--med)"></rect>
-      <rect x="23" y="13" width="8" height="8" rx="1.5" fill="var(--high)"></rect>
-      <rect x="3"  y="23" width="8" height="8" rx="1.5" fill="var(--low)"></rect>
-      <rect x="13" y="23" width="8" height="8" rx="1.5" fill="var(--low)"></rect>
-      <rect x="23" y="23" width="8" height="8" rx="1.5" fill="var(--med)"></rect>
+      <rect x="3"  y="3"  width="12" height="12" rx="2" fill="var(--cyan)"></rect>
+      <rect x="19" y="3"  width="12" height="12" rx="2" fill="var(--high)"></rect>
+      <rect x="3"  y="19" width="12" height="12" rx="2" fill="var(--crit)"></rect>
+      <rect x="19" y="19" width="12" height="12" rx="2" fill="var(--low)"></rect>
     </svg>
     <div class="topbar-text">
       <div class="eyebrow">Threat Modeling Activity</div>
-      <div class="title">Threat Model Worksheet</div>
+      <div class="title">Threat Model Game</div>
     </div>
   </header>
 
-  <!-- INTRO + SCENARIO + NAMES -->
   <section class="card intro" aria-labelledby="introTitle">
-    <h1 id="introTitle">Threat model the Treasurer's Office</h1>
-    <p class="lede">Work through the four sections below as a group. Type your answers, enter your names, then download your worksheet as a Word file and send it to your trainer. Nothing you type leaves this page.</p>
-
+    <h1 id="introTitle">Build the threat model</h1>
+    <p class="lede">Drag each answer into the box where it belongs. On a phone, tap an answer, then tap a box. Wrong answers spring back, so keep trying.</p>
     <details class="scenario" open>
       <summary>The scenario</summary>
-      <p>City Treasurer's Office. It has: a payroll database, 40 staff laptops, citizen records on paper, a vendor with remote access, one shared admin password, and backups that were never tested. Groups may add assumptions, but must write them down.</p>
+      <p>City Treasurer's Office. It has: a payroll database, 40 staff laptops, citizen records on paper, a vendor with remote access, one shared admin password, and backups that were never tested.</p>
     </details>
-
-    <div>
-      <label class="fld" for="assumptions">Assumptions we added <span class="opt">(optional)</span></label>
-      <textarea class="txt" id="assumptions" rows="2" maxlength="1000" placeholder="Anything you assumed that is not in the scenario"></textarea>
-    </div>
-
-    <div class="field-gap">
-      <label class="fld" for="names">Your name (or group member names) <span class="req" aria-hidden="true">*</span><span class="sr-only"> required</span></label>
-      <textarea class="txt" id="names" rows="2" maxlength="400" required aria-describedby="namesNote" placeholder="e.g. one name per line"></textarea>
-      <p class="fld-note" id="namesNote">Required. The download stays locked until you enter at least one name.</p>
-    </div>
-
-    <div class="field-gap">
-      <label class="fld" for="groupName">Group name <span class="opt">(optional)</span></label>
-      <input class="txt" id="groupName" type="text" maxlength="100" autocomplete="off">
-    </div>
   </section>
 
-  <!-- 1 ASSETS -->
-  <section class="card" aria-labelledby="h-assets">
-    <div class="sec-head"><span class="sec-num" aria-hidden="true">1</span><h2 id="h-assets">Assets</h2></div>
-    <p class="help">What matters most? Systems, data, devices, people.</p>
-    <ol class="rows" id="assetRows"></ol>
-    <button type="button" class="btn btn-add" id="addAsset">+ Add another</button><span class="count" id="assetCount"></span>
+  <div class="progress" aria-hidden="true">
+    <div class="progress-track"><div class="progress-fill" id="fill"></div></div>
+    <div class="progress-text"><b id="placedNum">0</b> of <span id="totalNum">12</span> placed</div>
+  </div>
+  <p class="sr-only" id="progressSr"></p>
+
+  <div class="status" id="status" role="status" aria-live="polite">Pick an answer below and put it in the right box.</div>
+
+  <div class="boxes" id="boxes">
+    <section class="box" data-box="assets" tabindex="0" role="button" aria-label="Assets box">
+      <div class="box-head"><h2 class="box-title">Assets</h2><span class="box-count" data-count>0 of 3</span></div>
+      <p class="box-hint">What matters most: systems, data, devices, people.</p>
+      <ul class="placed" data-placed></ul>
+    </section>
+    <section class="box" data-box="threats" tabindex="0" role="button" aria-label="Threats and doors box">
+      <div class="box-head"><h2 class="box-title">Threats and doors</h2><span class="box-count" data-count>0 of 3</span></div>
+      <p class="box-hint">Who might attack, and how could they get in?</p>
+      <ul class="placed" data-placed></ul>
+    </section>
+    <section class="box" data-box="risks" tabindex="0" role="button" aria-label="Top risks box">
+      <div class="box-head"><h2 class="box-title">Top risks</h2><span class="box-count" data-count>0 of 3</span></div>
+      <p class="box-hint">What could go wrong, and how badly would it hurt?</p>
+      <ul class="placed" data-placed></ul>
+    </section>
+    <section class="box" data-box="fixes" tabindex="0" role="button" aria-label="Top 3 fixes box">
+      <div class="box-head"><h2 class="box-title">Top 3 fixes</h2><span class="box-count" data-count>0 of 3</span></div>
+      <p class="box-hint">Practical actions that shrink the biggest risks.</p>
+      <ul class="placed" data-placed></ul>
+    </section>
+  </div>
+
+  <section class="card pool-card" aria-labelledby="poolTitle">
+    <h2 id="poolTitle">Answers</h2>
+    <p class="pool-help">Drag an answer into a box, or tap it and then tap a box.</p>
+    <div class="pool" id="pool"></div>
+    <p class="pool-empty" id="poolEmpty" hidden>All answers placed.</p>
+    <div class="row-actions" style="margin-top:1rem"><button type="button" class="btn btn-ghost" id="restart">Start over</button></div>
   </section>
 
-  <!-- 2 THREATS -->
-  <section class="card" aria-labelledby="h-threats">
-    <div class="sec-head"><span class="sec-num" aria-hidden="true">2</span><h2 id="h-threats">Threats and doors</h2></div>
-    <p class="help">Who might attack, and how could they get in?</p>
-    <ol class="rows" id="threatRows"></ol>
-    <button type="button" class="btn btn-add" id="addThreat">+ Add another</button><span class="count" id="threatCount"></span>
-  </section>
-
-  <!-- 3 RISKS -->
-  <section class="card" aria-labelledby="h-risks">
-    <div class="sec-head"><span class="sec-num" aria-hidden="true">3</span><h2 id="h-risks">Top risks</h2></div>
-    <p class="help">Give each risk a score and say why in a few words. Score = Likelihood × Impact, each rated 1 (lowest) to 5 (highest).</p>
-    <ol class="rows" id="riskRows"></ol>
-    <button type="button" class="btn btn-add" id="addRisk">+ Add another</button><span class="count" id="riskCount"></span>
-    <p class="band-note">Rating bands: Low 1–4 · Medium 5–9 · High 10–19 · Critical 20–25.</p>
-  </section>
-
-  <!-- 4 FIXES -->
-  <section class="card" aria-labelledby="h-fixes">
-    <div class="sec-head"><span class="sec-num" aria-hidden="true">4</span><h2 id="h-fixes">Top 3 fixes</h2></div>
-    <p class="help">Practical and matched to your biggest risks. Add your risks in section 3 first so you can pick from them.</p>
-    <ol class="rows" id="fixRows"></ol>
-  </section>
-
-  <!-- MATRIX -->
-  <section class="card" aria-labelledby="h-matrix">
-    <div class="sec-head"><span class="sec-num" aria-hidden="true">★</span><h2 id="h-matrix">Your risk matrix</h2></div>
-    <p class="help">Each numbered dot is one of your risks, placed by its likelihood and impact. It updates as you type.</p>
-    <div class="matrix-wrap">
-      <div class="y-title" aria-hidden="true">Impact</div>
-      <div class="matrix-main">
-        <div class="matrix" id="matrix" role="img" aria-label="Risk matrix heatmap" aria-describedby="matrixSummary"></div>
-        <div class="x-title" aria-hidden="true">Likelihood</div>
+  <section class="card win" id="win" hidden tabindex="-1" aria-labelledby="winTitle">
+    <h2 id="winTitle">Congratulations! You have built a threat model.</h2>
+    <p class="tries" id="tries"></p>
+    <ul class="recap">
+      <li><b>Assets</b> are what you protect.</li>
+      <li><b>Threats and doors</b> are who might attack and how they get in.</li>
+      <li><b>Top risks</b> are what could go wrong, ranked by how likely and how harmful.</li>
+      <li><b>Top 3 fixes</b> are practical actions that shrink the biggest risks.</li>
+    </ul>
+    <div class="reflect">
+      <h3>Your own office</h3>
+      <div class="q" id="ownQ">
+        <p><b>Think about the office where you work.</b> Pick the one asset (a system, data, a device, or a person) you would most want to protect.</p>
+        <p><b>Paragraph 1:</b> Who or what could threaten it, and how could they get in? How likely is it, and how badly would it hurt?</p>
+        <p><b>Paragraph 2:</b> What is the first practical fix you would propose, and who in your office would you need to work with to make it happen?</p>
       </div>
+      <p class="careful"><b>Keep it general.</b> Don't include passwords, the real names of staff, or exact weaknesses someone could misuse. Your file will be sent by email.</p>
+      <label for="ownAnswer" class="sr-only">Your written answer</label>
+      <textarea id="ownAnswer" maxlength="3000" placeholder="Write your answer in two short paragraphs…" aria-describedby="wordCount"></textarea>
+      <p class="wordcount" id="wordCount"><span><b id="wc">0</b> of <span id="wcMin">60</span> words minimum</span><span id="wcState">Keep going</span></p>
     </div>
-    <p class="legend" aria-hidden="true">
-      <span><i style="background:color-mix(in srgb, var(--low) 42%, var(--surface))"></i>Low</span>
-      <span><i style="background:color-mix(in srgb, var(--med) 42%, var(--surface))"></i>Medium</span>
-      <span><i style="background:color-mix(in srgb, var(--high) 42%, var(--surface))"></i>High</span>
-      <span><i style="background:color-mix(in srgb, var(--crit) 42%, var(--surface))"></i>Critical</span>
-    </p>
-    <p class="sr-only" id="matrixSummary"></p>
-  </section>
 
-  <!-- DOWNLOAD -->
-  <section class="card" aria-labelledby="h-dl">
-    <h2 id="h-dl" style="font-size:1.35rem;margin-bottom:0.35rem">Done? Download your worksheet</h2>
-    <p class="help">The Word file is built right here in your browser. Send it to your trainer when you have it.</p>
-    <button type="button" class="btn btn-primary" id="dlBtn" disabled>Download my threat model (.docx)</button>
-    <p class="dl-msg" id="dlMsg" role="status" aria-live="polite">Enter your name (or group member names) at the top of the page to enable the download.</p>
+    <div class="convert">
+      <h3>Save your threat model</h3>
+      <p class="help">Enter your full name, then convert your finished threat model and your answer into a Word file for your trainer.</p>
+      <label for="fullName">Your full name <span style="color:var(--crit)" aria-hidden="true">*</span></label>
+      <input type="text" id="fullName" maxlength="120" autocomplete="name" aria-describedby="docMsg">
+      <button type="button" class="btn btn-primary" id="docBtn" disabled>Convert into .docx</button>
+      <p class="msg" id="docMsg" role="status" aria-live="polite">Type your full name to unlock the button.</p>
+    </div>
+    <div class="row-actions">
+      <button type="button" class="btn btn-ghost" id="again">Play again</button>
+    </div>
   </section>
 
 </div>
 
-<style>.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}</style>
+<div class="placebar" id="placebar" role="group" aria-label="Choose a box for the selected answer">
+  <p class="placebar-label" id="placebarLabel"></p>
+  <div class="placebar-btns">
+    <button type="button" data-box="assets">Assets</button>
+    <button type="button" data-box="threats">Threats and doors</button>
+    <button type="button" data-box="risks">Top risks</button>
+    <button type="button" data-box="fixes">Top 3 fixes</button>
+  </div>
+</div>
 
-<script src="vendor/docx.iife.js"></script>
 <script>
 (function () {
   "use strict";
 
-  // ---------- Config ----------
-  var LIST_MIN = 3, LIST_MAX = 10;     // assets, threats
-  var RISK_MIN = 3, RISK_MAX = 8;      // top risks
-  var FIX_COUNT = 3;                   // exactly 3 fixes
-  var SCALE = [
-    ["", "Choose…"], ["1", "1 – Very low"], ["2", "2 – Low"], ["3", "3 – Medium"], ["4", "4 – High"], ["5", "5 – Very high"]
-  ];
-
-  // Rating bands for score = Likelihood x Impact (each 1..5, so possible scores are
-  // 1,2,3,4,5,6,8,9,10,12,15,16,20,25).
-  //   Low      1  - 4
-  //   Medium   5  - 9
-  //   High     10 - 19   (17-19 cannot occur with a 1-5 scale; they would count as High)
-  //   Critical 20 - 25
-  // The same function colours the on-screen matrix, the Rating label and the .docx.
-  var BANDS = {
-    low:  { key: "low",  label: "Low",      docFill: "9ED8B8" },
-    med:  { key: "med",  label: "Medium",   docFill: "F5DC85" },
-    high: { key: "high", label: "High",     docFill: "F4AE72" },
-    crit: { key: "crit", label: "Critical", docFill: "E8808B" }
+  // ---------- Answer key: every chip belongs to exactly one box ----------
+  var BOXES = {
+    assets:  { name: "Assets",            hint: "Not quite. Assets are the things worth protecting: systems, data, devices, people." },
+    threats: { name: "Threats and doors", hint: "Not quite. Threats and doors are who might attack and how they could get in." },
+    risks:   { name: "Top risks",         hint: "Not quite. A risk says what could go wrong and how much it would hurt." },
+    fixes:   { name: "Top 3 fixes",       hint: "Not quite. A fix is an action that makes a risk smaller." }
   };
-  function bandFor(score) {
-    if (score >= 20) return BANDS.crit;
-    if (score >= 10) return BANDS.high;
-    if (score >= 5)  return BANDS.med;
-    return BANDS.low;
-  }
+  var ANSWERS = [
+    { id: "a1", box: "assets",  text: "Payroll database" },
+    { id: "a2", box: "assets",  text: "40 staff laptops" },
+    { id: "a3", box: "assets",  text: "Citizen records on paper" },
+    { id: "t1", box: "threats", text: "Phishing email to a payroll clerk" },
+    { id: "t2", box: "threats", text: "Vendor remote access left open" },
+    { id: "t3", box: "threats", text: "One shared admin password" },
+    { id: "r1", box: "risks",   text: "Ransomware locks the payroll database" },
+    { id: "r2", box: "risks",   text: "Citizen paper records are stolen or lost" },
+    { id: "r3", box: "risks",   text: "Vendor account is abused to reach payroll" },
+    { id: "f1", box: "fixes",   text: "Give each person their own password" },
+    { id: "f2", box: "fixes",   text: "Limit and log vendor access" },
+    { id: "f3", box: "fixes",   text: "Test restoring from backup" }
+  ];
+  var PER_BOX = 3;
 
-  // ---------- Helpers ----------
   function $(id) { return document.getElementById(id); }
-  function clean(s) { return String(s == null ? "" : s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").trim(); }
-  function make(tag, cls, attrs) {
-    var el = document.createElement(tag);
-    if (cls) el.className = cls;
-    if (attrs) Object.keys(attrs).forEach(function (k) { el.setAttribute(k, attrs[k]); });
-    return el;
-  }
-  function trunc(s, n) { s = clean(s).replace(/\s+/g, " "); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
+  var pool = $("pool"), statusEl = $("status"), boxesEl = $("boxes");
+  var boxEls = {};
+  [].forEach.call(boxesEl.querySelectorAll(".box"), function (b) { boxEls[b.getAttribute("data-box")] = b; });
 
-  var dirty = false;
-  function markDirty() { dirty = true; }
-  window.addEventListener("beforeunload", function (e) {
-    if (dirty) { e.preventDefault(); e.returnValue = ""; }
+  var placed = 0, wrong = 0, selected = null;
+
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function say(msg, kind) {
+    statusEl.textContent = msg;
+    statusEl.className = "status" + (kind ? " " + kind : "");
+  }
+
+  function updateProgress() {
+    $("placedNum").textContent = placed;
+    $("totalNum").textContent = ANSWERS.length;
+    $("fill").style.width = (placed / ANSWERS.length * 100) + "%";
+    $("progressSr").textContent = placed + " of " + ANSWERS.length + " answers placed.";
+    $("poolEmpty").hidden = placed < ANSWERS.length;
+  }
+
+  function updateBox(key) {
+    var el = boxEls[key];
+    var n = el.querySelectorAll(".chip.locked").length;
+    el.querySelector("[data-count]").textContent = n + " of " + PER_BOX;
+    el.classList.toggle("complete", n === PER_BOX);
+  }
+
+  function setArmed(on) {
+    Object.keys(boxEls).forEach(function (k) { boxEls[k].classList.toggle("armed", on); });
+    document.body.classList.toggle("has-selection", !!(on && selected));
+    $("placebarLabel").innerHTML = "";
+    if (on && selected) {
+      $("placebarLabel").appendChild(document.createTextNode("Place “" + selected.textContent + "” in:"));
+    }
+  }
+
+  // ---------- Build the pool ----------
+  function build() {
+    pool.innerHTML = "";
+    shuffle(ANSWERS.slice()).forEach(function (a) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = a.text;
+      b.setAttribute("data-id", a.id);
+      b.setAttribute("data-box", a.box);
+      pool.appendChild(b);
+    });
+    Object.keys(boxEls).forEach(function (k) {
+      boxEls[k].querySelector("[data-placed]").innerHTML = "";
+      boxEls[k].classList.remove("complete", "over");
+      updateBox(k);
+    });
+    placed = 0; wrong = 0; selected = null;
+    setArmed(false);
+    $("win").hidden = true;
+    if ($("fullName")) $("fullName").value = "";
+    if ($("ownAnswer")) { $("ownAnswer").value = ""; refreshWordCount(); }
+    downloaded = false;
+    if ($("docBtn")) refreshDocBtn();
+    updateProgress();
+    say("Pick an answer below and put it in the right box.");
+  }
+
+  // ---------- Placing ----------
+  function place(chip, key) {
+    var from = chip.getAttribute("data-box");
+    if (from === key) {
+      var li = document.createElement("li");
+      chip.classList.remove("selected", "dragging", "shake");
+      chip.classList.add("locked");
+      chip.style.setProperty("--accent", getComputedStyle(boxEls[key]).getPropertyValue("--accent"));
+      chip.disabled = true;
+      chip.setAttribute("aria-label", chip.textContent + ", placed in " + BOXES[key].name);
+      li.appendChild(chip);
+      boxEls[key].querySelector("[data-placed]").appendChild(li);
+      placed++;
+      selected = null; setArmed(false);
+      updateBox(key); updateProgress();
+      if (placed === ANSWERS.length) return win();
+      say("Correct! That belongs in " + BOXES[key].name + ".", "good");
+    } else {
+      wrong++;
+      chip.classList.remove("selected", "dragging");
+      selected = null; setArmed(false);
+      chip.classList.remove("shake"); void chip.offsetWidth; chip.classList.add("shake");
+      setTimeout(function () { chip.classList.remove("shake"); }, 450);
+      say(BOXES[key].hint, "bad");
+    }
+  }
+
+  function win() {
+    setArmed(false);
+    $("tries").textContent = wrong === 0
+      ? "Perfect round: not one wrong placement."
+      : "You got there with " + wrong + " wrong " + (wrong === 1 ? "try" : "tries") + ".";
+    say("All 12 answers are in the right boxes.", "good");
+    loadDocx(); refreshDocBtn();
+    var w = $("win");
+    w.hidden = false;
+    w.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    w.focus({ preventScroll: true });
+  }
+
+  // ---------- Tap / keyboard: select a chip, then pick a box ----------
+  function select(chip) {
+    if (selected === chip) { chip.classList.remove("selected"); selected = null; setArmed(false); say("Pick an answer below and put it in the right box."); return; }
+    if (selected) selected.classList.remove("selected");
+    selected = chip;
+    chip.classList.add("selected");
+    setArmed(true);
+    say("Selected: “" + chip.textContent + "”. Now tap the box where it belongs.", "sel");
+  }
+
+  $("placebar").addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-box]");
+    if (btn && selected) place(selected, btn.getAttribute("data-box"));
   });
 
-  // ---------- Simple lists (assets, threats) ----------
-  function ListWidget(opts) {
-    var wrap = $(opts.rows), addBtn = $(opts.add), countEl = $(opts.count);
-    function rows() { return wrap.querySelectorAll(".row"); }
-    function renumber() {
-      var rs = rows();
-      rs.forEach(function (r, i) {
-        r.querySelector(".idx").textContent = i + 1;
-        r.querySelector(".txt").setAttribute("aria-label", opts.noun + " " + (i + 1));
-        var rm = r.querySelector(".rm");
-        rm.setAttribute("aria-label", "Remove " + opts.noun.toLowerCase() + " " + (i + 1));
-        rm.disabled = rs.length <= LIST_MIN;
-      });
-      addBtn.disabled = rs.length >= LIST_MAX;
-      countEl.textContent = rs.length + " of " + LIST_MAX;
+  boxesEl.addEventListener("click", function (e) {
+    var box = e.target.closest(".box");
+    if (box && selected) place(selected, box.getAttribute("data-box"));
+  });
+  boxesEl.addEventListener("keydown", function (e) {
+    if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("box")) {
+      e.preventDefault();
+      if (selected) place(selected, e.target.getAttribute("data-box"));
+      else say("First pick an answer from the Answers list, then come back to this box.");
     }
-    function add(focus) {
-      if (rows().length >= LIST_MAX) return;
-      var li = make("li", "row");
-      li.appendChild(make("span", "idx"));
-      var input = make("input", "txt", { type: "text", maxlength: "300", autocomplete: "off", placeholder: opts.placeholder });
-      input.addEventListener("input", markDirty);
-      li.appendChild(input);
-      var rm = make("button", "rm", { type: "button" });
-      rm.textContent = "×";
-      rm.addEventListener("click", function () {
-        if (rows().length <= LIST_MIN) return;
-        li.remove(); renumber(); markDirty();
-      });
-      li.appendChild(rm);
-      wrap.appendChild(li);
-      renumber();
-      if (focus) input.focus();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && selected) { selected.classList.remove("selected"); selected = null; setArmed(false); say("Selection cleared."); }
+  });
+
+  // ---------- Pointer dragging (mouse, touch and pen) ----------
+  var drag = null, DRAG_THRESHOLD = 7;
+
+  function boxAt(x, y) {
+    var el = document.elementFromPoint(x, y);
+    return el ? el.closest(".box") : null;
+  }
+  function clearOver() { Object.keys(boxEls).forEach(function (k) { boxEls[k].classList.remove("over"); }); }
+
+  pool.addEventListener("pointerdown", function (e) {
+    var chip = e.target.closest(".chip");
+    if (!chip || chip.disabled || (e.pointerType === "mouse" && e.button !== 0)) return;
+    drag = { chip: chip, id: e.pointerId, x0: e.clientX, y0: e.clientY, active: false, ghost: null, dx: 0, dy: 0 };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onCancel);
+  });
+
+  function startDrag(e) {
+    var r = drag.chip.getBoundingClientRect();
+    drag.dx = e.clientX - r.left; drag.dy = e.clientY - r.top;
+    var g = document.createElement("div");
+    g.className = "ghost";
+    g.textContent = drag.chip.textContent;
+    document.body.appendChild(g);
+    drag.ghost = g;
+    drag.active = true;
+    drag.chip.classList.add("dragging");
+    if (selected) { selected.classList.remove("selected"); selected = null; }
+    setArmed(false);
+  }
+
+  function onMove(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    if (!drag.active) {
+      if (Math.abs(e.clientX - drag.x0) + Math.abs(e.clientY - drag.y0) < DRAG_THRESHOLD) return;
+      startDrag(e);
     }
-    addBtn.addEventListener("click", function () { add(true); markDirty(); });
-    for (var i = 0; i < LIST_MIN; i++) add(false);
-    return {
-      values: function () {
-        var out = [];
-        rows().forEach(function (r) { var v = clean(r.querySelector(".txt").value); if (v) out.push(v); });
-        return out;
-      }
-    };
+    e.preventDefault();
+    drag.ghost.style.left = (e.clientX - drag.dx) + "px";
+    drag.ghost.style.top = (e.clientY - drag.dy) + "px";
+    clearOver();
+    var b = boxAt(e.clientX, e.clientY);
+    if (b) b.classList.add("over");
+    // Auto-scroll near the screen edges so a long page can still be dragged across.
+    var edge = 70;
+    if (e.clientY < edge) window.scrollBy(0, -14);
+    else if (e.clientY > window.innerHeight - edge) window.scrollBy(0, 14);
   }
 
-  var assets = ListWidget({ rows: "assetRows", add: "addAsset", count: "assetCount", noun: "Asset", placeholder: "Type an asset…" });
-  var threats = ListWidget({ rows: "threatRows", add: "addThreat", count: "threatCount", noun: "Threat", placeholder: "Type a threat or entry point…" });
-
-  // ---------- Risks ----------
-  var riskWrap = $("riskRows"), riskAdd = $("addRisk"), riskCount = $("riskCount");
-  var riskSeq = 0;
-
-  function riskRows() { return riskWrap.querySelectorAll(".risk"); }
-
-  function scaleSelect(label, cls) {
-    var lab = make("label");
-    lab.appendChild(document.createTextNode(label));
-    var sel = make("select", cls);
-    SCALE.forEach(function (o) {
-      var opt = make("option", null, { value: o[0] });
-      opt.textContent = o[1];
-      sel.appendChild(opt);
-    });
-    lab.appendChild(sel);
-    return { label: lab, select: sel };
+  function endDrag() {
+    window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("pointerup", onUp);
+    window.removeEventListener("pointercancel", onCancel);
+    clearOver();
+    if (drag && drag.ghost) drag.ghost.remove();
+    if (drag) drag.chip.classList.remove("dragging");
   }
 
-  function addRisk(focus) {
-    if (riskRows().length >= RISK_MAX) return;
-    riskSeq += 1;
-    var li = make("li", "risk", { "data-id": "r" + riskSeq });
+  function onUp(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var d = drag;
+    var b = d.active ? boxAt(e.clientX, e.clientY) : null;
+    endDrag(); drag = null;
+    if (!d.active) return;                 // a tap: the click handler below selects the chip
+    if (b) place(d.chip, b.getAttribute("data-box"));
+    else say("Dropped outside a box. Try again.");
+    d.chip.setAttribute("data-dragged", "1");   // swallow the click that follows a drag
+    setTimeout(function () { d.chip.removeAttribute("data-dragged"); }, 0);
+  }
+  function onCancel() { endDrag(); drag = null; }
 
-    var top = make("div", "row");
-    top.appendChild(make("span", "idx"));
-    var text = make("input", "txt r-text", { type: "text", maxlength: "300", autocomplete: "off", placeholder: "Describe the risk…" });
-    top.appendChild(text);
-    var rm = make("button", "rm", { type: "button" });
-    rm.textContent = "×";
-    top.appendChild(rm);
-    li.appendChild(top);
+  pool.addEventListener("click", function (e) {
+    var chip = e.target.closest(".chip");
+    if (!chip || chip.disabled || chip.getAttribute("data-dragged")) return;
+    select(chip);
+  });
 
-    var scores = make("div", "risk-scores");
-    var L = scaleSelect("Likelihood", "r-l");
-    var I = scaleSelect("Impact", "r-i");
-    scores.appendChild(L.label);
-    scores.appendChild(I.label);
-    var sBox = make("div", "score-box");
-    sBox.appendChild(document.createTextNode("Score"));
-    var sVal = make("output", "score-val r-score");
-    sVal.textContent = "—";
-    sBox.appendChild(sVal);
-    scores.appendChild(sBox);
-    var rBox = make("div", "score-box");
-    rBox.appendChild(document.createTextNode("Rating"));
-    var rVal = make("div", "rate r-rate");
-    rVal.textContent = "—";
-    rBox.appendChild(rVal);
-    scores.appendChild(rBox);
-    li.appendChild(scores);
+  // ---------- Convert to .docx (unlocked only when all 12 answers are correct and a name is entered) ----------
+  // Uses the locally bundled "docx" library (see vendor/README.txt); it is loaded only once the
+  // player finishes, and it makes no network request other than fetching that one local file.
+  var DOCX_SRC = "vendor/docx.iife.js";
+  var docxState = "idle"; // idle | loading | ready | failed
 
-    var whyLab = make("label", "why");
-    whyLab.appendChild(document.createTextNode("Why"));
-    var why = make("input", "txt r-why", { type: "text", maxlength: "300", autocomplete: "off", placeholder: "Why this score, in a few words" });
-    whyLab.appendChild(why);
-    li.appendChild(whyLab);
-
-    function update() {
-      var l = parseInt(L.select.value, 10), i = parseInt(I.select.value, 10);
-      if (l && i) {
-        var score = l * i, b = bandFor(score);
-        sVal.textContent = String(score);
-        rVal.textContent = b.label;
-        rVal.setAttribute("data-band", b.key);
-      } else {
-        sVal.textContent = "—";
-        rVal.textContent = "—";
-        rVal.removeAttribute("data-band");
-      }
-      renderMatrix();
-    }
-    L.select.addEventListener("change", function () { update(); markDirty(); });
-    I.select.addEventListener("change", function () { update(); markDirty(); });
-    text.addEventListener("input", function () { refreshFixOptions(); markDirty(); });
-    why.addEventListener("input", markDirty);
-    rm.addEventListener("click", function () {
-      if (riskRows().length <= RISK_MIN) return;
-      li.remove(); renumberRisks(); refreshFixOptions(); renderMatrix(); markDirty();
-    });
-
-    riskWrap.appendChild(li);
-    renumberRisks();
-    if (focus) text.focus();
+  function loadDocx() {
+    if (window.docx) { docxState = "ready"; refreshDocBtn(); return; }
+    if (docxState === "loading") return;
+    docxState = "loading";
+    var sc = document.createElement("script");
+    sc.src = DOCX_SRC;
+    sc.onload = function () { docxState = window.docx ? "ready" : "failed"; refreshDocBtn(); };
+    sc.onerror = function () { docxState = "failed"; refreshDocBtn(); };
+    document.head.appendChild(sc);
   }
 
-  function renumberRisks() {
-    var rs = riskRows();
-    rs.forEach(function (r, i) {
-      r.querySelector(".idx").textContent = i + 1;
-      r.querySelector(".r-text").setAttribute("aria-label", "Risk " + (i + 1));
-      var rm = r.querySelector(".rm");
-      rm.setAttribute("aria-label", "Remove risk " + (i + 1));
-      rm.disabled = rs.length <= RISK_MIN;
-    });
-    riskAdd.disabled = rs.length >= RISK_MAX;
-    riskCount.textContent = rs.length + " of " + RISK_MAX;
+  function cleanText(s) { return String(s == null ? "" : s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").trim(); }
+
+  var MIN_WORDS = 60;
+  function countWords(t) { var m = cleanText(t).match(/\S+/g); return m ? m.length : 0; }
+
+  function refreshWordCount() {
+    var n = countWords($("ownAnswer").value), ok = n >= MIN_WORDS;
+    $("wc").textContent = n;
+    $("wcMin").textContent = MIN_WORDS;
+    $("wordCount").className = "wordcount" + (ok ? " ok" : "");
+    $("wcState").textContent = ok ? "Good length" : (MIN_WORDS - n) + " more to go";
   }
 
-  riskAdd.addEventListener("click", function () { addRisk(true); markDirty(); });
-
-  function readRisks() {
-    var out = [];
-    riskRows().forEach(function (r, i) {
-      var l = parseInt(r.querySelector(".r-l").value, 10) || 0;
-      var im = parseInt(r.querySelector(".r-i").value, 10) || 0;
-      out.push({
-        id: r.getAttribute("data-id"),
-        n: i + 1,
-        text: clean(r.querySelector(".r-text").value),
-        why: clean(r.querySelector(".r-why").value),
-        l: l, i: im,
-        score: l && im ? l * im : 0
-      });
-    });
-    return out;
+  function refreshDocBtn() {
+    var btn = $("docBtn"), msg = $("docMsg");
+    var named = cleanText($("fullName").value).length > 0;
+    var words = countWords($("ownAnswer").value);
+    var longEnough = words >= MIN_WORDS;
+    var allCorrect = placed === ANSWERS.length;
+    btn.disabled = !(allCorrect && longEnough && named && docxState === "ready");
+    msg.className = "msg";
+    if (!allCorrect) msg.textContent = "Place all 12 answers correctly to unlock this.";
+    else if (!longEnough) msg.textContent = "Write at least " + MIN_WORDS + " words about your own office (" + words + " so far) to unlock the button.";
+    else if (!named) msg.textContent = "Type your full name to unlock the button.";
+    else if (docxState === "failed") { msg.className = "msg error"; msg.textContent = "The Word builder did not load. Refresh the page and try again."; }
+    else if (docxState !== "ready") msg.textContent = "Getting ready…";
+    else { msg.className = "msg ready"; msg.textContent = "Ready. Your file is made on this device and is not uploaded anywhere."; }
   }
+  $("fullName").addEventListener("input", refreshDocBtn);
+  $("ownAnswer").addEventListener("input", function () { refreshWordCount(); refreshDocBtn(); });
+  window.addEventListener("beforeunload", function (e) {
+    if (cleanText($("ownAnswer").value) && !downloaded) { e.preventDefault(); e.returnValue = ""; }
+  });
+  var downloaded = false;
 
-  // ---------- Fixes ----------
-  var fixWrap = $("fixRows");
-  function addFix(n) {
-    var li = make("li", "row fix");
-    li.appendChild(make("span", "idx"));
-    li.querySelector(".idx").textContent = n;
-    var body = make("div", "fix-body");
-
-    var lab1 = make("label");
-    lab1.appendChild(document.createTextNode("Fix"));
-    var text = make("input", "txt f-text", { type: "text", maxlength: "300", autocomplete: "off", placeholder: "Describe the fix…" });
-    lab1.appendChild(text);
-    body.appendChild(lab1);
-
-    var lab2 = make("label");
-    lab2.appendChild(document.createTextNode("Which risk does it reduce?"));
-    var sel = make("select", "f-risk");
-    lab2.appendChild(sel);
-    body.appendChild(lab2);
-
-    text.addEventListener("input", markDirty);
-    sel.addEventListener("change", markDirty);
-    li.appendChild(body);
-    fixWrap.appendChild(li);
-  }
-  for (var f = 1; f <= FIX_COUNT; f++) addFix(f);
-
-  // Fill each fix's dropdown from the risks typed so far; keep an existing choice
-  // (matched by the risk's stable id, so it survives re-ordering or removal of rows).
-  function refreshFixOptions() {
-    var risks = readRisks().filter(function (r) { return r.text; });
-    fixWrap.querySelectorAll(".f-risk").forEach(function (sel) {
-      var prev = sel.value;
-      sel.innerHTML = "";
-      var first = make("option", null, { value: "" });
-      first.textContent = risks.length ? "Choose a risk…" : "Add a risk in section 3 first";
-      sel.appendChild(first);
-      risks.forEach(function (r) {
-        var o = make("option", null, { value: r.id });
-        o.textContent = "Risk " + r.n + ": " + trunc(r.text, 60);
-        sel.appendChild(o);
-      });
-      var stillThere = risks.some(function (r) { return r.id === prev; });
-      sel.value = stillThere ? prev : "";
-    });
-  }
-
-  // ---------- Matrix preview ----------
-  function renderMatrix() {
-    var m = $("matrix");
-    var risks = readRisks().filter(function (r) { return r.l && r.i; });
-    m.innerHTML = "";
-    // Impact 5 (top) down to 1; likelihood 1..5 left to right.
-    for (var imp = 5; imp >= 1; imp--) {
-      var ax = make("div", "axis");
-      ax.textContent = imp;
-      ax.setAttribute("aria-hidden", "true");
-      m.appendChild(ax);
-      for (var lik = 1; lik <= 5; lik++) {
-        var cell = make("div", "mcell", { "data-band": bandFor(lik * imp).key });
-        risks.forEach(function (r) {
-          if (r.l === lik && r.i === imp) {
-            var d = make("span", "dot");
-            d.textContent = r.n;
-            cell.appendChild(d);
-          }
-        });
-        m.appendChild(cell);
-      }
-    }
-    m.appendChild(make("div", "axis"));
-    for (var k = 1; k <= 5; k++) {
-      var xa = make("div", "axis");
-      xa.textContent = k;
-      xa.setAttribute("aria-hidden", "true");
-      m.appendChild(xa);
-    }
-    $("matrixSummary").textContent = risks.length
-      ? risks.map(function (r) { return "Risk " + r.n + ": likelihood " + r.l + ", impact " + r.i + ", " + bandFor(r.score).label; }).join(". ") + "."
-      : "No risks plotted yet.";
-  }
-
-  // ---------- Download gate ----------
-  var namesEl = $("names"), dlBtn = $("dlBtn"), dlMsg = $("dlMsg");
-  var MSG_LOCKED = "Enter your name (or group member names) at the top of the page to enable the download.";
-  function updateDownloadState() {
-    var ok = clean(namesEl.value).length > 0;
-    dlBtn.disabled = !ok;
-    dlMsg.className = "dl-msg" + (ok ? " ready" : "");
-    dlMsg.textContent = ok ? "Ready. Your file is made on this device and is not uploaded anywhere." : MSG_LOCKED;
-  }
-  namesEl.addEventListener("input", function () { updateDownloadState(); markDirty(); });
-  $("groupName").addEventListener("input", markDirty);
-  $("assumptions").addEventListener("input", markDirty);
-
-  // ---------- .docx ----------
-  function slug(s) {
-    return clean(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
-  }
   function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function slug(s) { return cleanText(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40); }
 
-  function buildDocx() {
+  function buildDoc(fullName, answer) {
     var d = window.docx;
     var Document = d.Document, Packer = d.Packer, Paragraph = d.Paragraph, TextRun = d.TextRun, Table = d.Table,
         TableRow = d.TableRow, TableCell = d.TableCell, WidthType = d.WidthType, ShadingType = d.ShadingType,
-        AlignmentType = d.AlignmentType, VerticalAlign = d.VerticalAlign, HeadingLevel = d.HeadingLevel,
-        Footer = d.Footer, PageNumber = d.PageNumber, TableLayoutType = d.TableLayoutType, HeightRule = d.HeightRule;
-
+        VerticalAlign = d.VerticalAlign, HeadingLevel = d.HeadingLevel, TableLayoutType = d.TableLayoutType;
+    var INK = "14172B", DIM = "565B78", NAVY = "1E2761", HEAD_FILL = "E4E9F8", TOTAL = 9360;
+    var FILL = { assets: "BFE6F0", threats: "F8D5B5", risks: "F2B8BE", fixes: "BFE5CF" };
     var now = new Date();
     var dateStr = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate());
-    var names = clean(namesEl.value);
-    var group = clean($("groupName").value);
-    var assumptions = clean($("assumptions").value);
-    var assetList = assets.values();
-    var threatList = threats.values();
-    var risks = readRisks().filter(function (r) { return r.text || r.why || (r.l && r.i); });
-    var allRisks = readRisks();
 
-    var INK = "14172B", DIM = "565B78", NAVY = "1E2761", HEAD_FILL = "E4E9F8";
-    var TOTAL = 9360; // US Letter, 1" margins => 6.5" = 9360 dxa
-
-    function run(text, o) { o = o || {}; return new TextRun({ text: text, bold: o.bold, italics: o.italics, color: o.color || INK, size: o.size, font: o.font }); }
-    function lines(text) { return String(text).split(/\r?\n/); }
-    function para(text, o) {
-      o = o || {};
-      return new Paragraph({
-        spacing: { after: o.after == null ? 80 : o.after, before: o.before || 0 },
-        alignment: o.align,
-        children: [run(text, o)]
-      });
-    }
-    function multiPara(text, o) { return lines(text).filter(function (l) { return l.trim(); }).map(function (l) { return para(l, o); }); }
-    function h1(text) { return new Paragraph({ heading: HeadingLevel.HEADING_1, spacing: { before: 320, after: 120 }, children: [new TextRun({ text: text, bold: true, color: NAVY, size: 30, font: "Georgia" })] }); }
-    function note(text) { return para(text, { italics: true, color: DIM, size: 20, after: 100 }); }
-
-    function cell(children, width, o) {
+    function run(t, o) { o = o || {}; return new TextRun({ text: t, bold: o.bold, italics: o.italics, color: o.color || INK, size: o.size }); }
+    function para(t, o) { o = o || {}; return new Paragraph({ spacing: { after: o.after == null ? 80 : o.after }, children: [run(t, o)] }); }
+    function h1(t) { return new Paragraph({ heading: HeadingLevel.HEADING_1, spacing: { before: 300, after: 120 }, children: [new TextRun({ text: t, bold: true, color: NAVY, size: 30, font: "Georgia" })] }); }
+    function cell(t, w, o) {
       o = o || {};
       return new TableCell({
-        width: { size: width, type: WidthType.DXA },
-        verticalAlign: VerticalAlign.CENTER,
+        width: { size: w, type: WidthType.DXA }, verticalAlign: VerticalAlign.CENTER,
         shading: o.fill ? { type: ShadingType.CLEAR, fill: o.fill, color: "auto" } : undefined,
-        margins: { top: 70, bottom: 70, left: 110, right: 110 },
-        children: children
-      });
-    }
-    function cellText(text, width, o) {
-      o = o || {};
-      var kids = lines(text).map(function (l) {
-        return new Paragraph({ alignment: o.align, spacing: { after: 0 }, children: [run(l, { bold: o.bold, color: o.color, size: o.size || 21 })] });
-      });
-      return cell(kids, width, o);
-    }
-    function table(widths, rows) {
-      return new Table({
-        width: { size: TOTAL, type: WidthType.DXA },
-        columnWidths: widths,
-        layout: TableLayoutType.FIXED,
-        rows: rows
-      });
-    }
-    function headRow(labels, widths) {
-      return new TableRow({
-        tableHeader: true, cantSplit: true,
-        children: labels.map(function (l, i) { return cellText(l, widths[i], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }); })
-      });
-    }
-    function numbered(items) {
-      if (!items.length) return [note("(nothing entered)")];
-      return items.map(function (t, i) {
-        return new Paragraph({
-          spacing: { after: 70 }, indent: { left: 360, hanging: 360 },
-          children: [run((i + 1) + ".  ", { bold: true, color: NAVY }), run(t)]
-        });
+        margins: { top: 80, bottom: 80, left: 120, right: 120 },
+        children: [new Paragraph({ spacing: { after: 0 }, children: [run(t, { bold: o.bold, color: o.color, size: o.size || 22 })] })]
       });
     }
 
     var children = [];
+    children.push(new Paragraph({ heading: HeadingLevel.TITLE, spacing: { after: 60 }, children: [new TextRun({ text: "Threat Model", bold: true, color: NAVY, size: 44, font: "Georgia" })] }));
+    children.push(para("Completed in the Threat Model Game · City Treasurer's Office scenario", { color: DIM, size: 22, after: 200 }));
 
-    // Title + who
-    children.push(new Paragraph({ heading: HeadingLevel.TITLE, spacing: { after: 60 }, children: [new TextRun({ text: "Threat Model Worksheet", bold: true, color: NAVY, size: 44, font: "Georgia" })] }));
-    children.push(para("Cybersecurity training activity · City Treasurer's Office scenario", { color: DIM, size: 22, after: 200 }));
+    var iw = [2100, TOTAL - 2100];
+    children.push(new Table({
+      width: { size: TOTAL, type: WidthType.DXA }, columnWidths: iw, layout: TableLayoutType.FIXED,
+      rows: [
+        new TableRow({ children: [cell("Full name", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell(fullName, iw[1])] }),
+        new TableRow({ children: [cell("Date", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell(dateStr, iw[1])] }),
+        new TableRow({ children: [cell("Written answer", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell(countWords(answer) + " words", iw[1])] }),
+        new TableRow({ children: [cell("Result", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell("All 12 answers placed correctly" + (wrong ? " (" + wrong + " wrong " + (wrong === 1 ? "try" : "tries") + ")" : " with no wrong tries"), iw[1])] })
+      ]
+    }));
 
-    var infoW = [2100, TOTAL - 2100];
-    var infoRows = [
-      new TableRow({ children: [cellText("Name(s)", infoW[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cellText(names, infoW[1])] })
-    ];
-    if (group) infoRows.push(new TableRow({ children: [cellText("Group", infoW[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cellText(group, infoW[1])] }));
-    infoRows.push(new TableRow({ children: [cellText("Date", infoW[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cellText(dateStr, infoW[1])] }));
-    children.push(table(infoW, infoRows));
-
-    // Scenario + assumptions
     children.push(h1("Scenario"));
-    children.push(para("City Treasurer's Office. It has: a payroll database, 40 staff laptops, citizen records on paper, a vendor with remote access, one shared admin password, and backups that were never tested.", { after: 100 }));
-    children.push(para("Assumptions we added:", { bold: true, color: NAVY, after: 60 }));
-    if (assumptions) { multiPara(assumptions).forEach(function (p) { children.push(p); }); }
-    else children.push(note("(none)"));
+    children.push(para("City Treasurer's Office. It has: a payroll database, 40 staff laptops, citizen records on paper, a vendor with remote access, one shared admin password, and backups that were never tested."));
 
-    // 1 + 2
-    children.push(h1("1. Assets"));
-    numbered(assetList).forEach(function (p) { children.push(p); });
-    children.push(h1("2. Threats and doors"));
-    numbered(threatList).forEach(function (p) { children.push(p); });
-
-    // 3 risks table
-    children.push(h1("3. Top risks"));
-    var rw = [420, 2640, 1100, 960, 780, 1160, 2300]; // sums to 9360
-    var riskRowsDoc = [headRow(["#", "Risk", "Likelihood", "Impact", "Score", "Rating", "Why"], rw)];
-    if (!risks.length) {
-      riskRowsDoc.push(new TableRow({ children: [cellText("", rw[0]), cellText("(nothing entered)", rw[1], { color: DIM }), cellText("", rw[2]), cellText("", rw[3]), cellText("", rw[4]), cellText("", rw[5]), cellText("", rw[6])] }));
-    }
-    risks.forEach(function (r) {
-      var b = r.score ? bandFor(r.score) : null;
-      riskRowsDoc.push(new TableRow({
-        cantSplit: true,
-        children: [
-          cellText(String(r.n), rw[0], { align: AlignmentType.CENTER, bold: true }),
-          cellText(r.text || "—", rw[1]),
-          cellText(r.l ? String(r.l) : "—", rw[2], { align: AlignmentType.CENTER }),
-          cellText(r.i ? String(r.i) : "—", rw[3], { align: AlignmentType.CENTER }),
-          cellText(r.score ? String(r.score) : "—", rw[4], { align: AlignmentType.CENTER, bold: true }),
-          cellText(b ? b.label : "—", rw[5], { align: AlignmentType.CENTER, bold: true, fill: b ? b.docFill : undefined }),
-          cellText(r.why || "—", rw[6])
-        ]
-      }));
+    var sections = [["assets", "1. Assets"], ["threats", "2. Threats and doors"], ["risks", "3. Top risks"], ["fixes", "4. Top 3 fixes"]];
+    sections.forEach(function (sec) {
+      children.push(h1(sec[1]));
+      var rows = ANSWERS.filter(function (a) { return a.box === sec[0]; }).map(function (a, i) {
+        return new TableRow({ cantSplit: true, children: [cell(String(i + 1), 600, { bold: true, fill: FILL[sec[0]], color: NAVY }), cell(a.text, TOTAL - 600)] });
+      });
+      children.push(new Table({ width: { size: TOTAL, type: WidthType.DXA }, columnWidths: [600, TOTAL - 600], layout: TableLayoutType.FIXED, rows: rows }));
     });
-    children.push(table(rw, riskRowsDoc));
-    children.push(note("Score = Likelihood × Impact (each 1–5). Rating: Low 1–4 · Medium 5–9 · High 10–19 · Critical 20–25."));
 
-    // Matrix (native Word table so it prints sharply and works offline)
-    children.push(h1("Risk matrix"));
-    var mw = [900, 1292, 1292, 1292, 1292, 1292]; // 900 + 5*1292 = 7360
-    var mTotal = 7360;
-    var mRows = [];
-    for (var imp = 5; imp >= 1; imp--) {
-      var cells = [cellText("Impact " + imp, mw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 18, align: AlignmentType.CENTER })];
-      for (var lik = 1; lik <= 5; lik++) {
-        var here = allRisks.filter(function (r) { return r.l === lik && r.i === imp; }).map(function (r) { return r.n; });
-        cells.push(cellText(here.join(", "), mw[lik], { bold: true, size: 26, align: AlignmentType.CENTER, fill: bandFor(lik * imp).docFill }));
-      }
-      mRows.push(new TableRow({ cantSplit: true, height: { value: 720, rule: HeightRule.ATLEAST }, children: cells }));
-    }
-    var footCells = [cellText("", mw[0], { fill: HEAD_FILL })];
-    for (var k = 1; k <= 5; k++) footCells.push(cellText("Likelihood " + k, mw[k], { bold: true, fill: HEAD_FILL, color: NAVY, size: 18, align: AlignmentType.CENTER }));
-    mRows.push(new TableRow({ cantSplit: true, children: footCells }));
-    children.push(new Table({ width: { size: mTotal, type: WidthType.DXA }, columnWidths: mw, layout: TableLayoutType.FIXED, rows: mRows }));
-    children.push(note("Numbers show the risk # from the table above. Colours: green Low · yellow Medium · orange High · red Critical."));
-
-    // 4 fixes
-    children.push(h1("4. Top 3 fixes"));
-    var fw = [420, 5240, 3700];
-    var fixRowsDoc = [headRow(["#", "Fix", "Risk it reduces"], fw)];
-    fixWrap.querySelectorAll(".row").forEach(function (li, i) {
-      var text = clean(li.querySelector(".f-text").value);
-      var rid = li.querySelector(".f-risk").value;
-      var target = allRisks.filter(function (r) { return r.id === rid; })[0];
-      fixRowsDoc.push(new TableRow({
-        cantSplit: true,
-        children: [
-          cellText(String(i + 1), fw[0], { align: AlignmentType.CENTER, bold: true }),
-          cellText(text || "—", fw[1]),
-          cellText(target ? "Risk " + target.n + ": " + target.text : "—", fw[2])
-        ]
-      }));
+    children.push(h1("5. Your own office"));
+    children.push(para("Think about the office where you work. Pick the one asset (a system, data, a device, or a person) you would most want to protect.", { italics: true, color: DIM, after: 60 }));
+    children.push(para("Paragraph 1: Who or what could threaten it, and how could they get in? How likely is it, and how badly would it hurt?", { italics: true, color: DIM, after: 60 }));
+    children.push(para("Paragraph 2: What is the first practical fix you would propose, and who in your office would you need to work with to make it happen?", { italics: true, color: DIM, after: 160 }));
+    String(answer).split(/\r?\n/).forEach(function (line) {
+      var t = cleanText(line);
+      if (t) children.push(new Paragraph({ spacing: { after: 140, line: 300 }, children: [run(t, { size: 22 })] }));
     });
-    children.push(table(fw, fixRowsDoc));
 
     var doc = new Document({
-      creator: "Threat Model Worksheet",
-      title: "Threat Model Worksheet",
-      description: "City Treasurer's Office threat model",
+      creator: "Threat Model Game", title: "Threat Model",
       styles: {
         default: { document: { run: { font: "Calibri", size: 22, color: INK } } },
         paragraphStyles: [
-          { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 30, bold: true, color: NAVY, font: "Georgia" }, paragraph: { spacing: { before: 320, after: 120 }, outlineLevel: 0 } },
+          { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 30, bold: true, color: NAVY, font: "Georgia" }, paragraph: { spacing: { before: 300, after: 120 }, outlineLevel: 0 } },
           { id: "Title", name: "Title", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 44, bold: true, color: NAVY, font: "Georgia" } }
         ]
       },
-      sections: [{
-        properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1440, right: 1440, bottom: 1300, left: 1440 } } },
-        footers: {
-          default: new Footer({
-            children: [new Paragraph({
-              alignment: AlignmentType.CENTER,
-              children: [
-                new TextRun({ text: "Threat Model Worksheet · " + trunc(names, 60) + " · page ", color: DIM, size: 18 }),
-                new TextRun({ children: [PageNumber.CURRENT], color: DIM, size: 18 })
-              ]
-            })]
-          })
-        },
-        children: children
-      }]
+      sections: [{ properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1440, right: 1440, bottom: 1300, left: 1440 } } }, children: children }]
     });
-
-    var base = "threat-model";
-    var who = slug(group || names.split(/\r?\n/)[0]);
-    var fileName = base + (who ? "_" + who : "") + "_" + dateStr + ".docx";
-    return Packer.toBlob(doc).then(function (blob) { return { blob: blob, name: fileName }; });
+    var who = slug(fullName);
+    return Packer.toBlob(doc).then(function (blob) { return { blob: blob, name: "threat-model" + (who ? "_" + who : "") + "_" + dateStr + ".docx" }; });
   }
 
-  dlBtn.addEventListener("click", function () {
-    if (dlBtn.disabled) return;
-    if (!window.docx) {
-      dlMsg.className = "dl-msg error";
-      dlMsg.textContent = "The Word builder did not load. Refresh the page and try again.";
-      return;
-    }
-    dlBtn.disabled = true;
-    dlMsg.className = "dl-msg";
-    dlMsg.textContent = "Building your file…";
-    buildDocx().then(function (res) {
+  $("docBtn").addEventListener("click", function () {
+    var name = cleanText($("fullName").value);
+    var answer = cleanText($("ownAnswer").value);
+    if (placed !== ANSWERS.length || !name || countWords(answer) < MIN_WORDS || !window.docx) return;
+    var btn = $("docBtn"), msg = $("docMsg");
+    btn.disabled = true; msg.className = "msg"; msg.textContent = "Building your file…";
+    buildDoc(name, $("ownAnswer").value).then(function (res) {
       var url = URL.createObjectURL(res.blob);
       var a = document.createElement("a");
       a.href = url; a.download = res.name;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-      dirty = false;
-      dlMsg.className = "dl-msg ready";
-      dlMsg.textContent = "Downloaded " + res.name + ". Send this file to your trainer.";
+      downloaded = true;
+      refreshDocBtn();
+      msg.className = "msg ready"; msg.textContent = "Downloaded " + res.name + ". Send this file to your trainer.";
     }).catch(function (err) {
-      dlMsg.className = "dl-msg error";
-      dlMsg.textContent = "Something went wrong building the file. Please try again.";
+      msg.className = "msg error"; msg.textContent = "Something went wrong building the file. Please try again.";
       if (window.console) console.error(err);
-    }).then(function () { dlBtn.disabled = !clean(namesEl.value).length; });
+      refreshDocBtn();
+    });
   });
 
-  // ---------- Init ----------
-  for (var r = 0; r < RISK_MIN; r++) addRisk(false);
-  refreshFixOptions();
-  renderMatrix();
-  updateDownloadState();
+  // ---------- Reset ----------
+  $("restart").addEventListener("click", build);
+  $("again").addEventListener("click", function () { build(); window.scrollTo({ top: 0 }); });
+
+  build();
 
   // Ambient network/circuit canvas background — subtle, theme-aware (same as the other activity pages)
   (function () {
@@ -975,8 +836,7 @@
       for (var i = 0; i < nodes.length; i++) {
         for (var j = i + 1; j < nodes.length; j++) {
           var dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
-          var d2 = dx * dx + dy * dy;
-          if (d2 < 130 * 130) {
+          if (dx * dx + dy * dy < 130 * 130) {
             ctx.strokeStyle = line;
             ctx.lineWidth = 1;
             ctx.beginPath();
