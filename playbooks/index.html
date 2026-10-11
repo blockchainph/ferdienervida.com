@@ -307,11 +307,11 @@
           help: "NPC, DICT/CERT-PH, and law enforcement obligations specific to a ransomware event.",
           fields: [
             { id: "npcNotify", label: "National Privacy Commission (Data Privacy Act)", hint: "", rows: 4,
-              default: "Ransomware groups increasingly steal data before encrypting it. If personal or sensitive personal data was likely exfiltrated or exposed, treat this as a reportable Data Privacy Act breach: the DPO assesses within 72 hours of discovery and, where the threshold is met, submits to the National Privacy Commission via the DBNMS portal." },
+              default: "Ransomware groups increasingly steal data before encrypting it. If personal or sensitive personal data was likely exfiltrated or exposed, treat this as a reportable Data Privacy Act breach. The DPO assesses straight away whether it is notifiable. Where it is, notify the National Privacy Commission via the DBNMS portal within 72 hours of knowledge or reasonable belief that a notifiable breach occurred. The clock is 72 hours from knowledge of the breach, so start counting when the office first knows or reasonably believes it, not when the investigation ends. Affected people must generally be told within the same 72 hours, unless the NPC approves a postponement or exemption." },
             { id: "dictNotify", label: "DICT / CERT-PH", hint: "", rows: 3,
-              default: "Report to CERT-PH (cert-ph@dict.gov.ph) and the DICT regional office, especially if the affected system qualifies as Critical Information Infrastructure (DICT MC 005-17: 24-hour reporting window)." },
+              default: "Report to CERT-PH (cert-ph@dict.gov.ph) and the DICT regional office, especially if the affected system qualifies as Critical Information Infrastructure (DICT Memorandum Circular No. 005, s. 2017: report to the national CERT within 24 hours from detection)." },
             { id: "lawEnforcement", label: "Law enforcement referral", hint: "", rows: 3,
-              default: "Ransomware/extortion is a crime under RA 10175 (computer-related fraud / extortion). Refer to the PNP Anti-Cybercrime Group or NBI Cybercrime Division, particularly if payment is being considered or the attacker has made direct contact." },
+              default: "Ransomware usually involves cybercrime offenses under RA 10175, such as illegal access, data interference and system interference. Demanding payment under threat is extortion, which is an offense under the Revised Penal Code. Refer to the PNP Anti-Cybercrime Group or NBI Cybercrime Division, particularly if payment is being considered or the attacker has made direct contact." },
             { id: "publicComms", label: "Public / media statement authorization", hint: "", rows: 4,
               default: "Only the Approving Authority or designated PIO may speak publicly. Avoid confirming specific technical details, ransom amounts, or attacker identity while the incident is active or under law enforcement review. Prepare a holding statement acknowledging awareness and response without speculation." }
           ] },
@@ -368,7 +368,7 @@
           help: "NPC, DICT/CERT-PH, law enforcement, and internal awareness obligations.",
           fields: [
             { id: "npcNotify", label: "National Privacy Commission (Data Privacy Act)", hint: "", rows: 4,
-              default: "If the compromised mailbox or account contained personal or sensitive personal information the attacker could have accessed, treat this as a potential Data Privacy Act breach. The DPO assesses within 72 hours of discovery and, where the threshold is met, submits to the National Privacy Commission via the DBNMS portal." },
+              default: "If the compromised mailbox or account contained personal or sensitive personal information the attacker could have accessed, treat this as a potential Data Privacy Act breach. The DPO assesses straight away whether it is notifiable. Where it is, notify the National Privacy Commission via the DBNMS portal within 72 hours of knowledge or reasonable belief that a notifiable breach occurred. The clock is 72 hours from knowledge of the breach, so start counting when the office first knows or reasonably believes it, not when the investigation ends. Affected people must generally be told within the same 72 hours, unless the NPC approves a postponement or exemption." },
             { id: "dictNotify", label: "DICT / CERT-PH", hint: "", rows: 3,
               default: "Report to CERT-PH (cert-ph@dict.gov.ph) if the compromise affected Critical Information Infrastructure, or if the phishing campaign appears to be targeting multiple government offices — worth flagging so DICT can warn others." },
             { id: "lawEnforcement", label: "Law enforcement referral", hint: "", rows: 3,
@@ -411,7 +411,7 @@
           help: "Whether this breach legally requires NPC notification depends on a specific three-part test.",
           fields: [
             { id: "thresholdAssess", label: "Threshold assessment", hint: "", rows: 6,
-              default: "The DPO assesses whether this breach meets the National Privacy Commission's notification threshold: (a) sensitive personal information, or information that could enable identity fraud, is involved, AND (b) there is reasonable belief the information may have been acquired by an unauthorized person, AND (c) the breach is likely to give rise to real risk of serious harm to the affected individuals. If all three apply, the 72-hour notification clock starts from the time the office became aware of the breach." }
+              default: "The DPO assesses whether this breach meets the National Privacy Commission's notification threshold: (a) sensitive personal information, or information that could enable identity fraud, is involved, AND (b) there is reasonable belief the information may have been acquired by an unauthorized person, AND (c) the breach is likely to give rise to real risk of serious harm to the affected individuals. If all three apply, the breach is notifiable, and the clock is 72 hours from knowledge of the breach (from when the office knows or reasonably believes a notifiable breach occurred)." }
           ] },
         { id: "rootcause", title: "Root Cause Containment", railLabel: "Root cause",
           help: "Fix the specific gap that caused the exposure, not just the immediate symptom.",
@@ -423,9 +423,9 @@
           help: "NPC, affected individuals, and law enforcement — each with a different notification logic.",
           fields: [
             { id: "npcNotify", label: "National Privacy Commission (Data Privacy Act)", hint: "", rows: 4,
-              default: "If the DPO determines the threshold is met, submit the breach notification to the National Privacy Commission via the DBNMS portal within 72 hours of the office becoming aware of the breach, followed by a full report within 5 days as required by NPC Circular 16-03." },
+              default: "If the DPO determines the threshold is met, submit the breach notification to the National Privacy Commission via the DBNMS portal within 72 hours of knowledge or reasonable belief that a notifiable breach occurred (72 hours from knowledge of the breach), followed by a full report within 5 days of that knowledge, as required by NPC Circular 16-03." },
             { id: "affectedParty", label: "Affected-party communication", hint: "", rows: 4,
-              default: "Where required, notify affected individuals directly (not just a public notice) describing what data was involved, the likely impact, and what the office is doing about it — use the clearest, most direct channel available (letter, SMS, email) rather than assuming they'll see a general announcement." },
+              default: "Where required, notify affected individuals directly (not just a public notice) within the same 72 hours from knowledge of the breach, unless the NPC approves a postponement or exemption. Describe what data was involved, the likely impact, and what the office is doing about it — use the clearest, most direct channel available (letter, SMS, email) rather than assuming they'll see a general announcement." },
             { id: "lawEnforcement", label: "Law enforcement referral", hint: "", rows: 3,
               default: "If the breach involved theft, hacking, or malicious insider access, this may also constitute a cybercrime under RA 10175 (illegal access) — refer to the PNP Anti-Cybercrime Group or NBI Cybercrime Division as appropriate." }
           ] },
@@ -433,7 +433,7 @@
           help: "What gets reviewed after closure so the same exposure doesn't recur.",
           fields: [
             { id: "postIncident", label: "Post-incident review prompts", hint: "", rows: 6,
-              default: "Review: (1) how the exposure happened and whether the control gap has actually been closed, (2) how long it took from occurrence to detection, and from detection to DPO notification, (3) whether the 72-hour NPC clock was met if the threshold applied, (4) whether affected individuals were notified appropriately, (5) what policy or training change prevents a repeat (e.g., mandatory encryption for outbound sensitive files, folder permission audits)." }
+              default: "Review: (1) how the exposure happened and whether the control gap has actually been closed, (2) how long it took from occurrence to detection, and from detection to DPO notification, (3) whether the 72 hours from knowledge of the breach was met if the breach was notifiable, (4) whether affected individuals were notified appropriately, (5) what policy or training change prevents a repeat (e.g., mandatory encryption for outbound sensitive files, folder permission audits)." }
           ] }
       ]
     }
@@ -498,7 +498,8 @@
     document.getElementById("app").classList.add("no-rail");
     var html = '<div class="eyebrow">Incident Playbook Creator</div>';
     html += '<h2 class="step-title">Which incident are you drafting a playbook for?</h2>';
-    html += '<p class="step-help">Each playbook comes with the full set of sections and suggested defaults already filled in — you can accept them as-is or rewrite anything for your organization.</p>';
+    html += '<p class="step-help" style="margin-bottom:12px;">Each playbook comes with the full set of sections and suggested defaults already filled in — you can accept them as-is or rewrite anything for your organization.</p>';
+    html += '<p class="step-help"><strong>How this works:</strong> choose a type, review each default, edit it for your office, then download the Word file.</p>';
     html += '<div class="picker-grid">';
     Object.keys(PLAYBOOK_TYPES).forEach(function (id) {
       var t = PLAYBOOK_TYPES[id];

@@ -511,8 +511,8 @@
   }
 
   function renderRegulatory() {
-    return '<div class="fhint" style="margin-bottom:14px;">If personal or sensitive personal data is confirmed or suspected involved, your DPO determines notifiability and, where the threshold is met, submits to the National Privacy Commission via the DBNMS portal within 72 hours of discovery.</div>' +
-      field("NPC breach-notification chain", "Describe the decision chain: who assesses, who decides, who submits, and how the 72-hour clock is tracked from discovery.", textArea("npcChainDesc", state.npcChainDesc, "", 4)) +
+    return '<div class="fhint" style="margin-bottom:14px;">If personal or sensitive personal data is confirmed or suspected involved, your DPO determines notifiability. Where the breach is notifiable, the National Privacy Commission must be notified via the DBNMS portal within 72 hours of knowledge or reasonable belief that a notifiable breach occurred. The clock is 72 hours from knowledge of the breach, so start counting when the office first knows or reasonably believes it, not when the investigation ends. Affected people must generally be told within the same 72 hours, unless the NPC approves a postponement or exemption.</div>' +
+      field("NPC breach-notification chain", "Describe the decision chain: who assesses, who decides, who submits, and how the 72 hours from knowledge of the breach is tracked.", textArea("npcChainDesc", state.npcChainDesc, "", 4)) +
       field("DICT / CERT-PH coordination", "Contact and criteria for engaging DICT's regional office or CERT-PH.", textArea("dictContact", state.dictContact, "", 3)) +
       field("Law enforcement referral criteria", "When PNP Anti-Cybercrime Group or NBI Cybercrime Division get engaged.", textArea("lawEnforcementCriteria", state.lawEnforcementCriteria, "", 3)) +
       field("Internal staff communication", "", textArea("internalComms", state.internalComms, "", 3)) +
