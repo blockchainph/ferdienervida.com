@@ -206,6 +206,22 @@
   .recap li { padding: 0.65rem 0.8rem; border-radius: 0.7rem; background: var(--surface-2); border: 1px solid var(--border); font-size: 0.98rem; }
   .recap b { font-family: 'Fraunces', Georgia, serif; }
 
+  /* --- Own-office written answer (win screen) --- */
+  .reflect { border-top: 1px solid var(--border); padding-top: 1.1rem; margin: 0 0 1.2rem; }
+  .reflect h3 { font-size: 1.1rem; margin-bottom: 0.4rem; }
+  .reflect .q { background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--cyan); border-radius: 0.7rem; padding: 0.8rem 0.95rem; margin: 0 0 0.8rem; font-size: 1rem; line-height: 1.55; }
+  .reflect .q p { margin: 0 0 0.55rem; }
+  .reflect .q p:last-child { margin-bottom: 0; }
+  .reflect .careful { margin: 0 0 0.8rem; padding: 0.6rem 0.85rem; border-radius: 0.7rem; background: color-mix(in srgb, var(--med) 14%, var(--surface)); border: 1px solid var(--med); font-size: 0.92rem; line-height: 1.45; }
+  .reflect textarea {
+    width: 100%; font: inherit; font-size: 1.0625rem; line-height: 1.5; color: var(--ink); background: var(--surface-2);
+    border: 1.5px solid var(--border); border-radius: 0.65rem; padding: 0.7rem 0.8rem; min-height: 14rem; resize: vertical;
+  }
+  .reflect textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
+  .wordcount { display: flex; justify-content: space-between; gap: 0.6rem; margin: 0.4rem 0 0; font-size: 0.9rem; color: var(--ink-dim); }
+  .wordcount b { font-family: 'IBM Plex Mono', monospace; color: var(--ink); }
+  .wordcount.ok b, .wordcount.ok { color: var(--low); }
+
   /* --- Convert to .docx (win screen) --- */
   .convert { border-top: 1px solid var(--border); padding-top: 1.1rem; margin: 0 0 1.2rem; }
   .convert h3 { font-size: 1.1rem; margin-bottom: 0.3rem; }
@@ -331,9 +347,22 @@
       <li><b>Top risks</b> are what could go wrong, ranked by how likely and how harmful.</li>
       <li><b>Top 3 fixes</b> are practical actions that shrink the biggest risks.</li>
     </ul>
+    <div class="reflect">
+      <h3>Your own office</h3>
+      <div class="q" id="ownQ">
+        <p><b>Think about the office where you work.</b> Pick the one asset (a system, data, a device, or a person) you would most want to protect.</p>
+        <p><b>Paragraph 1:</b> Who or what could threaten it, and how could they get in? How likely is it, and how badly would it hurt?</p>
+        <p><b>Paragraph 2:</b> What is the first practical fix you would propose, and who in your office would you need to work with to make it happen?</p>
+      </div>
+      <p class="careful"><b>Keep it general.</b> Don't include passwords, the real names of staff, or exact weaknesses someone could misuse. Your file will be sent by email.</p>
+      <label for="ownAnswer" class="sr-only">Your written answer</label>
+      <textarea id="ownAnswer" maxlength="3000" placeholder="Write your answer in two short paragraphs…" aria-describedby="wordCount"></textarea>
+      <p class="wordcount" id="wordCount"><span><b id="wc">0</b> of <span id="wcMin">60</span> words minimum</span><span id="wcState">Keep going</span></p>
+    </div>
+
     <div class="convert">
       <h3>Save your threat model</h3>
-      <p class="help">Enter your full name, then convert your finished threat model into a Word file for your trainer.</p>
+      <p class="help">Enter your full name, then convert your finished threat model and your answer into a Word file for your trainer.</p>
       <label for="fullName">Your full name <span style="color:var(--crit)" aria-hidden="true">*</span></label>
       <input type="text" id="fullName" maxlength="120" autocomplete="name" aria-describedby="docMsg">
       <button type="button" class="btn btn-primary" id="docBtn" disabled>Convert into .docx</button>
@@ -448,6 +477,8 @@
     setArmed(false);
     $("win").hidden = true;
     if ($("fullName")) $("fullName").value = "";
+    if ($("ownAnswer")) { $("ownAnswer").value = ""; refreshWordCount(); }
+    downloaded = false;
     if ($("docBtn")) refreshDocBtn();
     updateProgress();
     say("Pick an answer below and put it in the right box.");
@@ -620,24 +651,43 @@
 
   function cleanText(s) { return String(s == null ? "" : s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").trim(); }
 
+  var MIN_WORDS = 60;
+  function countWords(t) { var m = cleanText(t).match(/\S+/g); return m ? m.length : 0; }
+
+  function refreshWordCount() {
+    var n = countWords($("ownAnswer").value), ok = n >= MIN_WORDS;
+    $("wc").textContent = n;
+    $("wcMin").textContent = MIN_WORDS;
+    $("wordCount").className = "wordcount" + (ok ? " ok" : "");
+    $("wcState").textContent = ok ? "Good length" : (MIN_WORDS - n) + " more to go";
+  }
+
   function refreshDocBtn() {
     var btn = $("docBtn"), msg = $("docMsg");
     var named = cleanText($("fullName").value).length > 0;
+    var words = countWords($("ownAnswer").value);
+    var longEnough = words >= MIN_WORDS;
     var allCorrect = placed === ANSWERS.length;
-    btn.disabled = !(allCorrect && named && docxState === "ready");
+    btn.disabled = !(allCorrect && longEnough && named && docxState === "ready");
     msg.className = "msg";
     if (!allCorrect) msg.textContent = "Place all 12 answers correctly to unlock this.";
+    else if (!longEnough) msg.textContent = "Write at least " + MIN_WORDS + " words about your own office (" + words + " so far) to unlock the button.";
     else if (!named) msg.textContent = "Type your full name to unlock the button.";
     else if (docxState === "failed") { msg.className = "msg error"; msg.textContent = "The Word builder did not load. Refresh the page and try again."; }
     else if (docxState !== "ready") msg.textContent = "Getting ready…";
     else { msg.className = "msg ready"; msg.textContent = "Ready. Your file is made on this device and is not uploaded anywhere."; }
   }
   $("fullName").addEventListener("input", refreshDocBtn);
+  $("ownAnswer").addEventListener("input", function () { refreshWordCount(); refreshDocBtn(); });
+  window.addEventListener("beforeunload", function (e) {
+    if (cleanText($("ownAnswer").value) && !downloaded) { e.preventDefault(); e.returnValue = ""; }
+  });
+  var downloaded = false;
 
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function slug(s) { return cleanText(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40); }
 
-  function buildDoc(fullName) {
+  function buildDoc(fullName, answer) {
     var d = window.docx;
     var Document = d.Document, Packer = d.Packer, Paragraph = d.Paragraph, TextRun = d.TextRun, Table = d.Table,
         TableRow = d.TableRow, TableCell = d.TableCell, WidthType = d.WidthType, ShadingType = d.ShadingType,
@@ -670,6 +720,7 @@
       rows: [
         new TableRow({ children: [cell("Full name", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell(fullName, iw[1])] }),
         new TableRow({ children: [cell("Date", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell(dateStr, iw[1])] }),
+        new TableRow({ children: [cell("Written answer", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell(countWords(answer) + " words", iw[1])] }),
         new TableRow({ children: [cell("Result", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell("All 12 answers placed correctly" + (wrong ? " (" + wrong + " wrong " + (wrong === 1 ? "try" : "tries") + ")" : " with no wrong tries"), iw[1])] })
       ]
     }));
@@ -684,6 +735,15 @@
         return new TableRow({ cantSplit: true, children: [cell(String(i + 1), 600, { bold: true, fill: FILL[sec[0]], color: NAVY }), cell(a.text, TOTAL - 600)] });
       });
       children.push(new Table({ width: { size: TOTAL, type: WidthType.DXA }, columnWidths: [600, TOTAL - 600], layout: TableLayoutType.FIXED, rows: rows }));
+    });
+
+    children.push(h1("5. Your own office"));
+    children.push(para("Think about the office where you work. Pick the one asset (a system, data, a device, or a person) you would most want to protect.", { italics: true, color: DIM, after: 60 }));
+    children.push(para("Paragraph 1: Who or what could threaten it, and how could they get in? How likely is it, and how badly would it hurt?", { italics: true, color: DIM, after: 60 }));
+    children.push(para("Paragraph 2: What is the first practical fix you would propose, and who in your office would you need to work with to make it happen?", { italics: true, color: DIM, after: 160 }));
+    String(answer).split(/\r?\n/).forEach(function (line) {
+      var t = cleanText(line);
+      if (t) children.push(new Paragraph({ spacing: { after: 140, line: 300 }, children: [run(t, { size: 22 })] }));
     });
 
     var doc = new Document({
@@ -703,15 +763,17 @@
 
   $("docBtn").addEventListener("click", function () {
     var name = cleanText($("fullName").value);
-    if (placed !== ANSWERS.length || !name || !window.docx) return;
+    var answer = cleanText($("ownAnswer").value);
+    if (placed !== ANSWERS.length || !name || countWords(answer) < MIN_WORDS || !window.docx) return;
     var btn = $("docBtn"), msg = $("docMsg");
     btn.disabled = true; msg.className = "msg"; msg.textContent = "Building your file…";
-    buildDoc(name).then(function (res) {
+    buildDoc(name, $("ownAnswer").value).then(function (res) {
       var url = URL.createObjectURL(res.blob);
       var a = document.createElement("a");
       a.href = url; a.download = res.name;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      downloaded = true;
       refreshDocBtn();
       msg.className = "msg ready"; msg.textContent = "Downloaded " + res.name + ". Send this file to your trainer.";
     }).catch(function (err) {
