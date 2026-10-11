@@ -231,7 +231,7 @@
   }
   .toast.show { opacity: 1; }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+<script src="../vendor/html-docx-js/html-docx.js"></script>
 </head>
 <body>
 
@@ -309,7 +309,7 @@
             { id: "npcNotify", label: "National Privacy Commission (Data Privacy Act)", hint: "", rows: 4,
               default: "Ransomware groups increasingly steal data before encrypting it. If personal or sensitive personal data was likely exfiltrated or exposed, treat this as a reportable Data Privacy Act breach. The DPO assesses straight away whether it is notifiable. Where it is, notify the National Privacy Commission via the DBNMS portal within 72 hours of knowledge or reasonable belief that a notifiable breach occurred. The clock is 72 hours from knowledge of the breach, so start counting when the office first knows or reasonably believes it, not when the investigation ends. Affected people must generally be told within the same 72 hours, unless the NPC approves a postponement or exemption." },
             { id: "dictNotify", label: "DICT / CERT-PH", hint: "", rows: 3,
-              default: "Report to CERT-PH (cert-ph@dict.gov.ph) and the DICT regional office, especially if the affected system qualifies as Critical Information Infrastructure (DICT Memorandum Circular No. 005, s. 2017: report to the national CERT within 24 hours from detection)." },
+              default: "Report to CERT-PH (cert-ph@dict.gov.ph) and the DICT regional office, especially if the affected system qualifies as Critical Information Infrastructure (DICT Memorandum Circular No. 005, s. 2017: report to the national CERT within 24 hours from detection). CERT-PH's own reporting guidelines recommend an even faster report for critical incidents such as ransomware: 12 hours from discovery." },
             { id: "lawEnforcement", label: "Law enforcement referral", hint: "", rows: 3,
               default: "Ransomware usually involves cybercrime offenses under RA 10175, such as illegal access, data interference and system interference. Demanding payment under threat is extortion, which is an offense under the Revised Penal Code. Refer to the PNP Anti-Cybercrime Group or NBI Cybercrime Division, particularly if payment is being considered or the attacker has made direct contact." },
             { id: "publicComms", label: "Public / media statement authorization", hint: "", rows: 4,
