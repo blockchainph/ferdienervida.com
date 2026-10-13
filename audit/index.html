@@ -268,7 +268,7 @@
   /* --- Stage 2: access grid --- */
   .reminder { margin: 0 0 0.9rem; padding: 0.6rem 0.85rem; border-radius: 0.7rem; background: color-mix(in srgb, var(--cyan) 10%, var(--surface)); border: 1px solid var(--cyan); font-weight: 600; }
   table.grid { width: 100%; border-collapse: separate; border-spacing: 4px; table-layout: fixed; }
-  table.grid th.role { width: 19%; }
+  table.grid th.role { width: 26%; }
   table.grid th { font-size: 0.85rem; font-weight: 700; color: var(--ink-dim); text-align: center; padding: 0.3rem 0.2rem; vertical-align: bottom; }
   table.grid th.role { text-align: left; color: var(--ink); font-size: 0.95rem; padding-right: 0.5rem; }
   table.grid td { padding: 0; }
@@ -290,9 +290,37 @@
   .hints li { margin: 0 0 0.25rem; }
   .score-line { margin: 0.8rem 0 0; font-weight: 700; }
 
+  /* --- Stage 2: easy tick boxes --- */
+  .role-card { border: 1px solid var(--border); border-radius: 0.9rem; background: var(--surface-2); padding: 0.7rem 0.8rem 0.8rem; margin: 0 0 0.7rem; }
+  .role-card h4 { margin: 0 0 0.15rem; font-family: 'Fraunces', Georgia, serif; font-size: 1.1rem; font-weight: 600; }
+  .role-card .job { margin: 0 0 0.6rem; font-size: 0.92rem; color: var(--ink-dim); line-height: 1.4; }
+  .ticks { display: flex; flex-direction: column; gap: 0.4rem; }
+  .tick { display: flex; align-items: center; gap: 0.7rem; min-height: 2.75rem; padding: 0.4rem 0.6rem; border: 2px solid transparent; border-radius: 0.6rem; background: var(--surface); cursor: pointer; }
+  .tick input { width: 1.4rem; height: 1.4rem; flex: 0 0 auto; accent-color: var(--navy); cursor: pointer; }
+  .tick span { font-weight: 600; }
+  .tick:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .tick.wrong { border-color: #d12a3a; box-shadow: 0 0 0 3px rgba(209, 42, 58, 0.4); }
+  table.grid th.role .job { display: block; font-weight: 400; font-size: 0.8rem; color: var(--ink-dim); margin-top: 0.15rem; line-height: 1.3; }
+  .linkbtn { font: inherit; font-size: 0.95rem; font-weight: 600; color: var(--ink); background: none; border: 0; border-bottom: 1.5px solid var(--cyan); padding: 0.55rem 0; min-height: 2.75rem; cursor: pointer; }
+  .linkbtn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .switch-row { margin: 0.4rem 0 0.9rem; }
+
+  /* --- Stage 3: pick the fix --- */
+  .pair { border: 1px solid var(--border); border-radius: 0.9rem; background: var(--surface-2); padding: 0.8rem 0.85rem 0.9rem; margin: 0 0 0.8rem; }
+  .pair-title { margin: 0 0 0.3rem; font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 1.1rem; }
+  .pair label.fld { margin: 0.6rem 0 0.35rem; font-size: 0.92rem; }
+  .match { margin: 0.55rem 0 0; font-size: 0.92rem; font-weight: 600; min-height: 1.2rem; }
+  .match.ok { color: color-mix(in srgb, var(--low) 58%, var(--ink)); }
+  .match.no { color: color-mix(in srgb, var(--crit) 62%, var(--ink)); }
+
   /* --- Stage 3 --- */
   label.fld { display: block; font-weight: 600; font-size: 0.98rem; margin: 0 0 0.4rem; }
   .req { color: var(--crit); }
+  select.sel {
+    width: 100%; font: inherit; font-size: 1.0625rem; color: var(--ink); background: var(--surface);
+    border: 1.5px solid var(--border); border-radius: 0.65rem; padding: 0.7rem 0.6rem; min-height: 2.75rem;
+  }
+  select.sel:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
   textarea, input[type="text"] {
     width: 100%; font: inherit; font-size: 1.0625rem; line-height: 1.5; color: var(--ink); background: var(--surface-2);
     border: 1.5px solid var(--border); border-radius: 0.65rem; padding: 0.7rem 0.8rem;
@@ -360,8 +388,8 @@
       <details class="scenario" open>
         <summary>What you will do</summary>
         <p><b>Stage 1.</b> Tap anything on the fake website that looks unsafe.</p>
-        <p><b>Stage 2.</b> Set who can view or change each kind of record.</p>
-        <p><b>Stage 3.</b> Write three short notes, then download your report as a Word file.</p>
+        <p><b>Stage 2.</b> Choose which records each job really needs.</p>
+        <p><b>Stage 3.</b> Pick three weaknesses and their fixes, then download your report as a Word file.</p>
       </details>
     </section>
 
@@ -491,17 +519,20 @@
 
     <!-- ============ STAGE 2 ============ -->
     <section class="card stage" id="stage2" data-locked="true" aria-labelledby="h2s">
-      <div class="stage-head"><h2 id="h2s">Stage 2: Fix the access</h2><span class="time">About 20 minutes</span></div>
+      <div class="stage-head"><h2 id="h2s">Stage 2: Fix the access</h2><span class="time">About 10 minutes</span></div>
       <p class="lock-note">Locked. Submit your findings in Stage 1 to open this stage.</p>
       <div class="stage-body">
-        <p class="help">Right now every role can change every record. That is the unsafe starting point. Tap a box to change it: None, then View, then Edit, then back to None. None means no access. View means look only. Edit means look and change.</p>
+        <p class="help" id="helpEasy">Right now every job can open every record. That is the unsafe starting point. Read what each person does. Then untick the records they do not need.</p>
+        <p class="help" id="helpDetail" hidden>Right now every role can change every record. That is the unsafe starting point. Tap a box to change it: None, then View, then Edit, then back to None. None means no access. View means look only. Edit means look and change.</p>
         <p class="reminder">Give each role only what the job needs.</p>
-        <div class="status" id="status2" role="status" aria-live="polite">Change the boxes, then press Check my settings.</div>
-        <table class="grid" id="grid">
+        <div class="status" id="status2" role="status" aria-live="polite">Untick the records each job does not need, then press Check my settings.</div>
+        <div id="easyGrid"></div>
+        <table class="grid" id="grid" hidden>
           <thead><tr><th scope="col"><span class="sr-only">Role</span></th></tr></thead>
           <tbody></tbody>
         </table>
-        <p class="legend-line">Tap to cycle: None, View, Edit.</p>
+        <p class="legend-line" id="legendLine" hidden>Tap to cycle: None, View, Edit.</p>
+        <p class="switch-row"><button type="button" class="linkbtn" id="toggleS2">Show the detailed version (None, View, Edit)</button></p>
         <div class="row-actions">
           <button type="button" class="btn btn-ghost" id="check2">Check my settings</button>
           <button type="button" class="btn btn-primary" id="submit2" disabled>Submit my settings</button>
@@ -521,23 +552,55 @@
 
     <!-- ============ STAGE 3 ============ -->
     <section class="card stage" id="stage3" data-locked="true" aria-labelledby="h3s">
-      <div class="stage-head"><h2 id="h3s">Stage 3: Report</h2><span class="time">About 15 minutes</span></div>
+      <div class="stage-head"><h2 id="h3s">Stage 3: Report</h2><span class="time">About 10 minutes</span></div>
       <p class="lock-note">Locked. Submit Stages 1 and 2 to open this stage.</p>
       <div class="stage-body">
-        <p class="help">Pick any three weaknesses from the fake website. For each one, say what is wrong and how to fix it. One or two sentences each, in your own words.</p>
-        <p class="careful"><b>Keep it general.</b> No real passwords and no real staff names.</p>
+        <div id="reportPick">
+          <p class="help">Pick three different weaknesses from the fake website. For each one, choose the fix that goes with it. You saw every weakness and its fix in your results from Stage 1.</p>
+          <div class="pair">
+            <p class="pair-title">Weakness 1</p>
+            <label class="fld" for="w_1">What is wrong?</label>
+            <select class="sel" id="w_1" data-pair="1"></select>
+            <label class="fld" for="f_1">What is the fix?</label>
+            <select class="sel" id="f_1" data-pair="1"></select>
+            <p class="match" id="m_1" aria-live="polite"></p>
+          </div>
+          <div class="pair">
+            <p class="pair-title">Weakness 2</p>
+            <label class="fld" for="w_2">What is wrong?</label>
+            <select class="sel" id="w_2" data-pair="2"></select>
+            <label class="fld" for="f_2">What is the fix?</label>
+            <select class="sel" id="f_2" data-pair="2"></select>
+            <p class="match" id="m_2" aria-live="polite"></p>
+          </div>
+          <div class="pair">
+            <p class="pair-title">Weakness 3</p>
+            <label class="fld" for="w_3">What is wrong?</label>
+            <select class="sel" id="w_3" data-pair="3"></select>
+            <label class="fld" for="f_3">What is the fix?</label>
+            <select class="sel" id="f_3" data-pair="3"></select>
+            <p class="match" id="m_3" aria-live="polite"></p>
+          </div>
+        </div>
 
-        <label for="r1" class="fld">Weakness 1 and the fix <span class="req" aria-hidden="true">*</span></label>
-        <textarea id="r1" maxlength="300" data-report></textarea>
-        <p class="count-line"><span><b data-count-for="r1">0</b> of 300 characters</span></p>
+        <div id="reportWrite" hidden>
+          <p class="help">Pick any three weaknesses from the fake website. For each one, say what is wrong and how to fix it. One or two sentences each, in your own words.</p>
+          <p class="careful"><b>Keep it general.</b> No real passwords and no real staff names.</p>
 
-        <label for="r2" class="fld">Weakness 2 and the fix <span class="req" aria-hidden="true">*</span></label>
-        <textarea id="r2" maxlength="300" data-report></textarea>
-        <p class="count-line"><span><b data-count-for="r2">0</b> of 300 characters</span></p>
+          <label for="r1" class="fld">Weakness 1 and the fix <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="r1" maxlength="300" data-report></textarea>
+          <p class="count-line"><span><b data-count-for="r1">0</b> of 300 characters</span></p>
 
-        <label for="r3" class="fld">Weakness 3 and the fix <span class="req" aria-hidden="true">*</span></label>
-        <textarea id="r3" maxlength="300" data-report></textarea>
-        <p class="count-line"><span><b data-count-for="r3">0</b> of 300 characters</span></p>
+          <label for="r2" class="fld">Weakness 2 and the fix <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="r2" maxlength="300" data-report></textarea>
+          <p class="count-line"><span><b data-count-for="r2">0</b> of 300 characters</span></p>
+
+          <label for="r3" class="fld">Weakness 3 and the fix <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="r3" maxlength="300" data-report></textarea>
+          <p class="count-line"><span><b data-count-for="r3">0</b> of 300 characters</span></p>
+        </div>
+
+        <p class="switch-row"><button type="button" class="linkbtn" id="toggleReport">I would rather write my own notes</button></p>
 
         <div class="summary" id="sumBox"></div>
 
@@ -546,7 +609,7 @@
         <div class="row-actions" style="margin-top:0.9rem">
           <button type="button" class="btn btn-primary" id="dlBtn" disabled>Download as Word</button>
         </div>
-        <p class="msg" id="dlMsg" role="status" aria-live="polite">Fill in all three notes and your name to unlock the button.</p>
+        <p class="msg" id="dlMsg" role="status" aria-live="polite">Choose a weakness and a fix for all three, and type your name, to unlock the button.</p>
       </div>
     </section>
 
@@ -624,7 +687,7 @@
   var flags = {};                  // item id -> true
   var s1Done = false, s2Done = false, downloaded = false;
   var found = 0, s1Points = 0;
-  var grid = [], lastChecked = null, checks = 0, changedSince = true, s2Correct = 0, s2Points = 0;
+  var grid = [], s2Correct = 0, s2Points = 0;
   var currentScreen = "home";
 
   // =====================================================================
@@ -705,7 +768,7 @@
     $("submitMsg").textContent = "Findings submitted.";
     say("status1", "You found " + found + " of " + WEAK.length + " weaknesses. Read the results below, then go on to Stage 2.", found === WEAK.length ? "good" : "");
     setLocked("stage2", false);
-    buildGrid();
+    buildStage2();
     updateTop(); updateProgress();
     $("results1").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
   }
@@ -764,18 +827,67 @@
   });
 
   // =====================================================================
-  // STAGE 2: who can see and change what
+  // STAGE 2: who needs access to what (easy tick boxes, or the detailed None / View / Edit grid)
   // =====================================================================
+  var JOBS = [
+    "Enters and fixes citizen records. Looks up the status of permit requests.",
+    "Reviews permit requests and approves or rejects them. Looks up the citizen's details.",
+    "Manages staff pay and leave. Does not work with citizen files.",
+    "Keeps the servers running and the system updated. Checks the audit logs when something goes wrong.",
+    "Checks that the rules are followed. Reads records, payroll and logs, but never changes anything."
+  ];
+  var s2Mode = "easy";                                   // "easy" (tick what the job needs) or "detail" (None, View, Edit)
+  var easy = [];                                         // easy[r][c] is true when the role is given access
+  var tries = { easy: 0, detail: 0 }, changed = { easy: true, detail: true };
+
+  function needs(r, c) { return CORRECT[r][c] > 0; }
+  function cellOk(r, c) { return s2Mode === "easy" ? easy[r][c] === needs(r, c) : grid[r][c] === CORRECT[r][c]; }
+  function countCorrect() {
+    var n = 0;
+    for (var r = 0; r < 5; r++) for (var c = 0; c < 5; c++) if (cellOk(r, c)) n++;
+    return n;
+  }
+
+  function buildEasy() {
+    var host = $("easyGrid"); host.innerHTML = ""; easy = [];
+    ROLES.forEach(function (role, ri) {
+      easy.push([true, true, true, true, true]);          // the unsafe starting point: every job can open everything
+      var card = el("div", "role-card");
+      card.appendChild(el("h4", null, role));
+      card.appendChild(el("p", "job", JOBS[ri]));
+      var ticks = el("div", "ticks");
+      RECS.forEach(function (rec, ci) {
+        var lab = el("label", "tick");
+        var box = el("input"); box.type = "checkbox"; box.checked = true;
+        box.setAttribute("data-r", ri); box.setAttribute("data-c", ci);
+        box.setAttribute("aria-label", role + " needs to open " + rec);
+        lab.appendChild(box); lab.appendChild(el("span", null, rec));
+        ticks.appendChild(lab);
+      });
+      card.appendChild(ticks); host.appendChild(card);
+    });
+    tries.easy = 0; changed.easy = true;
+  }
+  $("easyGrid").addEventListener("change", function (ev) {
+    var b = ev.target;
+    if (!b || b.type !== "checkbox" || s2Done) return;
+    var r = +b.getAttribute("data-r"), c = +b.getAttribute("data-c");
+    easy[r][c] = b.checked;
+    b.closest(".tick").classList.remove("wrong");        // a changed box is not judged again until the next check
+    changed.easy = true;
+    say("status2", ROLES[r] + " " + (b.checked ? "can open " : "can no longer open ") + RECS[c].toLowerCase() + ".");
+  });
+
   function buildGrid() {
     var thead = $("grid").querySelector("thead tr"), tbody = $("grid").querySelector("tbody");
     thead.innerHTML = ""; tbody.innerHTML = "";
     var corner = el("th"); corner.scope = "col"; corner.appendChild(el("span", "sr-only", "Role")); thead.appendChild(corner);
     RECS.forEach(function (r) { var th = el("th", null, r); th.scope = "col"; thead.appendChild(th); });
-    grid = []; lastChecked = null; checks = 0; changedSince = true;
+    grid = [];
     ROLES.forEach(function (role, ri) {
-      grid.push([2, 2, 2, 2, 2]);                      // the unsafe starting point: everyone can edit everything
+      grid.push([2, 2, 2, 2, 2]);                          // the unsafe starting point: everyone can edit everything
       var tr = el("tr");
-      var th = el("th", "role", role); th.scope = "row"; tr.appendChild(th);
+      var th = el("th", "role"); th.scope = "row"; th.appendChild(document.createTextNode(role)); th.appendChild(el("span", "job", JOBS[ri])); tr.appendChild(th);
       RECS.forEach(function (rec, ci) {
         var td = el("td"); td.setAttribute("data-label", rec);
         var b = el("button", "cell"); b.type = "button"; b.setAttribute("data-r", ri); b.setAttribute("data-c", ci);
@@ -784,6 +896,7 @@
       });
       tbody.appendChild(tr);
     });
+    tries.detail = 0; changed.detail = true;
   }
   function paintCell(b) {
     var r = +b.getAttribute("data-r"), c = +b.getAttribute("data-c"), v = grid[r][c];
@@ -795,20 +908,45 @@
     if (!b || s2Done) return;
     var r = +b.getAttribute("data-r"), c = +b.getAttribute("data-c");
     grid[r][c] = (grid[r][c] + 1) % 3;
-    b.classList.remove("wrong");                       // a changed box is no longer judged until the next check
-    paintCell(b); changedSince = true;
+    b.classList.remove("wrong");
+    paintCell(b); changed.detail = true;
     say("status2", ROLES[r] + " on " + RECS[c] + ": " + VAL[grid[r][c]] + ".");
   });
 
-  function countCorrect() {
-    var n = 0;
-    for (var r = 0; r < 5; r++) for (var c = 0; c < 5; c++) if (grid[r][c] === CORRECT[r][c]) n++;
-    return n;
+  function buildStage2() {
+    buildEasy(); buildGrid();
+    s2Mode = "easy"; showS2Mode(true);
+  }
+  function showS2Mode(fresh) {
+    var easyOn = s2Mode === "easy";
+    $("easyGrid").hidden = !easyOn; $("grid").hidden = easyOn; $("legendLine").hidden = easyOn;
+    $("helpEasy").hidden = !easyOn; $("helpDetail").hidden = easyOn;
+    $("toggleS2").textContent = easyOn ? "Show the detailed version (None, View, Edit)" : "Go back to the easy version (tick boxes)";
+    $("hints").hidden = true;
+    say("status2", easyOn ? "Untick the records each job does not need, then press Check my settings." : "Change the boxes, then press Check my settings.");
+    $("submit2").disabled = tries[s2Mode] === 0;
+    $("submit2Msg").textContent = tries[s2Mode] === 0 ? "Check your settings at least once to unlock Submit my settings." : "Ready when you are. Press Submit my settings to lock in your score.";
+  }
+  $("toggleS2").addEventListener("click", function () {
+    if (s2Done) return;
+    s2Mode = s2Mode === "easy" ? "detail" : "easy";
+    showS2Mode();
+    var f = s2Mode === "easy" ? $("easyGrid").querySelector("input") : $("grid").querySelector(".cell");
+    if (f) f.focus({ preventScroll: true });
+  });
+
+  function markWrong(r, c, bad) {
+    if (s2Mode === "easy") $("easyGrid").querySelector('input[data-r="' + r + '"][data-c="' + c + '"]').closest(".tick").classList.toggle("wrong", bad);
+    else $("grid").querySelector('.cell[data-r="' + r + '"][data-c="' + c + '"]').classList.toggle("wrong", bad);
   }
 
-  // A hint is a question. It points at the problem without giving the right value.
+  // A hint is a question. It points at the problem without giving the right answer.
   function hintFor(r, c) {
-    var who = WHO[r], rec = RECS[c].toLowerCase(), cur = grid[r][c], want = CORRECT[r][c];
+    var who = WHO[r], rec = RECS[c].toLowerCase();
+    if (s2Mode === "easy") {
+      return easy[r][c] ? "Does " + who + " need to open " + rec + " to do the job?" : "Can " + who + " do the job without opening " + rec + "?";
+    }
+    var cur = grid[r][c], want = CORRECT[r][c];
     if (want === 0) return "Does " + who + " need to " + (cur === 2 ? "see or change " : "see ") + rec + " to do the job?";
     if (want === 1 && cur === 2) return "Should " + who + " be able to change " + rec + ", or only look?";
     if (want === 1 && cur === 0) return "Can " + who + " do the job without being able to look at " + rec + "?";
@@ -818,16 +956,16 @@
 
   $("check2").addEventListener("click", function () {
     if (s2Done) return;
-    var withHints = checks >= 1;
-    if (checks >= 1 && !changedSince) { say("status2", "Change at least one box first, then check again.", "bad"); return; }
-    checks++; changedSince = false;
+    var m = s2Mode;
+    if (tries[m] >= 1 && !changed[m]) { say("status2", "Change at least one box first, then check again.", "bad"); return; }
+    var withHints = m === "easy" || tries[m] >= 1;       // the easy version gives hints from the very first check
+    tries[m]++; changed[m] = false;
     var wrongCells = [];
-    [].forEach.call(document.querySelectorAll("#grid .cell"), function (b) {
-      var r = +b.getAttribute("data-r"), c = +b.getAttribute("data-c");
-      var bad = grid[r][c] !== CORRECT[r][c];
-      b.classList.toggle("wrong", bad);
+    for (var r = 0; r < 5; r++) for (var c = 0; c < 5; c++) {
+      var bad = !cellOk(r, c);
+      markWrong(r, c, bad);
       if (bad) wrongCells.push([r, c]);
-    });
+    }
     var n = CELLS - wrongCells.length;
     var pts = Math.round(S2_MAX * n / CELLS);
     say("status2", n + " of " + CELLS + " boxes are correct (" + pts + " of " + S2_MAX + " points if you submit now). " + (n === CELLS ? "Every box is right. Press Submit my settings." : "Red boxes are not right yet."), n === CELLS ? "good" : "bad");
@@ -852,12 +990,10 @@
     s2Done = true;
     s2Correct = countCorrect();
     s2Points = Math.round(S2_MAX * s2Correct / CELLS);
-    [].forEach.call(document.querySelectorAll("#grid .cell"), function (b) {
-      var r = +b.getAttribute("data-r"), c = +b.getAttribute("data-c");
-      b.classList.toggle("wrong", grid[r][c] !== CORRECT[r][c]);
-      b.disabled = true;
-    });
-    $("check2").disabled = true; $("submit2").disabled = true;
+    for (var r = 0; r < 5; r++) for (var c = 0; c < 5; c++) markWrong(r, c, !cellOk(r, c));
+    [].forEach.call(document.querySelectorAll("#easyGrid input"), function (b) { b.disabled = true; });
+    [].forEach.call(document.querySelectorAll("#grid .cell"), function (b) { b.disabled = true; });
+    $("check2").disabled = true; $("submit2").disabled = true; $("toggleS2").disabled = true;
     $("submit2Msg").textContent = "Settings submitted.";
     $("hints").hidden = true;
     $("score2").hidden = false;
@@ -895,6 +1031,67 @@
   });
   $("fullName").addEventListener("input", function () { refreshDownload(); updateProgress(); });
 
+  // ---- Stage 3, easy version: pick three weaknesses and the fix for each ----
+  var FIXSHORT = [                                       // same order as WEAK (w1 to w8)
+    "Use https (the padlock)",
+    "Change default passwords and never show them",
+    "Add a second step (MFA)",
+    "Send a one-time reset link and store passwords scrambled",
+    "Check on the server who may see each record",
+    "Allow admin pages only for admin roles",
+    "Show a friendly message and keep the details in a private log",
+    "Update or replace the old software"
+  ];
+  var reportMode = "pick";                               // "pick" (choose from lists) or "write" (own notes)
+  var fixOrder = (function () {                          // shuffled once, so the fix list does not line up with the weakness list
+    var a = WEAK.map(function (w, i) { return i; });
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  })();
+
+  function buildPairs() {
+    [1, 2, 3].forEach(function (n) {
+      var w = $("w_" + n), f = $("f_" + n);
+      w.innerHTML = ""; f.innerHTML = "";
+      var o = el("option", null, "Choose a weakness"); o.value = ""; w.appendChild(o);
+      WEAK.forEach(function (it, i) { var op = el("option", null, it.title); op.value = String(i); w.appendChild(op); });
+      var o2 = el("option", null, "Choose a fix"); o2.value = ""; f.appendChild(o2);
+      fixOrder.forEach(function (i) { var op = el("option", null, FIXSHORT[i]); op.value = String(i); f.appendChild(op); });
+      w.addEventListener("change", pairsChanged); f.addEventListener("change", pairsChanged);
+    });
+  }
+  function pairVals() { return [1, 2, 3].map(function (n) { return { w: $("w_" + n).value, f: $("f_" + n).value }; }); }
+  function pairsDistinct(v) { return v[0].w !== v[1].w && v[0].w !== v[2].w && v[1].w !== v[2].w; }
+  function pickComplete() {
+    var v = pairVals();
+    return v.every(function (p) { return p.w !== "" && p.f !== ""; });
+  }
+  function pickReady() { return pickComplete() && pairsDistinct(pairVals()); }
+  function pairsChanged() {
+    var v = pairVals();
+    v.forEach(function (p, i) {
+      var m = $("m_" + (i + 1)); m.className = "match";
+      if (p.w !== "" && p.f !== "") {
+        var ok = p.w === p.f;
+        m.textContent = ok ? "Good match." : "That fix does not fit this weakness. Look at your Stage 1 results again.";
+        m.className = "match " + (ok ? "ok" : "no");
+      } else m.textContent = "";
+    });
+    refreshDownload(); updateProgress();
+  }
+  function showReportMode() {
+    var pick = reportMode === "pick";
+    $("reportPick").hidden = !pick; $("reportWrite").hidden = pick;
+    $("toggleReport").textContent = pick ? "I would rather write my own notes" : "Go back to the easy choices";
+    refreshDownload(); updateProgress();
+  }
+  $("toggleReport").addEventListener("click", function () {
+    reportMode = reportMode === "pick" ? "write" : "pick";
+    showReportMode();
+    var f = reportMode === "pick" ? $("w_1") : $("r1");
+    if (f) f.focus({ preventScroll: true });
+  });
+
   // Uses the .docx library already bundled for /threatmodel/. It loads once Stage 3 opens and makes
   // no request except for that one local file.
   var DOCX_SRC = "../threatmodel/vendor/docx.iife.js";
@@ -911,14 +1108,17 @@
   }
 
   function reportsFilled() { return ["r1", "r2", "r3"].every(function (id) { return clean($(id).value).length > 0; }); }
+  function reportReady() { return reportMode === "pick" ? pickReady() : reportsFilled(); }
 
   function refreshDownload() {
-    var named = clean($("fullName").value).length > 0, filled = reportsFilled();
+    var named = clean($("fullName").value).length > 0, filled = reportReady();
     var ok = s1Done && s2Done && filled && named && docxState === "ready";
     $("dlBtn").disabled = !ok;
     var m = $("dlMsg"); m.className = "msg";
     if (!s1Done || !s2Done) m.textContent = "Finish Stages 1 and 2 first.";
-    else if (!filled) m.textContent = "Write all three notes to unlock the button.";
+    else if (!filled) m.textContent = reportMode === "pick"
+      ? (pickComplete() ? "Pick a different weakness each time to unlock the button." : "Choose a weakness and a fix for all three to unlock the button.")
+      : "Write all three notes to unlock the button.";
     else if (!named) m.textContent = "Type your full name to unlock the button.";
     else if (docxState === "failed") { m.className = "msg error"; m.textContent = "The Word builder did not load. Refresh the page and try again."; }
     else if (docxState !== "ready") m.textContent = "Getting ready...";
@@ -973,7 +1173,7 @@
         row("Name", fullName),
         row("Date", dateStr),
         row("Weaknesses found", found + " of " + WEAK.length + " (" + s1Points + " points)"),
-        row("Access settings correct", s2Correct + " of " + CELLS + " (" + s2Points + " points)")
+        row("Access settings correct", s2Correct + " of " + CELLS + " (" + s2Points + " points), " + (s2Mode === "easy" ? "easy version (yes or no)" : "detailed version (None, View, Edit)"))
       ]
     }));
 
@@ -994,19 +1194,33 @@
     var hdr = new TableRow({ tableHeader: true, children: [cell("", cw[0], { fill: HEAD_FILL })].concat(RECS.map(function (r, i) { return cell(r, cw[i + 1], { bold: true, fill: HEAD_FILL, color: NAVY, size: 18, align: AlignmentType.CENTER }); })) });
     var rows = [hdr];
     ROLES.forEach(function (role, ri) {
-      rows.push(new TableRow({ cantSplit: true, children: [cell(role, cw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 19 })].concat(RECS.map(function (r, ci) { return cell(VAL[grid[ri][ci]], cw[ci + 1], { align: AlignmentType.CENTER, fill: FILL[grid[ri][ci]], size: 20, bold: true }); })) }));
+      rows.push(new TableRow({ cantSplit: true, children: [cell(role, cw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 19 })].concat(RECS.map(function (r, ci) {
+        var label, fill;
+        if (s2Mode === "easy") { label = easy[ri][ci] ? "Access" : "No access"; fill = easy[ri][ci] ? FILL[1] : FILL[0]; }
+        else { label = VAL[grid[ri][ci]]; fill = FILL[grid[ri][ci]]; }
+        return cell(label, cw[ci + 1], { align: AlignmentType.CENTER, fill: fill, size: 20, bold: true });
+      })) }));
     });
     children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: cw, layout: TableLayoutType.FIXED, rows: rows }));
-    children.push(para("None means no access. View means look only. Edit means look and change.", { italics: true, color: DIM, size: 20, before: 100 }));
+    children.push(para(s2Mode === "easy" ? "Access means the job needs to open it. No access means it does not." : "None means no access. View means look only. Edit means look and change.", { italics: true, color: DIM, size: 20, before: 100 }));
 
     children.push(h1("My report"));
-    [["Weakness 1 and the fix", "r1"], ["Weakness 2 and the fix", "r2"], ["Weakness 3 and the fix", "r3"]].forEach(function (p) {
-      children.push(para(p[0], { bold: true, color: NAVY, size: 24, before: 160, after: 60 }));
-      String($(p[1]).value).split(/\r?\n/).forEach(function (line) {
-        var t = clean(line);
-        if (t) children.push(para(t, { after: 100, line: 300 }));
+    if (reportMode === "pick") {
+      pairVals().forEach(function (p, i) {
+        var ok = p.w === p.f;
+        children.push(para("Weakness " + (i + 1) + ": " + WEAK[+p.w].title, { bold: true, color: NAVY, size: 24, before: 160, after: 40 }));
+        children.push(para([["What is wrong: ", { bold: true }], [WEAK[+p.w].what, {}]], { after: 40, indent: { left: 240 } }));
+        children.push(para([["Fix I chose: ", { bold: true }], [FIXSHORT[+p.f], {}], ["   ", {}], [ok ? " Matches the study sheet " : " Does not match the study sheet ", { bold: true, size: 18, fill: ok ? "BFE5CF" : "F5DC85" }]], { after: 100, indent: { left: 240 } }));
       });
-    });
+    } else {
+      [["Weakness 1 and the fix", "r1"], ["Weakness 2 and the fix", "r2"], ["Weakness 3 and the fix", "r3"]].forEach(function (p) {
+        children.push(para(p[0], { bold: true, color: NAVY, size: 24, before: 160, after: 60 }));
+        String($(p[1]).value).split(/\r?\n/).forEach(function (line) {
+          var t = clean(line);
+          if (t) children.push(para(t, { after: 100, line: 300 }));
+        });
+      });
+    }
 
     children.push(new Paragraph({ spacing: { before: 360, after: 60 }, border: { top: { style: d.BorderStyle.SINGLE, size: 6, color: "9AA3BD", space: 8 } }, children: [
       run("Automatic score: " + autoScore + " of " + AUTO_MAX + ".", { bold: true })
@@ -1033,7 +1247,7 @@
 
   $("dlBtn").addEventListener("click", function () {
     var name = clean($("fullName").value);
-    if (!s1Done || !s2Done || !name || !reportsFilled() || !window.docx) return;
+    if (!s1Done || !s2Done || !name || !reportReady() || !window.docx) return;
     var btn = $("dlBtn"), msg = $("dlMsg");
     btn.disabled = true; msg.className = "msg"; msg.textContent = "Building your file...";
     buildDoc(name).then(function (res) {
@@ -1066,8 +1280,10 @@
   function updateProgress() {
     var n = Object.keys(flags).filter(function (k) { return flags[k]; }).length;
     var p1 = s1Done ? 1 : Math.min(n / WEAK.length, 1) * 0.8;
-    var p2 = s2Done ? 1 : (checks > 0 ? 0.6 : 0);
-    var filled = ["r1", "r2", "r3"].filter(function (id) { return clean($(id).value); }).length + (clean($("fullName").value) ? 1 : 0);
+    var p2 = s2Done ? 1 : ((tries.easy + tries.detail) > 0 ? 0.6 : 0);
+    var filled = (reportMode === "pick"
+      ? pairVals().filter(function (p) { return p.w !== "" && p.f !== ""; }).length
+      : ["r1", "r2", "r3"].filter(function (id) { return clean($(id).value); }).length) + (clean($("fullName").value) ? 1 : 0);
     var p3 = downloaded ? 1 : (s2Done ? (filled / 4) * 0.8 : 0);
     var p = (p1 + p2 + p3) / 3;
     $("fill").style.width = (p * 100) + "%";
@@ -1088,6 +1304,7 @@
 
   // ---------- Start ----------
   setLocked("stage2", true); setLocked("stage3", true);
+  buildPairs(); showReportMode();
   renderFlags(); updateTop(); updateProgress(); refreshDownload();
 
   // Ambient network/circuit canvas background , subtle, theme-aware (same as the other activity pages)
