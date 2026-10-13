@@ -213,14 +213,28 @@
   .reflect .q p { margin: 0 0 0.55rem; }
   .reflect .q p:last-child { margin-bottom: 0; }
   .reflect .careful { margin: 0 0 0.8rem; padding: 0.6rem 0.85rem; border-radius: 0.7rem; background: color-mix(in srgb, var(--med) 14%, var(--surface)); border: 1px solid var(--med); font-size: 0.92rem; line-height: 1.45; }
-  .reflect textarea {
+  .reflect label.fld { display: block; font-weight: 600; font-size: 0.98rem; margin: 0 0 0.4rem; }
+  .reflect .opt-note { font-weight: 400; color: var(--ink-dim); }
+  .reflect .req { color: var(--crit); }
+  .reflect input[type="text"] {
     width: 100%; font: inherit; font-size: 1.0625rem; line-height: 1.5; color: var(--ink); background: var(--surface-2);
-    border: 1.5px solid var(--border); border-radius: 0.65rem; padding: 0.7rem 0.8rem; min-height: 14rem; resize: vertical;
+    border: 1.5px solid var(--border); border-radius: 0.65rem; padding: 0.7rem 0.8rem; margin: 0 0 1.1rem;
   }
-  .reflect textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
-  .wordcount { display: flex; justify-content: space-between; gap: 0.6rem; margin: 0.4rem 0 0; font-size: 0.9rem; color: var(--ink-dim); }
-  .wordcount b { font-family: 'IBM Plex Mono', monospace; color: var(--ink); }
-  .wordcount.ok b, .wordcount.ok { color: var(--low); }
+  .reflect input[type="text"]:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
+  fieldset.opts { border: 0; padding: 0; margin: 0 0 1.1rem; min-width: 0; }
+  fieldset.opts legend { font-weight: 700; font-size: 1.02rem; padding: 0; margin: 0 0 0.15rem; }
+  fieldset.opts .hint { display: block; font-weight: 400; font-size: 0.9rem; color: var(--ink-dim); margin: 0 0 0.5rem; }
+  .opt-list { display: flex; flex-direction: column; gap: 0.45rem; }
+  .opt {
+    display: flex; align-items: center; gap: 0.7rem; min-height: 2.75rem; padding: 0.45rem 0.8rem; cursor: pointer;
+    border: 1.5px solid var(--border); border-radius: 0.75rem; background: var(--surface-2);
+    transition: border-color 0.12s, background-color 0.12s;
+  }
+  .opt:hover { border-color: var(--navy); }
+  .opt input { flex: 0 0 auto; width: 1.35rem; height: 1.35rem; margin: 0; accent-color: var(--navy); cursor: pointer; }
+  .opt span { font-weight: 600; }
+  .opt:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .opt:has(input:checked) { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 14%, var(--surface)); }
 
   /* --- Convert to .docx (win screen) --- */
   .convert { border-top: 1px solid var(--border); padding-top: 1.1rem; margin: 0 0 1.2rem; }
@@ -350,14 +364,39 @@
     <div class="reflect">
       <h3>Your own office</h3>
       <div class="q" id="ownQ">
-        <p><b>Think about the office where you work.</b> Pick the one asset (a system, data, a device, or a person) you would most want to protect.</p>
-        <p><b>Paragraph 1:</b> Who or what could threaten it, and how could they get in? How likely is it, and how badly would it hurt?</p>
-        <p><b>Paragraph 2:</b> What is the first practical fix you would propose, and who in your office would you need to work with to make it happen?</p>
+        <p><b>Pick one important thing in your office</b> (for example, a computer system, a set of records, or a website).</p>
       </div>
-      <p class="careful"><b>Keep it general.</b> Don't include passwords, the real names of staff, or exact weaknesses someone could misuse. Your file will be sent by email.</p>
-      <label for="ownAnswer" class="sr-only">Your written answer</label>
-      <textarea id="ownAnswer" maxlength="3000" placeholder="Write your answer in two short paragraphs…" required aria-describedby="wordCount"></textarea>
-      <p class="wordcount" id="wordCount"><span><b id="wc">0</b> words</span><span id="wcState">Required</span></p>
+      <label for="thing" class="fld">The thing I picked <span class="opt-note">(optional)</span></label>
+      <input type="text" id="thing" maxlength="100" autocomplete="off" placeholder="For example: our permit records">
+
+      <fieldset class="opts" id="harmSet">
+        <legend>1. Who or what could harm it? <span class="hint">Select all that apply.</span></legend>
+        <div class="opt-list">
+          <label class="opt"><input type="checkbox" name="harm" value="Criminals"><span>Criminals</span></label>
+          <label class="opt"><input type="checkbox" name="harm" value="Insiders"><span>Insiders</span></label>
+          <label class="opt"><input type="checkbox" name="harm" value="Hacktivists"><span>Hacktivists</span></label>
+          <label class="opt"><input type="checkbox" name="harm" value="Nation-states"><span>Nation-states</span></label>
+          <label class="opt"><input type="checkbox" name="harm" value="All of the above" id="harmAll"><span>All of the above</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="opts" id="routeSet">
+        <legend>2. How could they get to it? <span class="hint">Select all that apply.</span></legend>
+        <div class="opt-list">
+          <label class="opt"><input type="checkbox" name="route" value="Email"><span>Email</span></label>
+          <label class="opt"><input type="checkbox" name="route" value="Websites"><span>Websites</span></label>
+          <label class="opt"><input type="checkbox" name="route" value="USB sticks"><span>USB sticks</span></label>
+          <label class="opt"><input type="checkbox" name="route" value="Wi-Fi"><span>Wi-Fi</span></label>
+          <label class="opt"><input type="checkbox" name="route" value="Vendors"><span>Vendors</span></label>
+          <label class="opt"><input type="checkbox" name="route" value="Remote access"><span>Remote access</span></label>
+          <label class="opt"><input type="checkbox" name="route" value="Phones"><span>Phones</span></label>
+        </div>
+      </fieldset>
+
+      <label for="helpWho" class="fld">3. Who would you ask for help? <span class="req" aria-hidden="true">*</span></label>
+      <input type="text" id="helpWho" maxlength="200" autocomplete="off" placeholder="Type your answer">
+
+      <p class="careful"><b>Keep it general.</b> Don't include passwords or the real names of staff. Your file will be sent by email.</p>
     </div>
 
     <div class="convert">
@@ -476,7 +515,7 @@
     setArmed(false);
     $("win").hidden = true;
     if ($("fullName")) $("fullName").value = "";
-    if ($("ownAnswer")) { $("ownAnswer").value = ""; refreshWordCount(); }
+    if ($("helpWho")) { $("helpWho").value = ""; $("thing").value = ""; [].forEach.call(document.querySelectorAll('input[name="harm"], input[name="route"]'), function (i) { i.checked = false; }); }
     downloaded = false;
     if ($("docBtn")) refreshDocBtn();
     updateProgress();
@@ -650,42 +689,50 @@
 
   function cleanText(s) { return String(s == null ? "" : s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").trim(); }
 
-  var MIN_WORDS = 1; // no length minimum: any non-empty answer unlocks the button
-  function countWords(t) { var m = cleanText(t).match(/\S+/g); return m ? m.length : 0; }
+  // The own-office questions: pick at least one harm, at least one route, and type who you would ask for help.
+  function ticked(name) { return [].map.call(document.querySelectorAll('input[name="' + name + '"]:checked'), function (i) { return i.value; }); }
+  function ownReady() { return ticked("harm").length > 0 && ticked("route").length > 0 && cleanText($("helpWho").value).length > 0; }
+  function ownStarted() { return ticked("harm").length > 0 || ticked("route").length > 0 || cleanText($("helpWho").value).length > 0 || cleanText($("thing").value).length > 0; }
 
-  function refreshWordCount() {
-    var n = countWords($("ownAnswer").value), ok = n >= MIN_WORDS;
-    $("wc").textContent = n;
-    $("wordCount").className = "wordcount" + (ok ? " ok" : "");
-    $("wcState").textContent = ok ? "Thanks" : "Required";
-  }
+  // "All of the above" ticks the four harm options, and unticking any of them clears it again.
+  var HARM_FOUR = ["Criminals", "Insiders", "Hacktivists", "Nation-states"];
+  $("harmSet").addEventListener("change", function (e) {
+    var t = e.target;
+    if (!t || t.name !== "harm") return;
+    if (t.id === "harmAll") {
+      [].forEach.call(document.querySelectorAll('input[name="harm"]'), function (i) { i.checked = t.checked; });
+    } else {
+      var all = HARM_FOUR.every(function (v) { return document.querySelector('input[name="harm"][value="' + v + '"]').checked; });
+      $("harmAll").checked = all;
+    }
+  });
 
   function refreshDocBtn() {
     var btn = $("docBtn"), msg = $("docMsg");
     var named = cleanText($("fullName").value).length > 0;
-    var words = countWords($("ownAnswer").value);
-    var longEnough = words >= MIN_WORDS;
+    var longEnough = ownReady();
     var allCorrect = placed === ANSWERS.length;
     btn.disabled = !(allCorrect && longEnough && named && docxState === "ready");
     msg.className = "msg";
     if (!allCorrect) msg.textContent = "Place all 12 answers correctly to unlock this.";
-    else if (!longEnough) msg.textContent = "Write your answer about your own office to unlock the button.";
+    else if (!longEnough) msg.textContent = "Answer the three questions about your own office to unlock the button.";
     else if (!named) msg.textContent = "Type your full name to unlock the button.";
     else if (docxState === "failed") { msg.className = "msg error"; msg.textContent = "The Word builder did not load. Refresh the page and try again."; }
     else if (docxState !== "ready") msg.textContent = "Getting ready…";
     else { msg.className = "msg ready"; msg.textContent = "Ready. Your file is made on this device and is not uploaded anywhere."; }
   }
   $("fullName").addEventListener("input", refreshDocBtn);
-  $("ownAnswer").addEventListener("input", function () { refreshWordCount(); refreshDocBtn(); });
+  $("helpWho").addEventListener("input", refreshDocBtn);
+  [].forEach.call(document.querySelectorAll("#harmSet, #routeSet"), function (fs) { fs.addEventListener("change", refreshDocBtn); });
   window.addEventListener("beforeunload", function (e) {
-    if (cleanText($("ownAnswer").value) && !downloaded) { e.preventDefault(); e.returnValue = ""; }
+    if (ownStarted() && !downloaded) { e.preventDefault(); e.returnValue = ""; }
   });
   var downloaded = false;
 
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function slug(s) { return cleanText(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40); }
 
-  function buildDoc(fullName, answer) {
+  function buildDoc(fullName) {
     var d = window.docx;
     var Document = d.Document, Packer = d.Packer, Paragraph = d.Paragraph, TextRun = d.TextRun, Table = d.Table,
         TableRow = d.TableRow, TableCell = d.TableCell, WidthType = d.WidthType, ShadingType = d.ShadingType,
@@ -718,7 +765,7 @@
       rows: [
         new TableRow({ children: [cell("Full name", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell(fullName, iw[1])] }),
         new TableRow({ children: [cell("Date", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell(dateStr, iw[1])] }),
-        new TableRow({ children: [cell("Written answer", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell(countWords(answer) + " words", iw[1])] }),
+        new TableRow({ children: [cell("My office item", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell(cleanText($("thing").value) || "Not named", iw[1])] }),
         new TableRow({ children: [cell("Result", iw[0], { bold: true, fill: HEAD_FILL, color: NAVY, size: 20 }), cell("All 12 answers placed correctly" + (wrong ? " (" + wrong + " wrong " + (wrong === 1 ? "try" : "tries") + ")" : " with no wrong tries"), iw[1])] })
       ]
     }));
@@ -736,14 +783,14 @@
     });
 
     children.push(h1("5. Your own office"));
-    children.push(para("Think about the office where you work. Pick the one asset (a system, data, a device, or a person) you would most want to protect.", { italics: true, color: DIM, after: 60 }));
-    children.push(para("Paragraph 1: Who or what could threaten it, and how could they get in? How likely is it, and how badly would it hurt?", { italics: true, color: DIM, after: 60 }));
-    children.push(para("Paragraph 2: What is the first practical fix you would propose, and who in your office would you need to work with to make it happen?", { italics: true, color: DIM, after: 160 }));
-    String(answer).split(/\r?\n/).forEach(function (line) {
-      var t = cleanText(line);
-      if (t) children.push(new Paragraph({ spacing: { after: 140, line: 300 }, children: [run(t, { size: 22 })] }));
-    });
-
+    children.push(para("Pick one important thing in your office (for example, a computer system, a set of records, or a website).", { italics: true, color: DIM, after: 140 }));
+    var thing = cleanText($("thing").value);
+    if (thing) children.push(new Paragraph({ spacing: { after: 140, line: 300 }, children: [run("The thing I picked: ", { bold: true, color: NAVY }), run(thing)] }));
+    var harm = ticked("harm"), route = ticked("route");
+    var harmText = harm.indexOf("All of the above") >= 0 ? "All of the above (" + HARM_FOUR.join(", ") + ")" : harm.join(", ");
+    children.push(new Paragraph({ spacing: { after: 140, line: 300 }, children: [run("1. Who or what could harm it? ", { bold: true, color: NAVY }), run(harmText)] }));
+    children.push(new Paragraph({ spacing: { after: 140, line: 300 }, children: [run("2. How could they get to it? ", { bold: true, color: NAVY }), run(route.join(", "))] }));
+    children.push(new Paragraph({ spacing: { after: 140, line: 300 }, children: [run("3. Who would you ask for help? ", { bold: true, color: NAVY }), run(cleanText($("helpWho").value))] }));
     var doc = new Document({
       creator: "Threat Model Game", title: "Threat Model",
       styles: {
@@ -761,11 +808,10 @@
 
   $("docBtn").addEventListener("click", function () {
     var name = cleanText($("fullName").value);
-    var answer = cleanText($("ownAnswer").value);
-    if (placed !== ANSWERS.length || !name || countWords(answer) < MIN_WORDS || !window.docx) return;
+    if (placed !== ANSWERS.length || !name || !ownReady() || !window.docx) return;
     var btn = $("docBtn"), msg = $("docMsg");
     btn.disabled = true; msg.className = "msg"; msg.textContent = "Building your file…";
-    buildDoc(name, $("ownAnswer").value).then(function (res) {
+    buildDoc(name).then(function (res) {
       var url = URL.createObjectURL(res.blob);
       var a = document.createElement("a");
       a.href = url; a.download = res.name;
