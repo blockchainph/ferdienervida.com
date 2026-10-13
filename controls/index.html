@@ -254,6 +254,25 @@
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .badge.retry { color: #14172b; } }
   .scorebox { margin: 0 0 0.9rem; padding: 0.7rem 0.9rem; border-radius: 0.7rem; background: color-mix(in srgb, var(--low) 12%, var(--surface)); border: 1px solid var(--low); font-weight: 600; }
 
+  /* --- Stage 2: easy choices --- */
+  fieldset.choices { border: 0; padding: 0; margin: 0 0 1.1rem; min-width: 0; }
+  fieldset.choices legend { font-weight: 700; font-size: 1.02rem; padding: 0; margin: 0 0 0.5rem; }
+  .choice-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .choice {
+    display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.7rem 0.85rem; min-height: 2.75rem; cursor: pointer;
+    border: 1.5px solid var(--border); border-radius: 0.8rem; background: var(--surface-2); line-height: 1.4;
+    transition: border-color 0.12s, background-color 0.12s;
+  }
+  .choice:hover { border-color: var(--navy); }
+  .choice input { flex: 0 0 auto; width: 1.3rem; height: 1.3rem; margin: 0.15rem 0 0; accent-color: var(--navy); cursor: pointer; }
+  .choice:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .choice:has(input:checked) { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 14%, var(--surface)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cyan) 28%, transparent); }
+  .choice b { display: block; font-weight: 600; }
+  .choice small { display: block; margin-top: 0.1rem; font-size: 0.9rem; color: var(--ink-dim); }
+  .linkbtn { font: inherit; font-size: 0.95rem; font-weight: 600; color: var(--ink); background: none; border: 0; border-bottom: 1.5px solid var(--cyan); padding: 0.55rem 0; min-height: 2.75rem; cursor: pointer; }
+  .linkbtn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .switch-row { margin: 0.2rem 0 0.9rem; }
+
   /* --- Stage 2 and 3 fields --- */
   .q { background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--cyan); border-radius: 0.7rem; padding: 0.8rem 0.95rem; margin: 0 0 0.8rem; font-size: 1.02rem; line-height: 1.55; }
   .careful { margin: 0 0 0.8rem; padding: 0.6rem 0.85rem; border-radius: 0.7rem; background: color-mix(in srgb, var(--med) 14%, var(--surface)); border: 1px solid var(--med); font-size: 0.92rem; line-height: 1.45; }
@@ -419,11 +438,30 @@
     <div class="stage-head"><h2 id="h2s">Stage 2: Find the gap</h2><span class="time">About 10 minutes</span></div>
     <p class="lock-note">Locked. Finish Stage 1 to open this stage.</p>
     <div class="stage-body">
-      <p class="q">Even with all twelve controls, one attack is still not stopped. Name it. Then name the one control you would add. Two or three sentences.</p>
+      <div id="gapChoose">
+        <p class="q">All twelve controls are in place, but one kind of problem can still get through. Choose the one that worries you most, then choose one control that would help. There is no trick. Think about the office and its people.</p>
+        <fieldset class="choices">
+          <legend>1. Which problem can still get through?</legend>
+          <div class="choice-list" id="problemList"></div>
+        </fieldset>
+        <fieldset class="choices">
+          <legend>2. Which one control would you add?</legend>
+          <div class="choice-list" id="controlList"></div>
+        </fieldset>
+        <label for="because" class="fld">3. In one sentence, why did you choose that control? <span class="req" aria-hidden="true">*</span></label>
+        <input type="text" id="because" maxlength="200" autocomplete="off" aria-describedby="becauseCount" placeholder="I chose this because...">
+        <p class="count-line" id="becauseCount"><span><b id="becauseNum">0</b> of 200 characters</span><span id="becauseState">Required</span></p>
+      </div>
+
+      <div id="gapWrite" hidden>
+        <p class="q">Even with all twelve controls, one attack is still not stopped. Name it. Then name the one control you would add. Two or three sentences.</p>
+        <label for="gap" class="fld">Your answer <span class="req" aria-hidden="true">*</span></label>
+        <textarea id="gap" maxlength="600" aria-describedby="gapCount" placeholder="Write two or three sentences"></textarea>
+        <p class="count-line" id="gapCount"><span><b id="gapNum">0</b> of 600 characters</span><span id="gapState">Required</span></p>
+      </div>
+
+      <p class="switch-row"><button type="button" class="linkbtn" id="toggleGap">I would rather write my own answer</button></p>
       <p class="careful"><b>Keep it general.</b> No passwords, no real staff names.</p>
-      <label for="gap" class="fld">Your answer <span class="req" aria-hidden="true">*</span></label>
-      <textarea id="gap" maxlength="600" aria-describedby="gapCount" placeholder="Write two or three sentences"></textarea>
-      <p class="count-line" id="gapCount"><span><b id="gapNum">0</b> of 600 characters</span><span id="gapState">Required</span></p>
       <button type="button" class="btn btn-primary" id="toStage3" disabled style="width:100%">Save my answer and continue</button>
     </div>
   </section>
@@ -518,6 +556,7 @@
   var cards = [];                 // { def, el, at, locked, revealed, wrongs, retry }
   var selected = null;            // the selected card object
   var stage1Done = false, gapSaved = false, downloaded = false;
+  var gapMode = "choose";          // "choose" (easy picks) or "write" (own words)
 
   function byEl(el) { for (var i = 0; i < cards.length; i++) if (cards[i].el === el) return cards[i]; return null; }
   function say(msg, kind) { statusEl.textContent = msg; statusEl.className = "status" + (kind ? " " + kind : ""); }
@@ -538,7 +577,8 @@
     });
     selected = null; stage1Done = false; gapSaved = false; downloaded = false;
     $("results").hidden = true; $("resBody").innerHTML = ""; $("resSum").textContent = "";
-    $("gap").value = ""; $("fullName").value = "";
+    $("gap").value = ""; $("because").value = ""; $("fullName").value = "";
+    gapMode = "choose"; buildChoices(); showGapMode();
     setLocked("stage2", true); setLocked("stage3", true);
     refreshGap(); refreshDownload();
     setArmed(false);
@@ -784,7 +824,7 @@
     loadDocx();
     var st = $("stage2");
     st.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
-    setTimeout(function () { $("gap").focus({ preventScroll: true }); }, reduceMotion() ? 0 : 450);
+    setTimeout(function () { var f = gapMode === "choose" ? document.querySelector('input[name="problem"]') : $("gap"); if (f) f.focus({ preventScroll: true }); }, reduceMotion() ? 0 : 450);
   }
 
   function setLocked(id, locked) {
@@ -794,16 +834,74 @@
     if (locked) el.setAttribute("inert", ""); else el.removeAttribute("inert");
   }
 
-  // ---------- Stage 2: find the gap ----------
+  // ---------- Stage 2: find the gap (easy picks, or write your own) ----------
+  var PROBLEMS = [
+    { id: "p1", title: "A person gets tricked", eg: "A fake call or email fools a staff member into sharing a password or approving a payment." },
+    { id: "p2", title: "Paper records go missing", eg: "Citizen files on paper are lost, stolen or seen by the wrong person." },
+    { id: "p3", title: "A trusted person misuses their access", eg: "A staff member who is allowed in copies or sells records." },
+    { id: "p4", title: "A software weakness nobody has fixed", eg: "Attackers use a flaw in a program before the update is installed." },
+    { id: "p5", title: "A lost phone or USB stick", eg: "Work files leave the office on a personal device that is not protected." }
+  ];
+  var ADDONS = [
+    { id: "c1", title: "Staff training on fake emails and calls" },
+    { id: "c2", title: "A second person must approve payments and bank changes" },
+    { id: "c3", title: "Locked cabinets and a shredder for paper records" },
+    { id: "c4", title: "A record of who opened which file, checked regularly" },
+    { id: "c5", title: "Regular software updates" },
+    { id: "c6", title: "Rules and protection for phones and USB sticks" }
+  ];
+
+  function choiceCard(name, item, withExample) {
+    var label = document.createElement("label"); label.className = "choice";
+    var input = document.createElement("input"); input.type = "radio"; input.name = name; input.value = item.id;
+    input.addEventListener("change", function () { refreshGap(); refreshDownload(); });
+    var text = document.createElement("span");
+    var b = document.createElement("b"); b.textContent = item.title; text.appendChild(b);
+    if (withExample) { var sm = document.createElement("small"); sm.textContent = item.eg; text.appendChild(sm); }
+    label.appendChild(input); label.appendChild(text);
+    return label;
+  }
+  function buildChoices() {
+    var pl = $("problemList"), cl = $("controlList");
+    pl.innerHTML = ""; cl.innerHTML = "";
+    PROBLEMS.forEach(function (it) { pl.appendChild(choiceCard("problem", it, true)); });
+    ADDONS.forEach(function (it) { cl.appendChild(choiceCard("control", it, false)); });
+  }
+  function chosen(name, list) {
+    var r = document.querySelector('input[name="' + name + '"]:checked');
+    if (!r) return null;
+    return list.filter(function (x) { return x.id === r.value; })[0] || null;
+  }
+  function gapReady() {
+    if (gapMode === "choose") return !!(chosen("problem", PROBLEMS) && chosen("control", ADDONS) && clean($("because").value));
+    return !!clean($("gap").value);
+  }
+  function gapStarted() {
+    return !!(clean($("gap").value) || clean($("because").value) || chosen("problem", PROBLEMS) || chosen("control", ADDONS));
+  }
+  function showGapMode() {
+    var choose = gapMode === "choose";
+    $("gapChoose").hidden = !choose; $("gapWrite").hidden = choose;
+    $("toggleGap").textContent = choose ? "I would rather write my own answer" : "Use the easier choices instead";
+  }
   function refreshGap() {
-    var t = clean($("gap").value);
+    var t = clean($("gap").value), b = clean($("because").value);
     $("gapNum").textContent = $("gap").value.length;
     $("gapState").textContent = t ? "Thanks" : "Required";
-    $("toStage3").disabled = !t;
+    $("becauseNum").textContent = $("because").value.length;
+    $("becauseState").textContent = b ? "Thanks" : "Required";
+    $("toStage3").disabled = !gapReady();
   }
   $("gap").addEventListener("input", function () { refreshGap(); refreshDownload(); });
+  $("because").addEventListener("input", function () { refreshGap(); refreshDownload(); });
+  $("toggleGap").addEventListener("click", function () {
+    gapMode = gapMode === "choose" ? "write" : "choose";
+    showGapMode(); refreshGap(); refreshDownload();
+    var f = gapMode === "choose" ? document.querySelector('input[name="problem"]') : $("gap");
+    if (f) f.focus({ preventScroll: true });
+  });
   $("toStage3").addEventListener("click", function () {
-    if (!clean($("gap").value)) return;
+    if (!gapReady()) return;
     gapSaved = true;
     setLocked("stage3", false);
     updateProgress(); refreshDownload();
@@ -829,12 +927,12 @@
 
   function refreshDownload() {
     var named = clean($("fullName").value).length > 0;
-    var hasGap = clean($("gap").value).length > 0;
+    var hasGap = gapReady();
     var ok = stage1Done && gapSaved && hasGap && named && docxState === "ready";
     $("dlBtn").disabled = !ok;
     var m = $("dlMsg"); m.className = "msg";
     if (!stage1Done || !gapSaved) m.textContent = "Finish Stages 1 and 2 first.";
-    else if (!hasGap) m.textContent = "Your Stage 2 answer is empty. Go back and write it.";
+    else if (!hasGap) m.textContent = "Your Stage 2 answer is not complete. Go back and finish it.";
     else if (!named) m.textContent = "Type your full name to unlock the button.";
     else if (docxState === "failed") { m.className = "msg error"; m.textContent = "The Word builder did not load. Refresh the page and try again."; }
     else if (docxState !== "ready") m.textContent = "Getting ready...";
@@ -851,7 +949,7 @@
     return w ? w.charAt(0).toUpperCase() + w.slice(1) : "Participant";
   }
 
-  function buildDoc(fullName, gapText) {
+  function buildDoc(fullName) {
     var d = window.docx;
     var Document = d.Document, Packer = d.Packer, Paragraph = d.Paragraph, TextRun = d.TextRun, Table = d.Table,
         TableRow = d.TableRow, TableCell = d.TableCell, WidthType = d.WidthType, ShadingType = d.ShadingType,
@@ -901,11 +999,19 @@
     });
 
     children.push(h1("Find the gap"));
-    children.push(para("Even with all twelve controls, one attack is still not stopped. Name it. Then name the one control you would add.", { italics: true, color: DIM, after: 140 }));
-    String(gapText).split(/\r?\n/).forEach(function (line) {
-      var t = clean(line);
-      if (t) children.push(new Paragraph({ spacing: { after: 140, line: 300 }, children: [run(t)] }));
-    });
+    if (gapMode === "choose") {
+      var prob = chosen("problem", PROBLEMS), ctl = chosen("control", ADDONS);
+      children.push(para("All twelve controls are in place, but one kind of problem can still get through.", { italics: true, color: DIM, after: 140 }));
+      children.push(new Paragraph({ spacing: { after: 100, line: 300 }, children: [run("A problem that can still get through: ", { bold: true, color: NAVY }), run(prob.title + ". " + prob.eg)] }));
+      children.push(new Paragraph({ spacing: { after: 100, line: 300 }, children: [run("One control I would add: ", { bold: true, color: NAVY }), run(ctl.title)] }));
+      children.push(new Paragraph({ spacing: { after: 100, line: 300 }, children: [run("Why: ", { bold: true, color: NAVY }), run(clean($("because").value))] }));
+    } else {
+      children.push(para("Even with all twelve controls, one attack is still not stopped. Name it. Then name the one control you would add.", { italics: true, color: DIM, after: 140 }));
+      String($("gap").value).split(/\r?\n/).forEach(function (line) {
+        var t = clean(line);
+        if (t) children.push(new Paragraph({ spacing: { after: 140, line: 300 }, children: [run(t)] }));
+      });
+    }
 
     var doc = new Document({
       creator: "Module 3 activity", title: "Module 3: Configure an Office",
@@ -926,11 +1032,11 @@
   }
 
   $("dlBtn").addEventListener("click", function () {
-    var name = clean($("fullName").value), gap = $("gap").value;
-    if (!stage1Done || !gapSaved || !name || !clean(gap) || !window.docx) return;
+    var name = clean($("fullName").value);
+    if (!stage1Done || !gapSaved || !name || !gapReady() || !window.docx) return;
     var btn = $("dlBtn"), msg = $("dlMsg");
     btn.disabled = true; msg.className = "msg"; msg.textContent = "Building your file...";
-    buildDoc(name, gap).then(function (res) {
+    buildDoc(name).then(function (res) {
       var url = URL.createObjectURL(res.blob);
       var a = document.createElement("a");
       a.href = url; a.download = res.name;
@@ -952,7 +1058,7 @@
     window.scrollTo({ top: 0 });
   });
   window.addEventListener("beforeunload", function (e) {
-    var started = cards.some(function (c) { return c.at; }) || clean($("gap").value);
+    var started = cards.some(function (c) { return c.at; }) || gapStarted();
     if (started && !downloaded) { e.preventDefault(); e.returnValue = ""; }
   });
 
