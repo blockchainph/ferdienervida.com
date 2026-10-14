@@ -200,6 +200,11 @@
   .field label.flabel {
     display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 7px; color: var(--ink);
   }
+  .default-badge {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700;
+    color: var(--gold); background: rgba(184,134,11,0.12); border-radius: 999px; padding: 3px 10px;
+    margin-left: 8px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
   .field .fhint { font-size: 12.5px; color: var(--ink-soft); margin: -3px 0 8px; }
   input[type="text"], textarea, select {
     width: 100%;
@@ -337,6 +342,27 @@
     ];
   }
 
+  // Suggested defaults for Sections 4, 5 and 7. They pre-fill the fields and are flagged in the draft until edited.
+  var DEFAULTS = {
+      "detectionSources": "Incidents may be detected through: alerts from antivirus, endpoint protection, firewall, or email security tools; unusual entries in system or server logs; reports from staff or the public (suspicious emails, locked files, unusual account activity, missing devices); notices from vendors, DICT/CERT-PH, or other agencies; and complaints about service outages or incorrect records.",
+      "reportingChannel": "Any staff member who suspects an incident reports it immediately to their immediate supervisor and the ICT office through [insert hotline, email, or messaging channel]. Do not wait to confirm the incident, and do not delete files, restart devices, or attempt fixes unless instructed. After hours, report to [insert after-hours contact]. The ICT office logs each report with the date, time, reporter, and a brief description, and notifies the Technical / IT Lead right away.",
+      "activationCriteria": "The IR team is activated when any of the following is true: personal or sensitive personal data is confirmed or suspected to be involved; the incident rates High or Critical under the Section 2 severity table; a critical service or system is down and cannot be restored within its target response time; malware, ransomware, or unauthorized access is confirmed on any system; or the Technical / IT Lead or the Data Protection Officer requests activation. When in doubt, activate. Standing down costs less than a late response.",
+      "escalationChain": "Staff member reports to the immediate supervisor and the ICT office. The ICT office notifies the Technical / IT Lead. The Technical / IT Lead notifies the IR Team Lead. The IR Team Lead notifies the Executive / Incident Authority. The Data Protection Officer is notified at the same time whenever personal data may be involved. If a role holder cannot be reached within 30 minutes, escalate to the next role in the chain.",
+      "npcChainDesc": "The Data Protection Officer is notified as soon as personal or sensitive personal data may be involved. The DPO and the IR Team Lead assess whether the breach is notifiable, and the Executive / Incident Authority approves the decision. The DPO submits the notification to the National Privacy Commission through its designated notification channel within 72 hours of knowledge or reasonable belief of a notifiable breach, and arranges notice to affected individuals within the same period unless the NPC approves a postponement or exemption. The IR Team Lead records the time the office first knew or reasonably believed a breach occurred, because the 72-hour clock starts then.",
+      "dictContact": "The Technical / IT Lead, through the DICT / CERT-PH Liaison, reports significant incidents to CERT-PH and the DICT regional office, and requests technical assistance when internal capacity is not enough. If the organization is or may be a Critical Information Infrastructure operator, report as required by applicable DICT issuances. Confirm current reporting channels and timelines with DICT and record them in the Appendices.",
+      "lawEnforcementCriteria": "Refer to the PNP Anti-Cybercrime Group or the NBI Cybercrime Division when an incident involves suspected criminal activity such as unauthorized access, data theft, extortion or ransom demands, fraud, or threats against staff or the public. Referral is authorized by the Executive / Incident Authority on the advice of Legal / Compliance. Preserve evidence before contact (see Section 8).",
+      "internalComms": "The Communications / PIO issues short, factual staff advisories approved by the IR Team Lead, stating what is affected, what staff should do or avoid, and where to send questions. Staff must not discuss the incident on social media or personal messaging groups. Send an update whenever the situation changes materially.",
+      "execBriefing": "Brief the Executive / Incident Authority at activation, then at least every 4 hours for High or Critical incidents until containment, then daily until closure, and once more at closure with a short summary.",
+      "publicComms": "Only the Executive / Incident Authority or the designated Communications / PIO speaks publicly. Statements are cleared by the Executive / Incident Authority and Legal / Compliance before release, and do not confirm technical details, ransom amounts, or attacker identity while the incident is active or under law enforcement review."
+  };
+  var DEFAULT_IDS = Object.keys(DEFAULTS);
+  var FIELD_META = {"detectionSources": [4, "detection sources"], "reportingChannel": [4, "reporting channel"], "activationCriteria": [5, "activation criteria"], "escalationChain": [5, "escalation chain"], "npcChainDesc": [7, "NPC breach-notification chain"], "dictContact": [7, "DICT / CERT-PH coordination"], "lawEnforcementCriteria": [7, "law enforcement referral criteria"], "internalComms": [7, "internal staff communication"], "execBriefing": [7, "executive briefing cadence"], "publicComms": [7, "public / media statement authorization"]};   // [section number, field name]
+  var DEFAULT_NOTE = "(Suggested default, not yet reviewed by the organization.)";
+  function sameText(a, b) { return String(a || "").replace(/\r\n/g, "\n").trim() === String(b || "").replace(/\r\n/g, "\n").trim(); }
+  function isDefault(id) { return DEFAULTS.hasOwnProperty(id) && sameText(state[id], DEFAULTS[id]); }
+  function hasPlaceholder(id) { return /\[insert/i.test(state[id] || ""); }
+  function localDate() { var t = new Date(); return t.getFullYear() + "-" + ("0" + (t.getMonth() + 1)).slice(-2) + "-" + ("0" + t.getDate()).slice(-2); }
+
   function defaultState() {
     var roles = {};
     ROLE_DEFS.forEach(function (r) { roles[r.id] = { name: "", contact: "", unassigned: false }; });
@@ -350,12 +376,12 @@
       roles: roles,
       severityTouched: false,
       severity: defaultSeverity(),
-      detectionSources: "", reportingChannel: "",
-      activationCriteria: "", escalationChain: "",
+      detectionSources: DEFAULTS.detectionSources, reportingChannel: DEFAULTS.reportingChannel,
+      activationCriteria: DEFAULTS.activationCriteria, escalationChain: DEFAULTS.escalationChain,
       playbooks: playbooks,
       containmentGeneral: "",
-      npcChainDesc: "", dictContact: "", lawEnforcementCriteria: "",
-      internalComms: "", execBriefing: "", publicComms: "",
+      npcChainDesc: DEFAULTS.npcChainDesc, dictContact: DEFAULTS.dictContact, lawEnforcementCriteria: DEFAULTS.lawEnforcementCriteria,
+      internalComms: DEFAULTS.internalComms, execBriefing: DEFAULTS.execBriefing, publicComms: DEFAULTS.publicComms,
       evidencePreserve: "", evidenceCustodian: "", evidenceLogging: "",
       reviewTimeline: "", reviewAttendees: "",
       reviewCycle: "", drillSchedule: "", versionControl: "",
@@ -404,8 +430,8 @@
       help: "", render: renderReview, isComplete: function () { return true; } }
   ];
 
-  function field(labelText, hint, inputHtml) {
-    return '<div class="field"><label class="flabel">' + labelText + '</label>' +
+  function field(labelText, hint, inputHtml, hasDefault) {
+    return '<div class="field"><label class="flabel">' + labelText + (hasDefault ? '<span class="default-badge">Suggested default, edit freely</span>' : '') + '</label>' +
       (hint ? '<div class="fhint">' + hint + '</div>' : '') + inputHtml + '</div>';
   }
 
@@ -526,13 +552,13 @@
   }
 
   function renderDetection() {
-    return field("Detection sources", "Alert sources, monitoring, staff reports — how an incident actually gets noticed.", textArea("detectionSources", state.detectionSources, "", 4)) +
-      field("Reporting channel", "How staff report a suspected incident, and who receives the first report.", textArea("reportingChannel", state.reportingChannel, "", 4));
+    return field("Detection sources", "Alert sources, monitoring, staff reports — how an incident actually gets noticed.", textArea("detectionSources", state.detectionSources, "", 4), true) +
+      field("Reporting channel", "How staff report a suspected incident, and who receives the first report.", textArea("reportingChannel", state.reportingChannel, "", 4), true);
   }
 
   function renderActivation() {
-    return field("Activation criteria", "What triggers formal IR team activation.", textArea("activationCriteria", state.activationCriteria, "", 4)) +
-      field("Escalation chain", "The full order — who is notified first, second, third.", textArea("escalationChain", state.escalationChain, "", 4));
+    return field("Activation criteria", "What triggers formal IR team activation.", textArea("activationCriteria", state.activationCriteria, "", 4), true) +
+      field("Escalation chain", "The full order — who is notified first, second, third.", textArea("escalationChain", state.escalationChain, "", 4), true);
   }
 
   function renderPlaybooks() {
@@ -550,12 +576,12 @@
 
   function renderRegulatory() {
     return '<div class="fhint" style="margin-bottom:14px;">If personal or sensitive personal data is confirmed or suspected involved, your DPO determines notifiability. Where the breach is notifiable, the National Privacy Commission must be notified via the DBNMS portal within 72 hours of knowledge or reasonable belief that a notifiable breach occurred. The clock is 72 hours from knowledge of the breach, so start counting when the office first knows or reasonably believes it, not when the investigation ends. Affected people must generally be told within the same 72 hours, unless the NPC approves a postponement or exemption.</div>' +
-      field("NPC breach-notification chain", "Describe the decision chain: who assesses, who decides, who submits, and how the 72 hours from knowledge of the breach is tracked.", textArea("npcChainDesc", state.npcChainDesc, "", 4)) +
-      field("DICT / CERT-PH coordination", "Contact and criteria for engaging DICT's regional office or CERT-PH.", textArea("dictContact", state.dictContact, "", 3)) +
-      field("Law enforcement referral criteria", "When PNP Anti-Cybercrime Group or NBI Cybercrime Division get engaged.", textArea("lawEnforcementCriteria", state.lawEnforcementCriteria, "", 3)) +
-      field("Internal staff communication", "", textArea("internalComms", state.internalComms, "", 3)) +
-      field("Executive briefing cadence", "", textArea("execBriefing", state.execBriefing, "", 3)) +
-      field("Public / media statement authorization", "Who is authorized to speak, and who signs off first.", textArea("publicComms", state.publicComms, "", 3));
+      field("NPC breach-notification chain", "Describe the decision chain: who assesses, who decides, who submits, and how the 72 hours from knowledge of the breach is tracked.", textArea("npcChainDesc", state.npcChainDesc, "", 4), true) +
+      field("DICT / CERT-PH coordination", "Contact and criteria for engaging DICT's regional office or CERT-PH.", textArea("dictContact", state.dictContact, "", 3), true) +
+      field("Law enforcement referral criteria", "When PNP Anti-Cybercrime Group or NBI Cybercrime Division get engaged.", textArea("lawEnforcementCriteria", state.lawEnforcementCriteria, "", 3), true) +
+      field("Internal staff communication", "", textArea("internalComms", state.internalComms, "", 3), true) +
+      field("Executive briefing cadence", "", textArea("execBriefing", state.execBriefing, "", 3), true) +
+      field("Public / media statement authorization", "Who is authorized to speak, and who signs off first.", textArea("publicComms", state.publicComms, "", 3), true);
   }
 
   function renderEvidence() {
@@ -596,11 +622,19 @@
     checks.push({ label: "Section 2: Severity table reviewed for this organization", ok: state.severityTouched });
     checks.push({ label: "Section 7: NPC 72-hour notification chain described", ok: !!state.npcChainDesc });
     checks.push({ label: "Section 8: Evidence custodian named", ok: !!state.evidenceCustodian });
+    if (DEFAULT_IDS.some(isDefault)) checks.push({ label: "Sections 4, 5, 7: suggested defaults not yet reviewed", ok: false, plain: true });
+    DEFAULT_IDS.forEach(function (id) {
+      if (!hasPlaceholder(id)) return;
+      var m = FIELD_META[id];
+      checks.push({ label: id === "reportingChannel" ? "Section 4: reporting channel contact not filled in" : "Section " + m[0] + ": " + m[1] + " still contains [insert ...] text", ok: false, plain: true });
+    });
     return checks;
   }
 
   // ---------- Document generation ----------
 
+  function gapD(id) { return gap(state[id]) + (isDefault(id) ? "  \n" + DEFAULT_NOTE : ""); }
+  function gapHtmlD(id) { return gapHtml(state[id]) + (isDefault(id) ? "<br><em>" + DEFAULT_NOTE + "</em>" : ""); }
   function gap(v) { return v ? escapeHtml(v) : "**[UNRESOLVED — see Completeness Gate]**"; }
   function gapHtml(v) { return v ? escapeHtml(v) : "<strong>[UNRESOLVED — see Completeness Gate]</strong>"; }
 
@@ -628,7 +662,7 @@
     lines.push("");
     lines.push("**Organization:** " + gap(state.orgName));
     lines.push("**Classification:** " + gap(state.orgType));
-    lines.push("**Generated:** " + new Date().toISOString().slice(0, 10) + " via CIRP Intake Wizard");
+    lines.push("**Generated:** " + localDate() + " via CIRP Intake Wizard");
     lines.push("");
 
     if (failing.length) {
@@ -671,16 +705,16 @@
 
     lines.push("## 4. Detection & Reporting Procedures");
     lines.push("");
-    lines.push("**Detection sources:** " + gap(state.detectionSources));
+    lines.push("**Detection sources:** " + gapD("detectionSources"));
     lines.push("");
-    lines.push("**Reporting channel:** " + gap(state.reportingChannel));
+    lines.push("**Reporting channel:** " + gapD("reportingChannel"));
     lines.push("");
 
     lines.push("## 5. Activation Criteria & Escalation");
     lines.push("");
-    lines.push("**Activation criteria:** " + gap(state.activationCriteria));
+    lines.push("**Activation criteria:** " + gapD("activationCriteria"));
     lines.push("");
-    lines.push("**Escalation chain:** " + gap(state.escalationChain));
+    lines.push("**Escalation chain:** " + gapD("escalationChain"));
     lines.push("");
 
     lines.push("## 6. Containment / Eradication / Recovery");
@@ -702,17 +736,17 @@
 
     lines.push("## 7. Communications Plan");
     lines.push("");
-    lines.push("**NPC Circular 16-03 breach-notification chain:** " + gap(state.npcChainDesc));
+    lines.push("**NPC Circular 16-03 breach-notification chain:** " + gapD("npcChainDesc"));
     lines.push("");
-    lines.push("**DICT / CERT-PH coordination:** " + gap(state.dictContact));
+    lines.push("**DICT / CERT-PH coordination:** " + gapD("dictContact"));
     lines.push("");
-    lines.push("**Law enforcement referral criteria:** " + gap(state.lawEnforcementCriteria));
+    lines.push("**Law enforcement referral criteria:** " + gapD("lawEnforcementCriteria"));
     lines.push("");
-    lines.push("**Internal staff communication:** " + gap(state.internalComms));
+    lines.push("**Internal staff communication:** " + gapD("internalComms"));
     lines.push("");
-    lines.push("**Executive briefing cadence:** " + gap(state.execBriefing));
+    lines.push("**Executive briefing cadence:** " + gapD("execBriefing"));
     lines.push("");
-    lines.push("**Public / media statement authorization:** " + gap(state.publicComms));
+    lines.push("**Public / media statement authorization:** " + gapD("publicComms"));
     lines.push("");
 
     lines.push("## 8. Evidence Handling & Chain of Custody");
@@ -766,7 +800,7 @@
     h.push("<h1>Computer Incident Response Plan</h1>");
     h.push("<p><strong>Organization:</strong> " + gapHtml(state.orgName) + "</p>");
     h.push("<p><strong>Classification:</strong> " + gapHtml(state.orgType) + "</p>");
-    h.push("<p><strong>Generated:</strong> " + new Date().toISOString().slice(0, 10) + " via CIRP Intake Wizard</p>");
+    h.push("<p><strong>Generated:</strong> " + localDate() + " via CIRP Intake Wizard</p>");
 
     if (failing.length) {
       h.push("<h2>Completeness Gate — Unresolved Items</h2>");
@@ -798,12 +832,12 @@
     h.push("</ul>");
 
     h.push("<h2>4. Detection &amp; Reporting Procedures</h2>");
-    h.push("<p><strong>Detection sources:</strong> " + gapHtml(state.detectionSources) + "</p>");
-    h.push("<p><strong>Reporting channel:</strong> " + gapHtml(state.reportingChannel) + "</p>");
+    h.push("<p><strong>Detection sources:</strong> " + gapHtmlD("detectionSources") + "</p>");
+    h.push("<p><strong>Reporting channel:</strong> " + gapHtmlD("reportingChannel") + "</p>");
 
     h.push("<h2>5. Activation Criteria &amp; Escalation</h2>");
-    h.push("<p><strong>Activation criteria:</strong> " + gapHtml(state.activationCriteria) + "</p>");
-    h.push("<p><strong>Escalation chain:</strong> " + gapHtml(state.escalationChain) + "</p>");
+    h.push("<p><strong>Activation criteria:</strong> " + gapHtmlD("activationCriteria") + "</p>");
+    h.push("<p><strong>Escalation chain:</strong> " + gapHtmlD("escalationChain") + "</p>");
 
     h.push("<h2>6. Containment / Eradication / Recovery</h2>");
     h.push("<p><strong>General procedure:</strong> " + gapHtml(state.containmentGeneral) + "</p>");
@@ -819,12 +853,12 @@
     if (!anyPlaybookHtml) { h.push("<p><em>No incident-specific playbook annexes selected.</em></p>"); }
 
     h.push("<h2>7. Communications Plan</h2>");
-    h.push("<p><strong>NPC Circular 16-03 breach-notification chain:</strong> " + gapHtml(state.npcChainDesc) + "</p>");
-    h.push("<p><strong>DICT / CERT-PH coordination:</strong> " + gapHtml(state.dictContact) + "</p>");
-    h.push("<p><strong>Law enforcement referral criteria:</strong> " + gapHtml(state.lawEnforcementCriteria) + "</p>");
-    h.push("<p><strong>Internal staff communication:</strong> " + gapHtml(state.internalComms) + "</p>");
-    h.push("<p><strong>Executive briefing cadence:</strong> " + gapHtml(state.execBriefing) + "</p>");
-    h.push("<p><strong>Public / media statement authorization:</strong> " + gapHtml(state.publicComms) + "</p>");
+    h.push("<p><strong>NPC Circular 16-03 breach-notification chain:</strong> " + gapHtmlD("npcChainDesc") + "</p>");
+    h.push("<p><strong>DICT / CERT-PH coordination:</strong> " + gapHtmlD("dictContact") + "</p>");
+    h.push("<p><strong>Law enforcement referral criteria:</strong> " + gapHtmlD("lawEnforcementCriteria") + "</p>");
+    h.push("<p><strong>Internal staff communication:</strong> " + gapHtmlD("internalComms") + "</p>");
+    h.push("<p><strong>Executive briefing cadence:</strong> " + gapHtmlD("execBriefing") + "</p>");
+    h.push("<p><strong>Public / media statement authorization:</strong> " + gapHtmlD("publicComms") + "</p>");
 
     h.push("<h2>8. Evidence Handling &amp; Chain of Custody</h2>");
     h.push("<p><strong>What must be preserved:</strong> " + gapHtml(state.evidencePreserve) + "</p>");
@@ -868,7 +902,7 @@
       : '<span style="color:var(--gate-bad-fg);">' + failing.length + ' item(s) still need attention.</span>') + '</div>';
     html += '<ul class="gate-list">';
     checks.forEach(function (c) {
-      html += '<li class="gate-item ' + (c.ok ? "ok" : "bad") + '"><span class="dot"></span>' + c.label + (c.ok ? "" : " — not yet provided") + '</li>';
+      html += '<li class="gate-item ' + (c.ok ? "ok" : "bad") + '"><span class="dot"></span>' + c.label + (c.ok || c.plain ? "" : " — not yet provided") + '</li>';
     });
     html += '</ul>';
 
