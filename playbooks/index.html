@@ -145,7 +145,6 @@
     line-height: 1.5;
   }
 
-  .quick-card-box { margin: 6px 0 22px; padding: 14px 16px; border: 1.5px solid var(--line); border-left: 4px solid var(--gold); border-radius: 10px; background: var(--panel); }
 
   /* ---------- Main ---------- */
   .main { padding: 48px 56px 80px; max-width: 780px; }
@@ -233,7 +232,6 @@
   }
   .toast.show { opacity: 1; }
 </style>
-<script src="../vendor/html-docx-js/html-docx.js"></script>
 </head>
 <body>
 
@@ -738,12 +736,11 @@
     html += '<div class="fhint" style="margin-bottom:6px;">Every operational section already has a suggested default, so you can generate a usable draft right now and refine it later. Fix organization identity above if needed, then come back here.</div>';
 
     html += '<div style="display:flex; gap:10px; margin: 18px 0 8px; flex-wrap:wrap;">';
-    html += '<button class="btn-gold" id="btn-download-docx">Download draft (.docx)</button>';
+    html += '<button class="btn-gold" id="btn-download-docx">Download playbook with quick card (.docx)</button>';
     html += '<button class="btn-ghost" id="btn-download">Download draft (.md)</button>';
     html += '<button class="btn-ghost" id="btn-copy">Copy to clipboard</button>';
     html += '</div>';
-    html += '<div class="quick-card-box"><button class="btn-gold" id="btn-card">Download quick card (.docx)</button>' +
-      '<p class="fhint" style="margin:8px 0 0;">One page to print and keep at the desk: the first actions, who to call, and the deadlines. Write the phone numbers in by hand, so no names or numbers need to be typed here.</p></div>';
+    html += '<p class="fhint" style="margin:0 0 18px;">The Word file starts with a one-page quick card to print and keep at the desk (write the phone numbers in by hand), followed by the full playbook.</p>';
 
     html += '<div class="preview-pane"><pre id="doc-preview"></pre></div>';
     return html;
@@ -757,7 +754,6 @@
       document.getElementById("btn-download").addEventListener("click", onDownload);
       document.getElementById("btn-download-docx").addEventListener("click", onDownloadDocx);
       document.getElementById("btn-copy").addEventListener("click", onCopy);
-      document.getElementById("btn-card").addEventListener("click", onDownloadCard);
       return;
     }
     step.section.fields.forEach(function (f) {
@@ -785,23 +781,6 @@
       showToast("Draft downloaded.");
     } catch (e) {
       showToast("Couldn't download — use Copy to clipboard instead.");
-    }
-  }
-
-  function onDownloadDocx() {
-    var orgSlug = (state.orgName || "org").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-    var filename = slug() + "-playbook-" + orgSlug + ".docx";
-    try {
-      var html = generateDocumentHtml();
-      var blob = window.htmlDocx.asBlob(html);
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement("a");
-      a.href = url; a.download = filename;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-      showToast("Draft downloaded.");
-    } catch (e) {
-      showToast("Couldn't generate .docx — try Download draft (.md) instead.");
     }
   }
 
@@ -848,7 +827,11 @@
     var W = 10800, HALF = 5400;
     var INK = "141414", GREY = "5A5A55", YELLOW = "FFD60A", PALE = "FFF4B8", RED = "C8102E", PAPER = "EFEEE8";
     var F_BODY = "Tahoma", F_HEAD = "Arial Black", F_MONO = "Courier New";
-    function r(t, o) { o = o || {}; return new TextRun({ text: String(t).replace(/'/g, "\u2019"), bold: o.bold, italics: o.italics, color: o.color || INK, size: o.size || 18, font: o.font || F_BODY, characterSpacing: o.spacing }); }
+    // Typographic quotes, so Word and other viewers never show &apos; or &quot; as literal text.
+    function typo(t) {
+      return String(t).replace(/(^|[\s(\[])"/g, "$1\u201C").replace(/"/g, "\u201D").replace(/'/g, "\u2019");
+    }
+    function r(t, o) { o = o || {}; return new TextRun({ text: typo(t), bold: o.bold, italics: o.italics, color: o.color || INK, size: o.size || 18, font: o.font || F_BODY, characterSpacing: o.spacing }); }
     function para(runs, o) {
       o = o || {};
       return new Paragraph({ spacing: { after: o.after == null ? 50 : o.after, before: o.before || 0 }, indent: o.indent, border: o.border, shading: o.shading, alignment: o.align, children: Array.isArray(runs) ? runs : [runs] });
@@ -932,30 +915,60 @@
 
     children.push(para(r("Printed from the Incident Playbook Creator. This is a draft and has not been legally reviewed. Your Data Protection Officer, legal or compliance office, and ICT head should review it before use. Keep it with the full playbook.", { size: 14, color: GREY }), { before: 140, after: 0 }));
 
+    // Section 2: the full playbook, in the same native format so it opens the same way everywhere.
+    var pb = [];
+    function plain(v, o) { return v ? r(v, o) : r("[UNRESOLVED]", { bold: true, size: (o && o.size) || 19 }); }
+    pb.push(para(r(type.docTitle, { font: F_HEAD, size: 32 }), { after: 140 }));
+    pb.push(para([r("Organization: ", { bold: true, size: 20 }), plain(state.orgName, { size: 20 })], { after: 20 }));
+    pb.push(para([r("Approving authority: ", { bold: true, size: 20 }), plain(state.approvingAuthority, { size: 20 })], { after: 20 }));
+    pb.push(para([r("Generated: ", { bold: true, size: 20 }), r(localDate() + " via Incident Playbook Creator", { size: 20 })], { after: 120 }));
+    var failing = completenessChecks().filter(function (c) { return !c.ok; });
+    if (failing.length) {
+      pb.push(para(r("Unresolved Items", { font: F_HEAD, size: 24 }), { before: 160, after: 60 }));
+      failing.forEach(function (c) { pb.push(para(r("\u2022  " + c.label, { size: 19 }), { indent: { left: 360, hanging: 260 }, after: 30 })); });
+    }
+    type.sections.forEach(function (sec, i) {
+      pb.push(para(r((i + 1) + ". " + sec.title, { font: F_HEAD, size: 24 }), { before: 260, after: 80,
+        border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "C9C8C0", space: 2 } } }));
+      sec.fields.forEach(function (f) {
+        if (f.id === "orgName" || f.id === "approvingAuthority") return;
+        pb.push(para(r(f.label + ":", { bold: true, size: 19 }), { before: 80, after: 30 }));
+        var v = String(state[f.id] || "");
+        if (!v.trim()) { pb.push(para(plain("", { size: 19 }), { after: 40 })); return; }
+        v.split(/\r?\n/).forEach(function (line) { if (line.trim()) pb.push(para(r(line, { size: 19 }), { after: 40 })); });
+      });
+    });
+    pb.push(para(r("This draft was AI-assisted and has not been legally reviewed. It must be reviewed and formally adopted by the organization's Data Protection Officer, legal/compliance office, and IT/ICT authority before use, and should be read alongside the organization's full Computer Incident Response Plan. " + type.footer, { italics: true, size: 17, color: GREY }),
+      { before: 240, after: 0, border: { top: { style: BorderStyle.SINGLE, size: 6, color: "C9C8C0", space: 6 } } }));
+
     var doc = new Document({
-      creator: "Incident Playbook Creator", title: card.title + " quick card",
+      creator: "Incident Playbook Creator", title: type.docTitle,
       styles: { default: { document: { run: { font: F_BODY, size: 18, color: INK } } } },
-      sections: [{ properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 720, right: 720, bottom: 720, left: 720 } } }, children: children }]
+      sections: [
+        { properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 720, right: 720, bottom: 720, left: 720 } } }, children: children },
+        { properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1080, right: 1080, bottom: 1080, left: 1080 } } }, children: pb }
+      ]
     });
     return Packer.toBlob(doc);
   }
 
-  function onDownloadCard() {
+  function onDownloadDocx() {
     var orgSlug = (state.orgName || "org").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-    var filename = slug() + "-quick-card-" + orgSlug + ".docx";
-    showToast("Preparing the quick card...");
+    var filename = slug() + "-playbook-" + orgSlug + ".docx";
+    showToast("Preparing your playbook...");
     ensureDocx().then(buildCardDoc).then(function (blob) {
       var url = URL.createObjectURL(blob);
       var a = document.createElement("a");
       a.href = url; a.download = filename;
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-      showToast("Quick card downloaded.");
+      showToast("Playbook downloaded.");
     }).catch(function (err) {
       if (window.console) console.error(err);
-      showToast("Couldn't generate the quick card. Please try again.");
+      showToast("Couldn't generate the .docx. Try Download draft (.md) instead.");
     });
   }
+
 
   function onCopy() {
     var doc = generateDocument();
