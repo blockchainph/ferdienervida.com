@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CIRP Intake Wizard</title>
+<title>CIRP Intake Wizard: Computer Incident Response Plan</title>
 <meta name="description" content="Guided, gap-flagging intake wizard for drafting a Philippine LGU/government Computer Incident Response Plan.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap');
@@ -163,6 +163,9 @@
     line-height: 1.5;
   }
 
+  .rail-sub { margin: -14px 0 18px; font-size: 12.5px; line-height: 1.4; color: var(--rail-text-dim); }
+  @media (max-width: 860px) { .rail-sub { margin: -8px 0 14px; } }
+
   /* ---------- Main ---------- */
   .main { padding: 48px 56px 80px; max-width: 780px; }
   @media (max-width: 640px) { .main { padding: 32px 20px 60px; } }
@@ -172,6 +175,26 @@
   }
   .step-title { font-size: 28px; margin: 0 0 10px; }
   .step-help { color: var(--ink-soft); font-size: 15px; line-height: 1.55; margin: 0 0 30px; max-width: 62ch; }
+
+  details.about {
+    background: var(--panel); border: 1.5px solid var(--line); border-left: 4px solid var(--gold);
+    border-radius: 10px; padding: 4px 18px 6px; margin: 0 0 28px; max-width: 70ch;
+  }
+  details.about summary {
+    cursor: pointer; list-style: none; font-weight: 700; font-size: 15.5px; padding: 12px 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px;
+  }
+  details.about summary::-webkit-details-marker { display: none; }
+  details.about summary::after { content: "\25BE"; color: var(--ink-soft); transition: transform 0.15s; }
+  details.about[open] summary::after { transform: rotate(180deg); }
+  details.about summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+  details.about p { margin: 0 0 12px; font-size: 14.5px; line-height: 1.6; }
+  details.about ul { margin: 0 0 12px; padding-left: 20px; }
+  details.about li { margin: 0 0 8px; font-size: 14.5px; line-height: 1.55; }
+  details.about .about-ok { background: rgba(184, 134, 11, 0.13); border-radius: 8px; padding: 11px 14px; margin: 4px 0 14px; }
+  .ok-note { margin: 0 0 24px; padding-left: 12px; border-left: 3px solid var(--gold); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); max-width: 62ch; }
+  .step-help + .ok-note { margin-top: -14px; }
+  details.about .about-note { font-size: 13px; color: var(--ink-soft); padding-top: 10px; border-top: 1px solid var(--line-soft); margin-bottom: 8px; }
 
   .field { margin-bottom: 22px; }
   .field label.flabel {
@@ -404,8 +427,23 @@
       '</section>';
   }
 
+  function renderAbout() {
+    return '<details class="about" open>' +
+      '<summary>New here? What is a CIRP?</summary>' +
+      '<p><strong>CIRP</strong> stands for <strong>Computer Incident Response Plan</strong>. It is a written plan that tells an office what to do when something goes wrong with its computers or data. For example: ransomware, a hacked email account, a lost laptop, or records sent to the wrong person.</p>' +
+      '<ul>' +
+        '<li><strong>Why have one:</strong> so nobody has to improvise in a crisis. Everyone knows who decides, who to call, and what to protect.</li>' +
+        '<li><strong>What this tool does:</strong> it walks you through 11 short sections and drafts a CIRP you can download as a Word or Markdown file. If you do not know an answer, leave it blank. The draft marks it as unresolved so you can fill it in later.</li>' +
+        '<li><strong>Who it is for:</strong> Philippine government and LGU offices. You do not need a technical background.</li>' +
+        '<li><strong>Your privacy:</strong> what you type stays in your browser until you choose to download or copy the draft.</li>' +
+      '</ul>' +
+      '<p class="about-ok"><strong>Not sure what to put yet? That is okay.</strong> This is not meant to be finished in one sitting. Leave blank anything you do not know yet. When you have the information, you can make the CIRP again with a fuller version. Nothing is saved on this page, so download your draft before you leave.</p>' +
+      '<p class="about-note">This is a starting draft. Before it is used, your Data Protection Officer, legal or compliance office, and ICT head should review and adopt it.</p>' +
+    '</details>';
+  }
+
   function renderPurposeScopeAuthority() {
-    return sectionGroup("1A. Organization classification", renderOrgType()) +
+    return renderAbout() + sectionGroup("1A. Organization classification", renderOrgType()) +
       sectionGroup("1B. Organization identity & authority", renderOrgIdentity()) +
       sectionGroup("1C. Scope", renderScope()) +
       sectionGroup("1D. Critical Information Infrastructure status", renderCII());
@@ -996,6 +1034,7 @@
     var rail = document.getElementById("rail");
     var html = '<div class="rail-brand">Government &amp; LGU Cybersecurity</div>';
     html += '<h1 class="rail-title">CIRP Intake Wizard</h1>';
+    html += '<p class="rail-sub">Computer Incident Response Plan (CIRP)</p>';
     html += '<button type="button" class="rail-toggle" id="rail-toggle" aria-expanded="' + rail.classList.contains("open") + '"><span>Step ' + (stepIndex + 1) + ' of ' + STEPS.length + ' · ' + STEPS[stepIndex].railLabel + '</span><span class="rail-toggle-caret" aria-hidden="true">▾</span></button>';
     html += '<ul class="rail-steps">';
     STEPS.forEach(function (s, i) {
@@ -1022,6 +1061,11 @@
     if (step.eyebrow) html += '<div class="eyebrow">' + step.eyebrow + '</div>';
     html += '<h2 class="step-title">' + step.title + '</h2>';
     if (step.help) html += '<p class="step-help">' + step.help + '</p>';
+    if (stepIndex > 0) {
+      html += '<p class="ok-note">' + (step.id === "review"
+        ? "Nothing is saved on this page, so download your draft before you leave. You can come back later with more information and make a fuller version."
+        : "Not sure yet? Leave it blank. You can make a fuller CIRP later, once you have the information.") + '</p>';
+    }
     html += step.render();
     html += '<div class="nav-row">';
     html += stepIndex > 0 ? '<button class="btn-ghost" id="btn-back">Back</button>' : '<span></span>';
