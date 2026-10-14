@@ -631,6 +631,11 @@
     return checks;
   }
 
+  // Single source of unresolved items: the Review list, its count and both draft formats all use this.
+  function unresolvedItems() {
+    return completenessChecks().filter(function (c) { return !c.ok; });
+  }
+
   // ---------- Document generation ----------
 
   function gapD(id) { return gap(state[id]) + (isDefault(id) ? "  \n" + DEFAULT_NOTE : ""); }
@@ -655,8 +660,7 @@
 
   function generateDocument() {
     var lines = [];
-    var checks = completenessChecks();
-    var failing = checks.filter(function (c) { return !c.ok; });
+    var failing = unresolvedItems();
 
     lines.push("# Computer Incident Response Plan");
     lines.push("");
@@ -794,8 +798,7 @@
 
   function generateDocumentHtml() {
     var h = [];
-    var checks = completenessChecks();
-    var failing = checks.filter(function (c) { return !c.ok; });
+    var failing = unresolvedItems();
 
     h.push("<h1>Computer Incident Response Plan</h1>");
     h.push("<p><strong>Organization:</strong> " + gapHtml(state.orgName) + "</p>");
@@ -893,16 +896,15 @@
   // ---------- Review screen ----------
 
   function renderReview() {
-    var checks = completenessChecks();
-    var failing = checks.filter(function (c) { return !c.ok; });
+    var failing = unresolvedItems();
     var html = "";
 
     html += '<div class="gate-summary">' + (failing.length === 0
       ? '<span style="color:var(--gate-ok-fg);">All completeness checks passed.</span>'
       : '<span style="color:var(--gate-bad-fg);">' + failing.length + ' item(s) still need attention.</span>') + '</div>';
     html += '<ul class="gate-list">';
-    checks.forEach(function (c) {
-      html += '<li class="gate-item ' + (c.ok ? "ok" : "bad") + '"><span class="dot"></span>' + c.label + (c.ok || c.plain ? "" : " — not yet provided") + '</li>';
+    failing.forEach(function (c) {
+      html += '<li class="gate-item bad"><span class="dot"></span>' + c.label + (c.plain ? "" : " — not yet provided") + '</li>';
     });
     html += '</ul>';
 
