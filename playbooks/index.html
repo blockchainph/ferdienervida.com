@@ -317,7 +317,7 @@
             { id: "lawEnforcement", label: "Law enforcement referral", hint: "", rows: 3,
               default: "Ransomware usually involves cybercrime offenses under RA 10175, such as illegal access, data interference and system interference. Demanding payment under threat is extortion, which is an offense under the Revised Penal Code. Refer to the PNP Anti-Cybercrime Group or NBI Cybercrime Division, particularly if payment is being considered or the attacker has made direct contact." },
             { id: "publicComms", label: "Public / media statement authorization", hint: "", rows: 4,
-              default: "Only the Approving Authority or designated PIO may speak publicly. Avoid confirming specific technical details, ransom amounts, or attacker identity while the incident is active or under law enforcement review. Prepare a holding statement acknowledging awareness and response without speculation." }
+              default: "Only the Approving Authority or designated PIO may speak publicly. Avoid confirming specific technical details, ransom amounts, or attacker identity while the incident is active or under law enforcement review. Prepare a holding statement acknowledging awareness and response without speculation. Holding statement template: \"We are aware of an incident affecting some of our systems. We have activated our incident response plan and are working with the Department of Information and Communications Technology (DICT). Our priority is to protect the public's data and restore services. We will share verified updates as soon as they are available. Please direct media inquiries to [insert PIO name and contact].\" Before release, the statement is cleared by the Executive / Incident Authority and Legal / Compliance. It names no cause, ransom amount, or attacker, and it does not confirm a data breach until the DPO and Legal / Compliance have cleared that wording." }
           ] },
         { id: "postincident", title: "Post-Incident Review", railLabel: "Post-incident review",
           help: "What gets reviewed after recovery so the same incident doesn't recur.",
@@ -568,6 +568,7 @@
         if (f.required) checks.push({ label: f.label, ok: !!state[f.id] });
       });
     });
+    if (currentType === "ransomware" && /\[insert/i.test(state.publicComms || "")) checks.push({ label: "Public statement: PIO contact not filled in", ok: false, plain: true });
     return checks;
   }
 
@@ -656,7 +657,7 @@
       : '<span style="color:var(--gate-bad-fg);">' + failing.length + ' item(s) still need attention.</span>') + '</div>';
     html += '<ul class="gate-list">';
     checks.forEach(function (c) {
-      html += '<li class="gate-item ' + (c.ok ? "ok" : "bad") + '"><span class="dot"></span>' + escapeHtml(c.label) + (c.ok ? "" : " — not yet provided") + '</li>';
+      html += '<li class="gate-item ' + (c.ok ? "ok" : "bad") + '"><span class="dot"></span>' + escapeHtml(c.label) + (c.ok || c.plain ? "" : " — not yet provided") + '</li>';
     });
     html += '</ul>';
 
