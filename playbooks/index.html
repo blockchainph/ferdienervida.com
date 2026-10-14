@@ -145,6 +145,8 @@
     line-height: 1.5;
   }
 
+  .quick-card-box { margin: 6px 0 22px; padding: 14px 16px; border: 1.5px solid var(--line); border-left: 4px solid var(--gold); border-radius: 10px; background: var(--panel); }
+
   /* ---------- Main ---------- */
   .main { padding: 48px 56px 80px; max-width: 780px; }
   @media (max-width: 640px) { .main { padding: 32px 20px 60px; } }
@@ -440,6 +442,46 @@
 
   };
 
+  // ---------- Quick card content ----------
+  // The legal clocks below are the single source for the one-page card. They must say the same thing as the
+  // defaults in the Notification sections above (72 hours from knowledge of the breach; CERT-PH 24 hours from detection).
+  var NPC_CLOCK = "National Privacy Commission (if personal data is involved and the breach is notifiable): notify through the DBNMS portal within 72 hours of knowledge or reasonable belief that a notifiable breach occurred. The clock is 72 hours from knowledge of the breach.";
+  var PEOPLE_CLOCK = "Affected people: tell them within the same 72 hours, unless the NPC approves a postponement or exemption.";
+  var CERT_CLOCK = "CERT-PH (cert-ph@dict.gov.ph), if the system is critical information infrastructure: report within 24 hours from detection (DICT Memorandum Circular No. 005, s. 2017).";
+  var CARD_CONTENT = {
+    ransomware: {
+      title: "Ransomware Response",
+      contacts: ["IR Team Lead", "Technical / IT Lead", "Executive Authority (approves any ransom-related decision)", "Legal / Compliance", "Data Protection Officer (DPO)", "Public Information Officer (PIO)"],
+      clocks: [CERT_CLOCK + " CERT-PH recommends reporting ransomware within 12 hours from discovery.", NPC_CLOCK, PEOPLE_CLOCK],
+      remember: [
+        "Do not power off affected devices. Unplug the network cable or turn off Wi-Fi instead, to keep evidence in memory.",
+        "Do not pay, negotiate or contact the attacker without Executive Authority and Legal sign-off.",
+        "Do not delete the ransom note or the attacker's contact details. Keep them as evidence.",
+        "Only the approving authority or the designated PIO speaks to the public or the media."
+      ]
+    },
+    phishing: {
+      title: "Phishing / Credential Compromise Response",
+      contacts: ["IR Team Lead", "Technical / IT Lead", "Data Protection Officer (DPO)"],
+      clocks: [CERT_CLOCK + " Also tell CERT-PH if several government offices appear to be targeted.", NPC_CLOCK, PEOPLE_CLOCK],
+      remember: [
+        "Reset the password and revoke active sessions first. Investigate after.",
+        "Check for hidden mailbox rules, forwarding addresses and added devices before calling the account clean.",
+        "Block or quarantine the phishing email across the whole organization, not just one mailbox."
+      ]
+    },
+    databreach: {
+      title: "Data Breach Response",
+      contacts: ["Data Protection Officer (DPO)", "IR Team Lead", "Technical / IT Lead", "Legal / Compliance"],
+      clocks: [NPC_CLOCK + " The full report is due within 5 days of that knowledge.", PEOPLE_CLOCK],
+      remember: [
+        "Tell the DPO straight away. Do not wait until every detail is confirmed.",
+        "Note exactly what data was involved and how many people are affected.",
+        "Save the evidence (who accessed it, when and how) before any fix that could overwrite logs."
+      ]
+    }
+  };
+
   var currentType = null;
   var state = {};
   var stepIndex = 0;
@@ -623,6 +665,8 @@
     html += '<button class="btn-ghost" id="btn-download">Download draft (.md)</button>';
     html += '<button class="btn-ghost" id="btn-copy">Copy to clipboard</button>';
     html += '</div>';
+    html += '<div class="quick-card-box"><button class="btn-gold" id="btn-card">Download quick card (.docx)</button>' +
+      '<p class="fhint" style="margin:8px 0 0;">One page to print and keep at the desk: the first actions, who to call, and the deadlines. Write the phone numbers in by hand, so no names or numbers need to be typed here.</p></div>';
 
     html += '<div class="preview-pane"><pre id="doc-preview"></pre></div>';
     return html;
@@ -636,6 +680,7 @@
       document.getElementById("btn-download").addEventListener("click", onDownload);
       document.getElementById("btn-download-docx").addEventListener("click", onDownloadDocx);
       document.getElementById("btn-copy").addEventListener("click", onCopy);
+      document.getElementById("btn-card").addEventListener("click", onDownloadCard);
       return;
     }
     step.section.fields.forEach(function (f) {
@@ -681,6 +726,158 @@
     } catch (e) {
       showToast("Couldn't generate .docx — try Download draft (.md) instead.");
     }
+  }
+
+  // One-page quick card: the first actions (from the participant's own text), who can act, a who-to-call
+  // table to fill in by hand, the legal clocks, and a short reminder list.
+  var CARD_MAX_STEPS = 7, CARD_MAX_CHARS = 200;        // keeps the card to one page, even with long text
+  function cardSteps() {
+    var raw = String(state.isolation || "").split(/\r?\n/).map(function (l) { return l.replace(/^\s*\d+\s*[\).:-]\s*/, "").trim(); }).filter(Boolean);
+    var trimmed = raw.length > CARD_MAX_STEPS;
+    var items = raw.slice(0, CARD_MAX_STEPS).map(function (t) {
+      if (t.length <= CARD_MAX_CHARS) return t;
+      trimmed = true;
+      return t.slice(0, CARD_MAX_CHARS - 3).replace(/\s+\S*$/, "") + "...";
+    });
+    return { items: items, trimmed: trimmed };
+  }
+
+  // The card is built as a real .docx (not wrapped HTML), so it looks the same in Word, LibreOffice and Google Docs
+  // and stays on one page. The library is the one already bundled for /threatmodel/, loaded only when needed.
+  var DOCX_SRC = "../threatmodel/vendor/docx.iife.js";
+  var docxLibPromise = null;
+  function ensureDocx() {
+    if (window.docx) return Promise.resolve();
+    if (!docxLibPromise) {
+      docxLibPromise = new Promise(function (resolve, reject) {
+        var sc = document.createElement("script");
+        sc.src = DOCX_SRC;
+        sc.onload = function () { window.docx ? resolve() : reject(new Error("docx library missing")); };
+        sc.onerror = function () { docxLibPromise = null; reject(new Error("docx library failed to load")); };
+        document.head.appendChild(sc);
+      });
+    }
+    return docxLibPromise;
+  }
+
+  function buildCardDoc() {
+    var d = window.docx, type = PLAYBOOK_TYPES[currentType], card = CARD_CONTENT[currentType];
+    var Document = d.Document, Packer = d.Packer, Paragraph = d.Paragraph, TextRun = d.TextRun, Table = d.Table,
+        TableRow = d.TableRow, TableCell = d.TableCell, WidthType = d.WidthType, ShadingType = d.ShadingType,
+        TableLayoutType = d.TableLayoutType, BorderStyle = d.BorderStyle, AlignmentType = d.AlignmentType, VerticalAlign = d.VerticalAlign;
+
+    // Look: an operations checklist. Heavy black and hazard yellow, typewriter-style labels, red for warnings.
+    // Fonts ship with Word on Windows and Mac, so nothing needs to be embedded.
+    var W = 10800, HALF = 5400;
+    var INK = "141414", GREY = "5A5A55", YELLOW = "FFD60A", PALE = "FFF4B8", RED = "C8102E", PAPER = "EFEEE8";
+    var F_BODY = "Tahoma", F_HEAD = "Arial Black", F_MONO = "Courier New";
+    function r(t, o) { o = o || {}; return new TextRun({ text: t, bold: o.bold, italics: o.italics, color: o.color || INK, size: o.size || 18, font: o.font || F_BODY, characterSpacing: o.spacing }); }
+    function para(runs, o) {
+      o = o || {};
+      return new Paragraph({ spacing: { after: o.after == null ? 50 : o.after, before: o.before || 0 }, indent: o.indent, border: o.border, shading: o.shading, alignment: o.align, children: Array.isArray(runs) ? runs : [runs] });
+    }
+    // Bold the deadlines (for example "72 hours" or "5 days") so they are the first thing the eye finds.
+    function withTimes(text, size) {
+      return text.split(/(\d+\s?(?:hours?|days?)\b)/).filter(Boolean).map(function (part) {
+        return /^\d+\s?(?:hours?|days?)$/.test(part) ? r(part, { bold: true, size: size }) : r(part, { size: size });
+      });
+    }
+    var none = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
+    var noBorders = { top: none, bottom: none, left: none, right: none, insideHorizontal: none, insideVertical: none };
+    function label(num, text, accent, inCell) {
+      return para([r(num + "  ", { font: F_MONO, bold: true, size: 20, color: accent || INK }), r(text, { font: F_MONO, bold: true, size: 20, spacing: 20 })],
+        { before: inCell ? 0 : 140, after: 80, shading: { type: ShadingType.CLEAR, fill: PAPER, color: "auto" }, border: { left: { style: BorderStyle.SINGLE, size: 36, color: accent || INK, space: 6 } } });
+    }
+    function box(children, w, fill) {
+      return new TableCell({ width: { size: w, type: WidthType.DXA }, borders: { top: none, bottom: none, left: none, right: none },
+        shading: fill ? { type: ShadingType.CLEAR, fill: fill, color: "auto" } : undefined, margins: { top: 90, bottom: 90, left: 140, right: 140 }, children: children });
+    }
+
+    var containment = type.sections.filter(function (x) { return x.id === "containment"; })[0];
+    var authField = containment ? containment.fields.filter(function (f) { return f.id === "isolationAuthority"; })[0] : null;
+    var cs = cardSteps();
+
+    var children = [];
+
+    // Title banner
+    children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], layout: TableLayoutType.FIXED, borders: noBorders, rows: [new TableRow({ children: [
+      box([
+        para(r("INCIDENT CARD", { font: F_MONO, bold: true, size: 18, color: YELLOW, spacing: 40 }), { after: 20 }),
+        para(r(card.title.toUpperCase(), { font: F_HEAD, size: 30, color: "FFFFFF" }), { after: 0 })
+      ], W, INK)
+    ] })] }));
+    children.push(para([r("ORGANIZATION ", { font: F_MONO, bold: true, size: 15, color: GREY }), r(state.orgName || "[not filled in]", { size: 16, color: GREY }),
+      r("    APPROVING AUTHORITY ", { font: F_MONO, bold: true, size: 15, color: GREY }), r(state.approvingAuthority || "[not filled in]", { size: 16, color: GREY }),
+      r("    PRINTED ", { font: F_MONO, bold: true, size: 15, color: GREY }), r(new Date().toISOString().slice(0, 10), { size: 16, color: GREY })], { before: 80, after: 40 }));
+
+    // 01 First actions: numbered black squares
+    children.push(label("01", "FIRST ACTIONS, IN ORDER"));
+    var hair = { bottom: { style: BorderStyle.SINGLE, size: 4, color: "C9C8C0" }, top: none, left: none, right: none };
+    var stepRows = [];
+    if (cs.items.length) {
+      cs.items.forEach(function (t, i) {
+        stepRows.push(new TableRow({ cantSplit: true, children: [
+          new TableCell({ width: { size: 560, type: WidthType.DXA }, borders: { top: none, bottom: { style: BorderStyle.SINGLE, size: 12, color: "FFFFFF" }, left: none, right: none }, shading: { type: ShadingType.CLEAR, fill: INK, color: "auto" }, verticalAlign: VerticalAlign.CENTER,
+            margins: { top: 40, bottom: 40, left: 40, right: 40 }, children: [para(r(String(i + 1), { font: F_HEAD, size: 22, color: "FFFFFF" }), { after: 0, align: AlignmentType.CENTER })] }),
+          new TableCell({ width: { size: W - 560, type: WidthType.DXA }, borders: hair, verticalAlign: VerticalAlign.CENTER, margins: { top: 50, bottom: 50, left: 140, right: 60 }, children: [para(r(t, { size: 18 }), { after: 0 })] })
+        ] }));
+      });
+    } else {
+      stepRows.push(new TableRow({ children: [box([para(r("[Not filled in yet. Complete the Immediate Containment step.]", { bold: true }), { after: 0 })], W)] }));
+    }
+    children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: cs.items.length ? [560, W - 560] : [W], layout: TableLayoutType.FIXED, borders: noBorders, rows: stepRows }));
+    if (cs.trimmed) children.push(para(r("Some text was shortened to fit one page. See the full playbook for every step.", { italics: true, size: 15, color: GREY }), { before: 40, after: 0 }));
+    if (authField) children.push(para([r(authField.label.toUpperCase() + "  ", { font: F_MONO, bold: true, size: 15 }), r(state.isolationAuthority || "[not filled in]", { size: 17, bold: true })], { before: 80, after: 0 }));
+
+    // 02 Who to call (by hand)  |  03 Report on time (yellow panel)
+    var calls = [label("02", "WHO TO CALL", null, true), para(r("Write the numbers in by hand.", { italics: true, size: 15, color: GREY }), { after: 60 })];
+    function callLine(role, bold) {
+      calls.push(para(r(role, { bold: true, size: 16 }), { after: 0 }));
+      calls.push(para(r("Name ____________________   Phone ____________", { size: 15, color: GREY }), { after: 50, border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: "C9C8C0", space: 2 } } }));
+    }
+    card.contacts.forEach(function (role) { callLine(role); });
+    calls.push(para(r("Law enforcement: PNP Anti-Cybercrime Group or NBI Cybercrime Division", { bold: true, size: 16 }), { after: 0 }));
+    calls.push(para(r("Phone ______________________________________", { size: 15, color: GREY }), { after: 50, border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: "C9C8C0", space: 2 } } }));
+    calls.push(para([r("CERT-PH ", { bold: true, size: 16 }), r("cert-ph@dict.gov.ph", { size: 16 }), r("    Phone ____________", { size: 15, color: GREY })], { after: 0 }));
+
+    var clockParas = [label("03", "REPORT ON TIME", null, true)];
+    card.clocks.forEach(function (c) {
+      clockParas.push(para([r("■  ", { size: 14 })].concat(withTimes(c, 17)), { indent: { left: 260, hanging: 260 }, after: 90 }));
+    });
+    children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [HALF, HALF], layout: TableLayoutType.FIXED, borders: noBorders,
+      rows: [new TableRow({ cantSplit: true, children: [box(calls, HALF), box(clockParas, HALF, PALE)] })] }));
+
+    // 04 Remember (red)
+    children.push(label("04", "REMEMBER", RED));
+    card.remember.forEach(function (t) {
+      children.push(para([r("!  ", { font: F_HEAD, size: 18, color: RED })].concat(withTimes(t, 18)), { indent: { left: 300, hanging: 300 }, after: 60 }));
+    });
+
+    children.push(para(r("Printed from the Incident Playbook Creator. This is a draft and has not been legally reviewed. Your Data Protection Officer, legal or compliance office, and ICT head should review it before use. Keep it with the full playbook.", { size: 14, color: GREY }), { before: 140, after: 0 }));
+
+    var doc = new Document({
+      creator: "Incident Playbook Creator", title: card.title + " quick card",
+      styles: { default: { document: { run: { font: F_BODY, size: 18, color: INK } } } },
+      sections: [{ properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 720, right: 720, bottom: 720, left: 720 } } }, children: children }]
+    });
+    return Packer.toBlob(doc);
+  }
+
+  function onDownloadCard() {
+    var orgSlug = (state.orgName || "org").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    var filename = slug() + "-quick-card-" + orgSlug + ".docx";
+    showToast("Preparing the quick card...");
+    ensureDocx().then(buildCardDoc).then(function (blob) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      showToast("Quick card downloaded.");
+    }).catch(function (err) {
+      if (window.console) console.error(err);
+      showToast("Couldn't generate the quick card. Please try again.");
+    });
   }
 
   function onCopy() {
