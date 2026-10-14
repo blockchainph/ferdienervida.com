@@ -249,6 +249,8 @@
 
   // ---------- Field-level helpers ----------
 
+  // Local calendar date as YYYY-MM-DD (toISOString would give the UTC date, a day behind in Manila before 8 AM).
+  function localDate() { return new Date().toLocaleDateString("en-CA"); }
   function escapeHtml(s) { return (s || "").replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); }
   function escapeAttr(s) { return escapeHtml(s).replace(/"/g, "&quot;"); }
   function gap(v) { return v ? escapeHtml(v) : "**[UNRESOLVED]**"; }
@@ -311,7 +313,7 @@
             { id: "npcNotify", label: "National Privacy Commission (Data Privacy Act)", hint: "", rows: 4,
               default: "Ransomware groups increasingly steal data before encrypting it. If personal or sensitive personal data was likely exfiltrated or exposed, treat this as a reportable Data Privacy Act breach. The DPO assesses straight away whether it is notifiable. Where it is, notify the National Privacy Commission via the DBNMS portal within 72 hours of knowledge or reasonable belief that a notifiable breach occurred. The clock is 72 hours from knowledge of the breach, so start counting when the office first knows or reasonably believes it, not when the investigation ends. Affected people must generally be told within the same 72 hours, unless the NPC approves a postponement or exemption." },
             { id: "dictNotify", label: "DICT / CERT-PH", hint: "", rows: 3,
-              default: "Report to CERT-PH (cert-ph@dict.gov.ph) and the DICT regional office, especially if the affected system qualifies as Critical Information Infrastructure (DICT Memorandum Circular No. 005, s. 2017: report to the national CERT within 24 hours from detection). CERT-PH's own reporting guidelines recommend an even faster report for critical incidents such as ransomware: 12 hours from discovery." },
+              default: "Report to CERT-PH (cert-ph@dict.gov.ph) and the DICT regional office. Under DICT Memorandum Circular No. 005, s. 2017, cybersecurity incidents are to be reported to the national CERT within 24 hours from detection. Report earlier where possible, especially if the affected system is Critical Information Infrastructure. Confirm the current scope and reporting channel with DICT." },
             { id: "lawEnforcement", label: "Law enforcement referral", hint: "", rows: 3,
               default: "Ransomware usually involves cybercrime offenses under RA 10175, such as illegal access, data interference and system interference. Demanding payment under threat is extortion, which is an offense under the Revised Penal Code. Refer to the PNP Anti-Cybercrime Group or NBI Cybercrime Division, particularly if payment is being considered or the attacker has made direct contact." },
             { id: "publicComms", label: "Public / media statement authorization", hint: "", rows: 4,
@@ -447,12 +449,12 @@
   // defaults in the Notification sections above (72 hours from knowledge of the breach; CERT-PH 24 hours from detection).
   var NPC_CLOCK = "National Privacy Commission (if personal data is involved and the breach is notifiable): notify through the DBNMS portal within 72 hours of knowledge or reasonable belief that a notifiable breach occurred. The clock is 72 hours from knowledge of the breach.";
   var PEOPLE_CLOCK = "Affected people: tell them within the same 72 hours, unless the NPC approves a postponement or exemption.";
-  var CERT_CLOCK = "CERT-PH (cert-ph@dict.gov.ph), if the system is critical information infrastructure: report within 24 hours from detection (DICT Memorandum Circular No. 005, s. 2017).";
+  var CERT_CLOCK = "CERT-PH (cert-ph@dict.gov.ph): report cybersecurity incidents within 24 hours from detection (DICT Memorandum Circular No. 005, s. 2017). Report earlier where you can. Confirm the current scope and reporting channel with DICT.";
   var CARD_CONTENT = {
     ransomware: {
       title: "Ransomware Response",
       contacts: ["IR Team Lead", "Technical / IT Lead", "Executive Authority (approves any ransom-related decision)", "Legal / Compliance", "Data Protection Officer (DPO)", "Public Information Officer (PIO)"],
-      clocks: [CERT_CLOCK + " CERT-PH recommends reporting ransomware within 12 hours from discovery.", NPC_CLOCK, PEOPLE_CLOCK],
+      clocks: [CERT_CLOCK, NPC_CLOCK, PEOPLE_CLOCK],
       remember: [
         "Do not power off affected devices. Unplug the network cable or turn off Wi-Fi instead, to keep evidence in memory.",
         "Do not pay, negotiate or contact the attacker without Executive Authority and Legal sign-off.",
@@ -581,7 +583,7 @@
     lines.push("");
     lines.push("**Organization:** " + gap(state.orgName));
     lines.push("**Approving authority:** " + gap(state.approvingAuthority));
-    lines.push("**Generated:** " + new Date().toISOString().slice(0, 10) + " via Incident Playbook Creator");
+    lines.push("**Generated:** " + localDate() + " via Incident Playbook Creator");
     lines.push("");
 
     if (failing.length) {
@@ -619,7 +621,7 @@
     h.push("<h1>" + escapeHtml(type.docTitle) + "</h1>");
     h.push("<p><strong>Organization:</strong> " + gapHtml(state.orgName) + "</p>");
     h.push("<p><strong>Approving authority:</strong> " + gapHtml(state.approvingAuthority) + "</p>");
-    h.push("<p><strong>Generated:</strong> " + new Date().toISOString().slice(0, 10) + " via Incident Playbook Creator</p>");
+    h.push("<p><strong>Generated:</strong> " + localDate() + " via Incident Playbook Creator</p>");
 
     if (failing.length) {
       h.push("<h2>Unresolved Items</h2><ul>");
@@ -771,7 +773,7 @@
     var W = 10800, HALF = 5400;
     var INK = "141414", GREY = "5A5A55", YELLOW = "FFD60A", PALE = "FFF4B8", RED = "C8102E", PAPER = "EFEEE8";
     var F_BODY = "Tahoma", F_HEAD = "Arial Black", F_MONO = "Courier New";
-    function r(t, o) { o = o || {}; return new TextRun({ text: t, bold: o.bold, italics: o.italics, color: o.color || INK, size: o.size || 18, font: o.font || F_BODY, characterSpacing: o.spacing }); }
+    function r(t, o) { o = o || {}; return new TextRun({ text: String(t).replace(/'/g, "\u2019"), bold: o.bold, italics: o.italics, color: o.color || INK, size: o.size || 18, font: o.font || F_BODY, characterSpacing: o.spacing }); }
     function para(runs, o) {
       o = o || {};
       return new Paragraph({ spacing: { after: o.after == null ? 50 : o.after, before: o.before || 0 }, indent: o.indent, border: o.border, shading: o.shading, alignment: o.align, children: Array.isArray(runs) ? runs : [runs] });
@@ -808,7 +810,7 @@
     ] })] }));
     children.push(para([r("ORGANIZATION ", { font: F_MONO, bold: true, size: 15, color: GREY }), r(state.orgName || "[not filled in]", { size: 16, color: GREY }),
       r("    APPROVING AUTHORITY ", { font: F_MONO, bold: true, size: 15, color: GREY }), r(state.approvingAuthority || "[not filled in]", { size: 16, color: GREY }),
-      r("    PRINTED ", { font: F_MONO, bold: true, size: 15, color: GREY }), r(new Date().toISOString().slice(0, 10), { size: 16, color: GREY })], { before: 80, after: 40 }));
+      r("    PRINTED ", { font: F_MONO, bold: true, size: 15, color: GREY }), r(localDate(), { size: 16, color: GREY })], { before: 80, after: 40 }));
 
     // 01 First actions: numbered black squares
     children.push(label("01", "FIRST ACTIONS, IN ORDER"));
