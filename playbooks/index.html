@@ -440,6 +440,69 @@
               default: "Review: (1) how the exposure happened and whether the control gap has actually been closed, (2) how long it took from occurrence to detection, and from detection to DPO notification, (3) whether the 72 hours from knowledge of the breach was met if the breach was notifiable, (4) whether affected individuals were notified appropriately, (5) what policy or training change prevents a repeat (e.g., mandatory encryption for outbound sensitive files, folder permission audits)." }
           ] }
       ]
+    },
+
+    defacement: {
+      label: "Website Defacement",
+      pickerHint: "A public website was altered, taken over, or replaced with an attacker's message.",
+      docTitle: "Website Defacement Incident Response Playbook",
+      footer: "This document does not certify compliance with RA 10173, RA 10175, NPC Circular 16-03, DICT issuances, or any other law or regulation.",
+      sections: [
+        { id: "identity", title: "Plan Identity & Trigger Definition", railLabel: "Identity & triggers",
+          help: "Name the organization and authority, and confirm what actually counts as a website defacement event for your office.",
+          fields: [
+            { id: "orgName", label: "Organization name", hint: "Full name of the agency / LGU / office this playbook is for.", required: true },
+            { id: "approvingAuthority", label: "Approving authority", hint: "Who signs this playbook into effect.", required: true },
+            { id: "triggers", label: "What counts as a website defacement event", hint: "Adjust for your environment.", rows: 5,
+              default: "The website's homepage or other pages show content the office did not publish (attacker messages, slogans, images, or redirects to other sites); the site is replaced with a blank page or a banner from a hacking group; pages or files were changed without an approved request; visitors are redirected to unknown or malicious pages; staff, the public, or media report that the site looks wrong; the hosting provider or DICT-CERT reports unauthorized changes; admin accounts show logins or changes nobody recognizes." }
+          ] },
+        { id: "containment", title: "Immediate Containment (First 60 Minutes)", railLabel: "Immediate containment",
+          help: "What happens the moment a defaced or taken-over website is noticed.",
+          fields: [
+            { id: "isolation", label: "Immediate containment steps", hint: "The first actions, in order.", rows: 7,
+              default: "1) Take screenshots of the defaced pages with the date and time visible before anything is changed.\n2) Notify the IR Team Lead and Technical / IT Lead immediately.\n3) Take the site offline or replace it with a plain maintenance page, as decided by the Technical / IT Lead. Do not simply delete the defaced pages.\n4) Preserve web server logs, CMS and admin logs, hosting control panel logs, and a full copy of the defaced site files before any cleaning.\n5) Change passwords and end active sessions for all website, CMS, hosting, FTP/SSH, and DNS accounts. Turn on multi-factor authentication where available.\n6) Check DNS records and the domain registrar account for unauthorized changes." },
+            { id: "isolationAuthority", label: "Who has authority to take the site offline", hint: "",
+              default: "Technical / IT Lead, with immediate notification to the IR Team Lead. If a vendor runs the site, notify the vendor contact at the same time." }
+          ] },
+        { id: "scope", title: "Scope Assessment", railLabel: "Scope assessment",
+          help: "Is this only a visible defacement, or part of a wider compromise.",
+          fields: [
+            { id: "scopeAssess", label: "Scope assessment steps", hint: "", rows: 6,
+              default: "Decide whether this is only a visible defacement or part of a wider compromise. Check: other sites and subdomains on the same server or hosting account; whether the web server or CMS connects to databases that hold personal data; whether files or database content were copied out; new or unknown admin accounts, scheduled tasks, or uploaded files (such as web shells); whether email, DNS, or internal systems were reached from the web server. Record which systems were affected and which were not." },
+            { id: "dpoCheck", label: "Personal data check", hint: "", rows: 3,
+              default: "Ask the Data Protection Officer whether the website or its database holds personal data (forms, applications, user accounts, mailing lists). If personal data may have been accessed, treat it as a possible breach and follow the Notification section." }
+          ] },
+        { id: "eradication", title: "Eradication", railLabel: "Eradication",
+          help: "Find how the attacker got in and remove their access completely.",
+          fields: [
+            { id: "eradication", label: "Eradication steps", hint: "", rows: 6,
+              default: "Identify how the attacker got in: outdated CMS or plugins, stolen or weak admin credentials, vulnerable themes, exposed admin pages, a compromised hosting or FTP account, or a DNS or registrar takeover. Remove unknown files, accounts, and scheduled tasks. Rebuild or restore the site from a clean backup taken before the compromise, then patch the CMS, plugins, and server before going back online. Rotate all credentials and keys connected to the site, including database and API credentials." }
+          ] },
+        { id: "recovery", title: "Recovery & Communication", railLabel: "Recovery & communication",
+          help: "Bringing the site back safely and telling visitors what they need to know.",
+          fields: [
+            { id: "recovery", label: "Recovery & communication steps", hint: "", rows: 5,
+              default: "Restore only after the entry point is closed. Test the site on a private address first. Put the site back online, then monitor logs and page integrity closely for at least 72 hours, and re-check the registrar and DNS records. If visitors saw the defacement or the site was down for a long time, the Communications / PIO issues a short statement through approved channels. Do not name a cause or an attacker until confirmed." }
+          ] },
+        { id: "notification", title: "Regulatory & Public Notification", railLabel: "Notification",
+          help: "NPC, DICT/CERT-PH, law enforcement, and public statement obligations.",
+          fields: [
+            { id: "npcNotify", label: "National Privacy Commission (Data Privacy Act)", hint: "", rows: 4,
+              default: "Only if personal data may have been accessed or exposed. The DPO assesses straight away whether it is notifiable. Where it is, notify the National Privacy Commission via the DBNMS portal within 72 hours of knowledge or reasonable belief that a notifiable breach occurred, and tell affected people within the same period unless the NPC approves a postponement or exemption." },
+            { id: "dictNotify", label: "DICT / CERT-PH", hint: "", rows: 3,
+              default: "Report to CERT-PH (cert-ph@dict.gov.ph) and the DICT regional office. Under DICT Memorandum Circular No. 005, s. 2017, cybersecurity incidents are to be reported to the national CERT within 24 hours from detection. Report earlier where possible. Confirm the current scope and reporting channel with DICT." },
+            { id: "lawEnforcement", label: "Law enforcement referral", hint: "", rows: 3,
+              default: "Defacement usually involves cybercrime offenses under RA 10175, such as illegal access and data interference. Refer to the PNP Anti-Cybercrime Group or NBI Cybercrime Division, with the screenshots and logs preserved in step 2." },
+            { id: "publicComms", label: "Public / media statement authorization", hint: "", rows: 4,
+              default: "Only the Approving Authority or the designated PIO may speak publicly. Avoid confirming technical details or attacker identity while the incident is active or under law enforcement review. Prepare a holding statement acknowledging awareness and response without speculation." }
+          ] },
+        { id: "postincident", title: "Post-Incident Review", railLabel: "Post-incident review",
+          help: "What gets reviewed after recovery so the same incident doesn't recur.",
+          fields: [
+            { id: "postIncident", label: "Post-incident review prompts", hint: "", rows: 6,
+              default: "Review: (1) how the attacker gained entry and whether that gap is closed, (2) whether the site's backups were recent and clean, (3) whether the office knew who runs and hosts the site and how to reach them, (4) whether staff followed the reporting chain, (5) whether admin accounts had multi-factor authentication and unused accounts were removed. Feed findings back into this playbook and the organization's broader Computer Incident Response Plan." }
+          ] }
+      ]
     }
 
   };
@@ -481,7 +544,18 @@
         "Note exactly what data was involved and how many people are affected.",
         "Save the evidence (who accessed it, when and how) before any fix that could overwrite logs."
       ]
+    },
+    defacement: {
+      title: "Website Defacement Response",
+      contacts: ["IR Team Lead", "Technical / IT Lead", "Executive Authority", "Legal / Compliance", "Data Protection Officer (DPO)", "Public Information Officer (PIO)", "Website or hosting vendor"],
+      clocks: [CERT_CLOCK, NPC_CLOCK],
+      remember: [
+        "Do not delete the defaced pages before you have copied them. They are evidence.",
+        "Do not log in to admin accounts from a device that may be affected.",
+        "Only the approving authority or the designated PIO speaks publicly."
+      ]
     }
+
   };
 
   var currentType = null;
