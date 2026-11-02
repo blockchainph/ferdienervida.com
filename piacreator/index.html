@@ -354,7 +354,10 @@
   }
   .gate-item.bad { background: var(--gate-bad-bg); color: var(--gate-bad-fg); }
   .gate-item.ok { background: var(--gate-ok-bg); color: var(--gate-ok-fg); }
-  .gate-item .dot { flex: 0 0 auto; margin-top: 4px; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .gate-tag { flex: 0 0 auto; min-width: 46px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; border: 1.5px solid currentColor; border-radius: 999px; padding: 1px 8px; text-align: center; margin-top: 1px; }
+  .gate-done { margin: 0 0 26px; }
+  .gate-done summary { cursor: pointer; font-weight: 600; font-size: 14px; padding: 8px 0; min-height: 44px; display: flex; align-items: center; }
+  .gate-done summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
   .gate-summary { font-size: 14.5px; margin-bottom: 8px; font-weight: 600; }
 
   .preview-pane {
@@ -440,6 +443,16 @@
     { id: "other", label: "Another basis (explain in the notes below)" }
   ];
 
+  // Sec. 13 has its own list of cases. Paraphrased from the text of RA 10173; the Legal Office / DPO confirms.
+  var BASIS_OPTIONS_SPI = [
+    { id: "consent", label: "Consent of the data subject, specific to the purpose and given before processing" },
+    { id: "law", label: "Processing is provided for by existing laws and regulations that guarantee protection of the data" },
+    { id: "life", label: "Needed to protect the life and health of the person or another person, who cannot give consent" },
+    { id: "medical", label: "Needed for medical treatment by a medical practitioner or treatment institution" },
+    { id: "legalclaims", label: "Needed to protect lawful rights and interests in court, to establish, exercise or defend legal claims, or when provided to government or a public authority" },
+    { id: "other", label: "Another case (explain in the notes below)" }
+  ];
+
   var YN = [{ v: "yes", l: "Yes" }, { v: "no", l: "No" }];
   var YNU = [{ v: "yes", l: "Yes" }, { v: "no", l: "No" }, { v: "unsure", l: "Not sure" }];
   var YNUNA = [{ v: "yes", l: "Yes" }, { v: "no", l: "No" }, { v: "unsure", l: "Not sure" }, { v: "na", l: "Not applicable" }];
@@ -448,7 +461,7 @@
     { v: "", l: "Not yet decided" },
     { v: "reduce", l: "Reduce (add a control)" },
     { v: "accept", l: "Accept" },
-    { v: "transfer", l: "Transfer (for example to a contractor)" },
+    { v: "transfer", l: "Transfer (for example to a contractor; the office stays accountable)" },
     { v: "avoid", l: "Avoid (stop the activity)" }
   ];
 
@@ -529,6 +542,60 @@
         sharing: "Payroll and benefit details go to the bank, benefit agencies and oversight bodies as required. Add each recipient, what is sent, and how."
       }
     },
+    business: {
+      label: "Business Permits",
+      desc: "Receiving applications for business permits and licenses, and issuing or renewing them.",
+      common: true,
+      defaults: {
+        description: "The office receives applications for business permits and licenses, checks the documents and clearances, assesses fees, and issues, renews or denies permits.",
+        purpose: "To confirm that a business may operate, collect the correct fees, and keep a record of permits issued.",
+        catPI: "Owner's and representative's full name; home and business address; contact number and email; signature; IDs and photos presented; business name and registration details; tax and clearance records; names of lessors or employees where documents require them.",
+        catSPI: "Government-issued ID and tax numbers of the owner; age and civil status shown in documents; records of offenses if a clearance is required. Confirm the exact list with your DPO.",
+        subjects: "Business owners and applicants; authorized representatives; lessors and property owners named in documents; employees named in documents.",
+        sources: "Applicants and their representatives; offices that issue clearances (for example health, fire safety, zoning and barangay); registration agencies; inspection teams.",
+        collection: "Applicants submit forms and supporting documents at the counter or through an online portal. Staff check the documents and record the details in the permit system.",
+        use: "Details are used to evaluate the application, compute fees, issue and renew permits, schedule inspections, and prepare reports.",
+        storage: "Application folders are kept in the permits office. Electronic records are kept in the permit system and on office-managed backup storage.",
+        access: "Permit processing staff and the evaluators handle records. Cashiers see only the fee details. The office head and the DPO can view records for supervision.",
+        sharing: "Applications may be routed to other offices for clearances or inspection. Add each recipient, what is shared, and how."
+      }
+    },
+    scholarship: {
+      label: "Scholarships",
+      desc: "Receiving scholarship applications, selecting grantees and releasing benefits.",
+      common: true,
+      defaults: {
+        description: "The office receives scholarship applications, checks eligibility, selects grantees, releases allowances, and monitors grantees' progress.",
+        purpose: "To select qualified applicants fairly, release scholarship benefits, and track grantees' standing.",
+        catPI: "Applicant and parent or guardian names; home address; contact details; school and course; grades and enrollment records; photos; signature; bank or payout account details.",
+        catSPI: "Age and civil status; household income and family circumstances; health or disability information where used for eligibility; education records; government ID numbers. Confirm the exact list with your DPO.",
+        subjects: "Applicants, many of whom may be minors; parents and guardians; scholars; school officials who certify records.",
+        sources: "Applicants and their families; schools; barangay officials who certify residency or income; partner agencies.",
+        collection: "Applicants submit forms and supporting documents. Staff check eligibility, interview shortlisted applicants, and record the results.",
+        use: "Details are used to rank and select applicants, release allowances, check grantees' grades and enrollment, and report on the program.",
+        storage: "Application folders are kept in locked cabinets. Electronic lists of applicants and grantees are kept on office computers or in a program database.",
+        access: "The scholarship staff and the selection committee see applications. Finance staff see only the payout details. The office head and the DPO can view records for supervision.",
+        sharing: "Records may be shared with schools to confirm enrollment and grades, and with partner agencies. Add each recipient, what is shared, and how."
+      }
+    },
+    health: {
+      label: "Health Services",
+      desc: "Consultations, immunization, health programs and patient records.",
+      common: true,
+      defaults: {
+        description: "The office provides health services to residents, such as consultations, immunization and health programs, keeps patient records, and reports to health authorities.",
+        purpose: "To deliver health services, keep a record of the care given, and report as health programs require.",
+        catPI: "Patient name; home address; contact number; birth date; sex; guardian or emergency contact; ID numbers; program enrollment; appointment and visit records.",
+        catSPI: "Health information such as diagnoses, treatments, test results, immunization and disease program records; age and civil status; information about minors; government ID and health insurance numbers. Confirm the exact list with your DPO.",
+        subjects: "Patients and clients; children and their guardians; pregnant women and other program enrollees.",
+        sources: "Patients and families; health workers' encounters; laboratories; hospitals and referring facilities; health programs.",
+        collection: "Health workers record patient details and visit notes during consultations and program activities, on paper forms or in a health records system.",
+        use: "Details are used to give care, follow up patients, run programs, and prepare required health reports.",
+        storage: "Patient charts are kept in locked cabinets in the health office. Electronic records are kept in the records system and on office-managed backup storage.",
+        access: "Health workers who treat the patient see the record. Records staff handle filing. The office head and the DPO can view records for supervision.",
+        sharing: "Reports and referrals go to health authorities, hospitals and insurers as needed or required. Add each recipient, what is sent, and how."
+      }
+    },
     custom: {
       label: "Other / Custom",
       desc: "Any other process that uses personal data. Nothing is pre-filled.",
@@ -574,7 +641,7 @@
     { id: "no_disposal", sec: "lifecycle", when: function () { return blank("disposal"); }, l: 3, i: 3,
       risk: "No disposal method is stated, so old records may be thrown away unsafely or kept without limit.",
       control: "State how paper and electronic records are destroyed once the retention period ends, and who approves it." },
-    { id: "no_dsa", sec: "lifecycle", when: function () { return state.threshold.q4 === "yes" && (state.v.dsa === "no" || state.v.dsa === "unsure"); }, l: 3, i: 4,
+    { id: "no_dsa", sec: "lifecycle", unsureField: "dsa", when: function () { return state.threshold.q4 === "yes" && (state.v.dsa === "no" || state.v.dsa === "unsure"); }, l: 3, i: 4,
       risk: "Data is shared with another agency or contractor without a data sharing agreement, so there is no written limit on how it is used or protected.",
       control: "Sign a data sharing agreement or contract terms with each recipient before more data is shared. The Legal Office reviews the wording." },
     { id: "shared_accounts", sec: "security", field: "sharedAccounts", bad: ["yes", "unsure"], l: 4, i: 4,
@@ -683,8 +750,8 @@
     // Basis and principles
     { id: "basisPI", sec: "basis", type: "checks", options: BASIS_OPTIONS, review: true, label: "Candidate lawful basis for personal information (RA 10173 Sec. 12)",
       hint: "Tick what may apply. This is a candidate list for the Legal Office / DPO to confirm. It is not a legal conclusion." },
-    { id: "basisSPI", sec: "basis", type: "checks", options: BASIS_OPTIONS, review: true, label: "Candidate lawful basis for sensitive personal information (RA 10173 Sec. 13)",
-      hint: "Needed only if the process uses sensitive personal information. Sensitive personal information has its own conditions in Sec. 13, which the Legal Office / DPO checks." },
+    { id: "basisSPI", sec: "basis", type: "checks", options: BASIS_OPTIONS_SPI, review: true, label: "Candidate lawful basis for sensitive personal information (RA 10173 Sec. 13)",
+      hint: "Needed only if the process uses sensitive personal information. Sec. 13 has its own list of cases, which differs from Sec. 12. Tick what may apply. The Legal Office / DPO confirms." },
     { id: "basisNotes", sec: "basis", type: "textarea", rows: 3, label: "Notes for the Legal Office / DPO", hint: "The law or provision the office relies on, if known.", blank: "None recorded." },
     { id: "privacyNotice", sec: "basis", grp: "Transparency, legitimate purpose and proportionality", type: "radio", options: YNU, label: "Transparency: are people given a privacy notice when their data is collected?" },
     { id: "purposeSpecified", sec: "basis", type: "radio", options: YNU, label: "Legitimate purpose: is the purpose specific, and is the data used only for that purpose?" },
@@ -714,7 +781,7 @@
 
     // Sign-off
     { id: "preparedBy", sec: "signoff", type: "text", required: true, label: "Prepared by", hint: "Name and position of the person who drafted this PIA." },
-    { id: "nextReview", sec: "signoff", type: "date", required: true, label: "Next review date" },
+    { id: "nextReview", sec: "signoff", type: "date", required: true, label: "Next review date", hint: "Filled with one year after today as a suggestion for your office. It is not a deadline set by the NPC. Change it to fit your cycle." },
     { id: "reviewTriggers", sec: "signoff", type: "textarea", rows: 3, label: "When this PIA will be reviewed again" }
   ];
 
@@ -747,6 +814,8 @@
     return t.getFullYear() + "-" + ("0" + (t.getMonth() + 1)).slice(-2) + "-" + ("0" + t.getDate()).slice(-2);
   }
 
+  function plusYear(d) { var p = d.split("-"); return (+p[0] + 1) + "-" + p[1] + "-" + p[2]; }
+
   function initPreset(id) {
     state.preset = id;
     state.v = {};
@@ -763,6 +832,7 @@
   function defaultFor(fid) {
     if (fid === "piaDate") return localDate();
     if (fid === "version") return "Draft 0.1";
+    if (fid === "nextReview") return plusYear(localDate());
     var p = PRESETS[state.preset];
     if (!p) return undefined;
     if (p.defaults.hasOwnProperty(fid)) return p.defaults[fid];
@@ -820,12 +890,14 @@
     RULES.forEach(function (r, idx) {
       if (!ruleFires(r)) return;
       var o = state.risks[r.id] || {};
-      var l = clamp15(o.l, r.l), i = clamp15(o.i, r.i);
+      var uf = r.field || r.unsureField;
+      var unsure = !!uf && state.v[uf] === "unsure";   // "Not sure" means verify first, so likelihood starts lower
+      var l = clamp15(o.l, unsure ? Math.min(r.l, 2) : r.l), i = clamp15(o.i, r.i);
       var control = o.control !== undefined ? o.control : r.control;
       rows.push({ id: r.id, rule: r, order: idx, risk: r.risk, control: control,
         controlIsDefault: sameText(control, r.control),
-        l: l, i: i, score: l * i, treatment: o.treatment || "", owner: o.owner || "", date: o.date || "",
-        source: "Flagged from Section " + (secNo(r.sec) || "") + " answers" });
+        l: l, i: i, score: l * i, treatment: o.treatment || "", owner: o.owner || "", date: o.date || "", unsure: unsure,
+        source: unsure ? "Answer was Not sure. Verify first. The rating is provisional until the answer is confirmed." : "Flagged from Section " + (secNo(r.sec) || "") + " answers" });
     });
     state.customRisks.forEach(function (c, idx) {
       var l = clamp15(c.l, 3), i = clamp15(c.i, 3);
@@ -837,6 +909,7 @@
     return rows;
   }
 
+  function riskText(r) { return (r.unsure ? "Verify first: " : "") + r.risk; }
   function treatmentLabel(v) { for (var i = 0; i < TREATMENTS.length; i++) if (TREATMENTS[i].v === v) return TREATMENTS[i].l.replace(/ \(.*\)$/, ""); return ""; }
 
   /* ---------- Completeness gate ---------- */
@@ -1009,7 +1082,7 @@
       h += '<button type="button" class="type-card" data-act="pick-preset" data-preset="' + id + '"><span class="tc-title">' + esc(p.label) + '</span><span class="tc-desc">' + esc(p.desc) + "</span></button>";
     });
     h += "</div>";
-    h += '<p class="ok-note">More process types, such as Health, may be added later.</p>';
+    h += '<p class="ok-note">Need another process type? Pick Other / Custom and fill in your own details.</p>';
     h += '<div class="nav-row"><button type="button" class="btn-ghost" data-act="to-office">Back</button><span></span></div>';
     return h;
   }
@@ -1086,7 +1159,7 @@
     if (r.custom) {
       h += '<div class="risk-text" style="font-weight:400"><label class="small" for="rk-' + r.id + '">Risk statement</label><textarea id="rk-' + r.id + '" data-risk="' + r.id + '" data-k="risk" rows="2">' + esc(r.risk) + "</textarea></div>";
     } else {
-      h += '<div class="risk-text">' + esc(r.risk) + '<span class="risk-src">' + esc(r.source) + "</span></div>";
+      h += '<div class="risk-text">' + esc(riskText(r)) + '<span class="risk-src">' + esc(r.source) + "</span></div>";
     }
     h += scoreBadge(r.score) + "</div>";
     if (!r.custom && r.rule.note) h += '<p class="risk-note">' + esc(r.rule.note) + "</p>";
@@ -1105,7 +1178,7 @@
 
   function renderRegister() {
     var rows = registerRows();
-    var h = '<p class="ok-note">Score = likelihood x impact (1 to 25). Bands: Low 1 to 4, Medium 5 to 9, High 10 to 16, Critical 20 to 25. These ratings are suggestions to start the discussion. Your office sets the final ratings.</p>';
+    var h = '<p class="ok-note">Score = likelihood x impact (1 to 25). Bands: Low 1 to 4, Medium 5 to 9, High 10 to 16, Critical 20 to 25. These ratings are suggestions to start the discussion. Your office sets the final ratings. If you use a 3 x 3 grid in training, the idea is the same with fewer levels. As a rough match, treat 1 to 2 as low, 3 as medium and 4 to 5 as high. A "Not sure" answer starts with a lower likelihood and is marked Verify first.</p>';
     if (!rows.length) h += '<p class="callout">No risks have been flagged yet. Answer the questions in the earlier sections, or add your own risk below.</p>';
     rows.forEach(function (r) { h += riskCardHtml(r); });
     h += '<div class="btn-row"><button type="button" class="btn-ghost" data-act="add-risk">Add a risk of your own</button></div>';
@@ -1144,11 +1217,12 @@
     var th = thresholdResult();
     var rows = isFull() ? registerRows() : [];
     var h = '<div class="gate-summary">' + (open.length ? open.length + " open item" + (open.length === 1 ? "" : "s") + " to resolve before adoption" : "All checks complete") + "</div>";
-    h += '<ul class="gate-list" id="gate-list">';
-    checks.forEach(function (c) {
-      h += '<li class="gate-item ' + (c.ok ? "ok" : "bad") + '" data-gate="' + esc(c.field) + '"><span class="dot"></span><span>' + esc(c.label) + "</span></li>";
-    });
-    h += "</ul>";
+    function gateItem(c) {
+      return '<li class="gate-item ' + (c.ok ? "ok" : "bad") + '" data-gate="' + esc(c.field) + '"><span class="gate-tag">' + (c.ok ? "Done" : "Open") + "</span><span>" + esc(c.label) + "</span></li>";
+    }
+    var done = checks.filter(function (c) { return c.ok; });
+    if (open.length) h += '<h3 class="grp">Open items (' + open.length + ')</h3><ul class="gate-list" id="gate-list">' + open.map(gateItem).join("") + "</ul>";
+    if (done.length) h += '<details class="gate-done"><summary>Done (' + done.length + ")</summary><ul class=\"gate-list\">" + done.map(gateItem).join("") + "</ul></details>";
     h += '<p class="ok-note">Result: ' + (isFull() ? "full PIA" : "short record") + (rows.length ? " with " + rows.length + " risk" + (rows.length === 1 ? "" : "s") + " in the register" : "") +
       (th.status === "open" ? ". The threshold check is not finished." : ".") + "</p>";
     h += '<div class="btn-row">' +
@@ -1448,7 +1522,7 @@
     return textOut(f);
   }
 
-  function dateOut(id) { var t = String(state.v[id] || "").trim(); return t || UNRESOLVED; }
+  function dateOut(id) { var t = String(state.v[id] || "").trim(); if (!t) return UNRESOLVED; return isDefault(id) ? t + " " + DEFAULT_NOTE : t; }
   function gap(t) { t = String(t || "").trim(); return t || UNRESOLVED; }
 
   function fieldBlocks(secId, skip) {
@@ -1481,7 +1555,7 @@
       b.push({ t: "h3", text: "Top risks and priority actions" });
       if (top.length) {
         b.push({ t: "table", head: ["Risk", "Rating", "Action", "Owner", "Target date"], widths: [0.28, 0.1, 0.3, 0.16, 0.16], small: true, compact: true,
-          rows: top.map(function (r) { var bd = bandFor(r.score); return [r.risk, { text: bd.name + " (" + r.score + ")", fill: bd.fill, bold: true }, gap(r.control), gap(r.owner), gap(r.date)]; }) });
+          rows: top.map(function (r) { var bd = bandFor(r.score); return [riskText(r), { text: bd.name + " (" + r.score + ")", fill: bd.fill, bold: true }, gap(r.control), gap(r.owner), gap(r.date)]; }) });
         if (top.some(function (r) { return r.controlIsDefault || !r.treatment; })) b.push({ t: "p", em: true, text: "Ratings and actions are suggested defaults until the organization edits and reviews them." });
       } else {
         b.push({ t: "p", text: "No risks were flagged from the answers given." });
@@ -1580,13 +1654,13 @@
 
       // Register
       b.push({ t: "h2", text: "Section " + secNo("register") + ". Risk register" });
-      b.push({ t: "p", text: "Score = likelihood x impact (1 to 25). Bands: Low 1 to 4, Medium 5 to 9, High 10 to 16, Critical 20 to 25. Ratings and controls come from this tool's suggested rules until the organization edits them." });
+      b.push({ t: "p", text: "Score = likelihood x impact (1 to 25). Bands: Low 1 to 4, Medium 5 to 9, High 10 to 16, Critical 20 to 25. Ratings and controls come from this tool's suggested rules until the organization edits them. Likelihood and impact each run from 1 to 5. On a 3 x 3 grid, roughly 1 to 2 is low, 3 is medium and 4 to 5 is high. Rows marked Verify first came from a Not sure answer and carry a provisional rating." });
       if (rows.length) {
         b.push({ t: "table", head: ["#", "Risk and control", "L", "I", "Score", "Treatment", "Owner", "Target date"], widths: [0.04, 0.34, 0.04, 0.04, 0.12, 0.12, 0.15, 0.15], small: true,
           rows: rows.map(function (r, i) {
             var bd = bandFor(r.score);
             return [String(i + 1),
-              { lines: [{ text: r.risk, bold: true }, { text: "Control: " + (String(r.control).trim() ? r.control + (r.controlIsDefault ? " " + DEFAULT_NOTE : "") : UNRESOLVED) }] },
+              { lines: [{ text: riskText(r), bold: true }, { text: "Control: " + (String(r.control).trim() ? r.control + (r.controlIsDefault ? " " + DEFAULT_NOTE : "") : UNRESOLVED) }] },
               String(r.l), String(r.i), { text: String(r.score) + " " + bd.name, fill: bd.fill, bold: true },
               treatmentLabel(r.treatment) || UNRESOLVED, gap(r.owner), gap(r.date)];
           }) });
