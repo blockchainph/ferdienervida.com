@@ -673,7 +673,7 @@
   // ---------- Convert to .docx (unlocked only when all 12 answers are correct and a name is entered) ----------
   // Uses the locally bundled "docx" library (see vendor/README.txt); it is loaded only once the
   // player finishes, and it makes no network request other than fetching that one local file.
-  var DOCX_SRC = "vendor/docx.iife.js";
+  var DOCX_SRC = "../vendor/docx/docx.iife.js";
   var docxState = "idle"; // idle | loading | ready | failed
 
   function loadDocx() {

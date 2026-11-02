@@ -912,7 +912,7 @@
   // ---------- Stage 3: name and Word download ----------
   // Uses the .docx library already bundled for /threatmodel/. It loads once Stage 1 is finished and
   // makes no request except for that one local file.
-  var DOCX_SRC = "../threatmodel/vendor/docx.iife.js";
+  var DOCX_SRC = "../vendor/docx/docx.iife.js";
   var docxState = "idle";            // idle | loading | ready | failed
   function loadDocx() {
     if (window.docx) { docxState = "ready"; refreshDownload(); return; }

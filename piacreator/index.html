@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIA Draft Creator: Privacy Impact Assessment for Philippine Government Offices</title>
+<meta name="description" content="Guided tool for drafting a Privacy Impact Assessment (PIA) for a Philippine government office process. Everything you type stays in your browser.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    --paper: #f7f8fa;
+    --panel: #ffffff;
+    --ink: #16233a;
+    --ink-soft: #4b5768;
+    --navy: #1f3a5f;
+    --navy-deep: #0f1d33;
+    --gold: #b8860b;
+    --gold-soft: #e7c874;
+    --line: #dce1e8;
+    --line-soft: #eceff3;
+    --rail-text: #cdd8ea;
+    --rail-text-dim: #8ea0bc;
+    --gate-bad-bg: #fbeaea;
+    --gate-bad-fg: #8b1e1e;
+    --gate-ok-bg: #e9f5ec;
+    --gate-ok-fg: #1f6b3a;
+    --focus: #2f6fb0;
+    --band-low: #e9f5ec;
+    --band-low-fg: #1f6b3a;
+    --band-med: #fff4cc;
+    --band-med-fg: #7a5a00;
+    --band-high: #fde0c8;
+    --band-high-fg: #8a3b00;
+    --band-crit: #f6c9c9;
+    --band-crit-fg: #8b1e1e;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --paper: #10182a;
+      --panel: #16223a;
+      --ink: #e8edf6;
+      --ink-soft: #aab7cc;
+      --line: #2a3752;
+      --line-soft: #202c46;
+      --gate-bad-bg: #3a1f1f;
+      --gate-bad-fg: #f1a3a3;
+      --gate-ok-bg: #1c3527;
+      --gate-ok-fg: #8fd6a8;
+      --band-low: #1c3527;
+      --band-low-fg: #8fd6a8;
+      --band-med: #3b3210;
+      --band-med-fg: #f0d675;
+      --band-high: #44280f;
+      --band-high-fg: #f5b98a;
+      --band-crit: #4a2020;
+      --band-crit-fg: #f1a3a3;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #10182a;
+    --panel: #16223a;
+    --ink: #e8edf6;
+    --ink-soft: #aab7cc;
+    --line: #2a3752;
+    --line-soft: #202c46;
+    --gate-bad-bg: #3a1f1f;
+    --gate-bad-fg: #f1a3a3;
+    --gate-ok-bg: #1c3527;
+    --gate-ok-fg: #8fd6a8;
+    --band-low: #1c3527;
+    --band-low-fg: #8fd6a8;
+    --band-med: #3b3210;
+    --band-med-fg: #f0d675;
+    --band-high: #44280f;
+    --band-high-fg: #f5b98a;
+    --band-crit: #4a2020;
+    --band-crit-fg: #f1a3a3;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Public Sans', system-ui, sans-serif;
+    margin: 0;
+  }
+  h1, h2, h3, .display {
+    font-family: 'Spectral', Georgia, serif;
+    text-wrap: balance;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .app {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: 100vh;
+  }
+  .app.no-rail { grid-template-columns: 1fr; }
+  .app.no-rail .rail { display: none; }
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; }
+    .rail { position: static !important; height: auto !important; padding: 18px 20px; }
+    .rail-title { margin-bottom: 14px; font-size: 20px; }
+    .rail .rail-toggle { display: flex; }
+    .rail:not(.open) .rail-steps,
+    .rail:not(.open) .rail-footer { display: none; }
+    .rail.open .rail-toggle-caret { transform: rotate(180deg); }
+  }
+  .rail-toggle {
+    display: none;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 6px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .rail-toggle-caret { flex: 0 0 auto; transition: transform 0.15s; }
+
+  /* ---------- Rail ---------- */
+  .rail {
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+    color: var(--rail-text);
+    padding: 28px 22px 22px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .rail-brand {
+    font-family: 'Spectral', serif;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    margin-bottom: 4px;
+  }
+  .rail-title {
+    font-family: 'Spectral', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 22px;
+    line-height: 1.25;
+  }
+  .rail-steps { list-style: none; margin: 0; padding: 0; }
+  .rail-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 8px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    line-height: 1.4;
+    color: var(--rail-text-dim);
+    transition: background 0.15s, color 0.15s;
+  }
+  .rail-step:hover { background: rgba(255,255,255,0.06); color: var(--rail-text); }
+  .rail-step.done { color: var(--rail-text); }
+  .rail-step.active { background: rgba(184,134,11,0.16); color: #fff; }
+  .rail-step:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 1px; }
+  .rail-num {
+    flex: 0 0 auto;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--rail-text-dim);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .rail-step.done .rail-num { background: var(--gold); border-color: var(--gold); color: var(--navy-deep); }
+  .rail-step.active .rail-num { border-color: var(--gold); color: var(--gold-soft); }
+  .rail-step-label { padding-top: 2px; }
+  .rail-footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    font-size: 11.5px;
+    color: var(--rail-text-dim);
+    line-height: 1.5;
+  }
+  .rail-footer p { margin: 0 0 10px; }
+  .rail-link {
+    background: none; border: none; padding: 0; color: var(--gold-soft); font: inherit; font-size: 12px;
+    text-decoration: underline; cursor: pointer; font-weight: 500;
+  }
+  .rail-sub { margin: -14px 0 18px; font-size: 12.5px; line-height: 1.4; color: var(--rail-text-dim); }
+  @media (max-width: 860px) { .rail-sub { margin: -8px 0 14px; } }
+
+  /* ---------- Main ---------- */
+  .main { padding: 48px 56px 80px; max-width: 780px; }
+  .app.no-rail .main { margin: 0 auto; width: 100%; }
+  @media (max-width: 640px) { .main { padding: 28px 18px 60px; } }
+  .setup-brand { font-family: 'Spectral', serif; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; font-weight: 600; }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 8px;
+  }
+  .step-title { font-size: 28px; margin: 0 0 10px; }
+  @media (max-width: 640px) { .step-title { font-size: 24px; } }
+  .step-help { color: var(--ink-soft); font-size: 15px; line-height: 1.55; margin: 0 0 30px; max-width: 62ch; }
+
+  details.about {
+    background: var(--panel); border: 1.5px solid var(--line); border-left: 4px solid var(--gold);
+    border-radius: 10px; padding: 4px 18px 6px; margin: 0 0 28px; max-width: 70ch;
+  }
+  details.about summary {
+    cursor: pointer; list-style: none; font-weight: 700; font-size: 15.5px; padding: 12px 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px;
+  }
+  details.about summary::-webkit-details-marker { display: none; }
+  details.about summary::after { content: "\25BE"; color: var(--ink-soft); transition: transform 0.15s; }
+  details.about[open] summary::after { transform: rotate(180deg); }
+  details.about summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+  details.about p { margin: 0 0 12px; font-size: 14.5px; line-height: 1.6; }
+  details.about ul { margin: 0 0 12px; padding-left: 20px; }
+  details.about li { margin: 0 0 8px; font-size: 14.5px; line-height: 1.55; }
+  details.about .about-ok { background: rgba(184, 134, 11, 0.13); border-radius: 8px; padding: 11px 14px; margin: 4px 0 14px; }
+  .ok-note { margin: 0 0 24px; padding-left: 12px; border-left: 3px solid var(--gold); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); max-width: 62ch; }
+  .step-help + .ok-note { margin-top: -14px; }
+  details.about .about-note { font-size: 13px; color: var(--ink-soft); padding-top: 10px; border-top: 1px solid var(--line-soft); margin-bottom: 8px; }
+
+  .grp { font-size: 17px; margin: 30px 0 14px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  .grp:first-of-type { margin-top: 6px; }
+  .field { margin-bottom: 22px; }
+  .field .flabel, .field legend.flabel {
+    display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 7px; color: var(--ink); padding: 0;
+  }
+  .field fieldset { border: none; margin: 0; padding: 0; min-width: 0; }
+  .req { color: var(--gate-bad-fg); font-weight: 700; margin-left: 2px; }
+  .default-badge {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700;
+    color: var(--gold); background: rgba(184,134,11,0.12); border-radius: 999px; padding: 3px 10px;
+    margin-left: 8px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .default-badge[hidden] { display: none; }
+  .review-tag {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--navy); background: var(--line-soft); border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px; margin-left: 8px;
+  }
+  .field .fhint { font-size: 12.5px; color: var(--ink-soft); margin: -3px 0 8px; line-height: 1.5; }
+  input[type="text"], input[type="date"], textarea, select {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14.5px;
+    color: var(--ink);
+    background: var(--panel);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 13px;
+    line-height: 1.5;
+  }
+  @media (max-width: 640px) { input[type="text"], input[type="date"], textarea, select { font-size: 16px; } }
+  textarea { resize: vertical; min-height: 84px; }
+  input:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px rgba(47,111,176,0.16);
+  }
+
+  .radio-grid { display: grid; gap: 8px; }
+  .radio-grid.row { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+  .radio-opt {
+    display: flex; align-items: center; gap: 10px;
+    border: 1.5px solid var(--line); border-radius: 8px; padding: 11px 13px;
+    cursor: pointer; font-size: 14px; background: var(--panel); min-height: 44px;
+  }
+  .radio-opt:has(input:checked) { border-color: var(--navy); background: var(--line-soft); font-weight: 600; }
+  .radio-opt:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .radio-opt input { accent-color: var(--navy); width: 17px; height: 17px; flex: 0 0 auto; }
+
+  .callout {
+    border: 1.5px solid var(--gold); background: rgba(184,134,11,0.10); border-radius: 10px;
+    padding: 12px 15px; margin: 0 0 22px; font-size: 14px; line-height: 1.55;
+  }
+  .callout[hidden] { display: none; }
+
+  .type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .type-grid { grid-template-columns: 1fr; } }
+  .type-card {
+    text-align: left; background: var(--panel); border: 1.5px solid var(--line); border-radius: 12px;
+    padding: 18px; cursor: pointer; color: var(--ink); display: block; width: 100%;
+  }
+  .type-card:hover { border-color: var(--navy); }
+  .type-card:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .type-card .tc-title { font-family: 'Spectral', serif; font-size: 19px; font-weight: 700; display: block; margin-bottom: 6px; }
+  .type-card .tc-desc { font-size: 13.5px; font-weight: 400; color: var(--ink-soft); line-height: 1.5; display: block; }
+
+  .th-q { background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+  .th-q fieldset { border: none; margin: 0; padding: 0; min-width: 0; }
+  .th-q legend { padding: 0; margin: 0 0 4px; width: 100%; }
+  .th-q .th-text { font-weight: 600; font-size: 14.5px; margin-bottom: 4px; }
+  .th-q .fhint { margin: 0 0 10px; }
+  .th-result { border-radius: 10px; padding: 16px 18px; margin: 22px 0 6px; border: 1.5px solid var(--line); background: var(--panel); }
+  .th-result h3 { margin: 0 0 6px; font-size: 18px; }
+  .th-result p { margin: 0 0 8px; font-size: 14px; line-height: 1.55; }
+  .th-result ul { margin: 0 0 10px; padding-left: 20px; font-size: 14px; line-height: 1.55; }
+  .th-result.full { border-color: var(--gold); background: rgba(184,134,11,0.08); }
+  .th-result.short { border-color: var(--gate-ok-fg); background: var(--gate-ok-bg); }
+
+  .risk-card { background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+  .risk-head { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .risk-text { font-weight: 600; font-size: 14.5px; line-height: 1.45; flex: 1; }
+  .risk-src { display: block; font-weight: 500; font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+  .score-badge {
+    flex: 0 0 auto; min-width: 84px; text-align: center; border-radius: 8px; padding: 6px 8px; font-size: 12px; font-weight: 700; line-height: 1.3;
+  }
+  .score-badge b { display: block; font-size: 18px; font-family: 'Spectral', serif; }
+  .band-low { background: var(--band-low); color: var(--band-low-fg); }
+  .band-med { background: var(--band-med); color: var(--band-med-fg); }
+  .band-high { background: var(--band-high); color: var(--band-high-fg); }
+  .band-crit { background: var(--band-crit); color: var(--band-crit-fg); }
+  .risk-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+  .risk-grid.three { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 640px) { .risk-grid, .risk-grid.three { grid-template-columns: 1fr; } }
+  .risk-grid label, .risk-card label.small { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--ink-soft); }
+  .risk-card textarea { min-height: 64px; }
+  .risk-note { font-size: 13px; background: rgba(184,134,11,0.10); border-radius: 8px; padding: 8px 11px; margin: 0 0 10px; line-height: 1.5; }
+
+  .action-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 0 0 18px; }
+  .action-table th, .action-table td { border: 1px solid var(--line); padding: 8px; vertical-align: top; text-align: left; }
+  .action-table th { background: var(--navy); color: #fff; font-weight: 600; font-size: 12px; }
+  .table-wrap { overflow-x: auto; }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 36px; gap: 12px; }
+  button {
+    font-family: inherit; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer;
+    padding: 12px 22px; border: none; min-height: 44px;
+  }
+  .btn-primary { background: var(--navy); color: #fff; }
+  .btn-primary:hover { background: var(--navy-deep); }
+  .btn-ghost { background: transparent; color: var(--ink-soft); border: 1.5px solid var(--line); }
+  .btn-ghost:hover { border-color: var(--ink-soft); color: var(--ink); }
+  .btn-gold { background: var(--gold); color: var(--navy-deep); }
+  .btn-gold:hover { filter: brightness(0.94); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .link-row a { color: var(--navy); font-weight: 600; }
+  :root[data-theme="dark"] .link-row a { color: var(--gold-soft); }
+
+  /* ---------- Review screen ---------- */
+  .gate-list { list-style: none; margin: 0 0 26px; padding: 0; }
+  .gate-item {
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 13px; border-radius: 8px; margin-bottom: 6px; font-size: 13.5px;
+  }
+  .gate-item.bad { background: var(--gate-bad-bg); color: var(--gate-bad-fg); }
+  .gate-item.ok { background: var(--gate-ok-bg); color: var(--gate-ok-fg); }
+  .gate-item .dot { flex: 0 0 auto; margin-top: 4px; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .gate-summary { font-size: 14.5px; margin-bottom: 8px; font-weight: 600; }
+
+  .preview-pane {
+    background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px;
+    padding: 18px 20px; margin-top: 8px; max-height: 480px; overflow-y: auto;
+  }
+  .preview-pane pre {
+    white-space: pre-wrap; word-wrap: break-word; font-family: 'Public Sans', sans-serif; font-size: 12.5px;
+    color: var(--ink-soft); line-height: 1.6; margin: 0;
+  }
+  .disclaimer { margin-top: 34px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; line-height: 1.6; color: var(--ink-soft); max-width: 70ch; }
+  .disclaimer p { margin: 0 0 6px; }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--navy-deep); color: #fff; padding: 11px 20px; border-radius: 8px; font-size: 13.5px;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s; max-width: 90vw; text-align: center;
+  }
+  .toast.show { opacity: 1; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <nav class="rail" id="rail" aria-label="PIA sections"></nav>
+  <main class="main" id="main"></main>
+</div>
+<input type="file" id="load-file" accept="application/json,.json" class="sr-only" tabindex="-1" aria-hidden="true">
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<noscript><p style="padding:24px">This tool needs JavaScript. Nothing you type leaves your browser.</p></noscript>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =====================================================================
+     DATA TABLES. Edit these to change content; the logic below reads them.
+     ===================================================================== */
+
+  var DEFAULT_NOTE = "(Suggested default, not yet reviewed by the organization.)";
+  var UNRESOLVED = "[UNRESOLVED]";
+  var SAVE_APP = "piacreator";
+  var SAVE_VERSION = 1;
+  var DOCX_SRC = "../vendor/docx/docx.iife.js";
+
+  var DISCLAIMER = [
+    "This is a draft for review by the DPO, Legal Office, and ICT office before adoption.",
+    "It does not certify compliance with RA 10173, its IRR, or NPC issuances.",
+    "It is based on NPC Advisory No. 2017-03. The NPC is updating its PIA guidance through a draft circular, so this template may change."
+  ];
+
+  // Office types. `sector` lets a private-sector list be added later without changing the logic.
+  var OFFICE_TYPES = [
+    { id: "nga", sector: "gov", label: "National government agency", noun: "national government agency", mandate: "your agency charter or enabling law" },
+    { id: "province", sector: "gov", label: "Provincial government", noun: "provincial government", mandate: "the Local Government Code and provincial ordinances" },
+    { id: "city", sector: "gov", label: "City government", noun: "city government", mandate: "the Local Government Code and city ordinances" },
+    { id: "municipality", sector: "gov", label: "Municipal government", noun: "municipal government", mandate: "the Local Government Code and municipal ordinances" },
+    { id: "barangay", sector: "gov", label: "Barangay", noun: "barangay", mandate: "the Local Government Code and barangay ordinances" },
+    { id: "gocc", sector: "gov", label: "Government-owned or controlled corporation (GOCC)", noun: "GOCC", mandate: "your agency charter or enabling law" },
+    { id: "suc", sector: "gov", label: "State university or college", noun: "state university or college", mandate: "your institution's charter or enabling law" },
+    { id: "other", sector: "gov", label: "Other government office", noun: "government office", mandate: "the law, charter or order that created or governs your office" }
+  ];
+
+  var THRESHOLD_QUESTIONS = [
+    { id: "q1", text: "Does the process handle sensitive personal information?", reason: "It handles sensitive personal information.",
+      hint: "RA 10173 lists what counts as sensitive. Examples include health, age, civil status, education, government-issued ID numbers and records of offenses. If you are not sure, ask your DPO and answer Yes for now." },
+    { id: "q2", text: "Does it involve a large number of people or records?", reason: "It involves a large number of people or records.",
+      hint: "There is no fixed number here. Think about whether a leak would affect a large part of your community or workforce." },
+    { id: "q3", text: "Is the process new, or is the system or way of working being changed?", reason: "The process or system is new or being changed.",
+      hint: "Examples: a new database, a move to an online portal, a new vendor, or a new form that collects more data." },
+    { id: "q4", text: "Is personal data shared with other agencies, contractors or other third parties?", reason: "Personal data is shared with other agencies, contractors or third parties.",
+      hint: "Include sharing by email, portal, paper, or access given to a contractor or system provider." },
+    { id: "q5", text: "Does the process use CCTV or other monitoring of people?", reason: "It uses CCTV or other monitoring of people.",
+      hint: "Examples: CCTV, biometric time clocks, tracking of devices or vehicles." },
+    { id: "q6", text: "Are decisions about people made, or mostly guided, by an automated system?", reason: "Decisions about people are made or guided by an automated system.",
+      hint: "Examples: automatic scoring of applicants, or a system that approves or rejects requests without a staff member checking." }
+  ];
+
+  var BASIS_OPTIONS = [
+    { id: "public", label: "Performance of a public function or mandate under law" },
+    { id: "legal", label: "Legal obligation" },
+    { id: "consent", label: "Consent, where it is used" },
+    { id: "other", label: "Another basis (explain in the notes below)" }
+  ];
+
+  var YN = [{ v: "yes", l: "Yes" }, { v: "no", l: "No" }];
+  var YNU = [{ v: "yes", l: "Yes" }, { v: "no", l: "No" }, { v: "unsure", l: "Not sure" }];
+  var YNUNA = [{ v: "yes", l: "Yes" }, { v: "no", l: "No" }, { v: "unsure", l: "Not sure" }, { v: "na", l: "Not applicable" }];
+
+  var TREATMENTS = [
+    { v: "", l: "Not yet decided" },
+    { v: "reduce", l: "Reduce (add a control)" },
+    { v: "accept", l: "Accept" },
+    { v: "transfer", l: "Transfer (for example to a contractor)" },
+    { v: "avoid", l: "Avoid (stop the activity)" }
+  ];
+
+  // Rating bands, applied to score = likelihood x impact (1 to 25).
+  var BANDS = [
+    { name: "Critical", min: 20, cls: "band-crit", fill: "F6C9C9" },
+    { name: "High", min: 10, cls: "band-high", fill: "FDE0C8" },
+    { name: "Medium", min: 5, cls: "band-med", fill: "FFF4CC" },
+    { name: "Low", min: 1, cls: "band-low", fill: "E9F5EC" }
+  ];
+
+  // Defaults shared by every preset except Custom.
+  var COMMON_DEFAULTS = {
+    rightsAccess: "People may ask the office, through the DPO, for a copy of the personal data it holds about them. The office checks the requester's identity, finds the records, and replies in writing. Requests and replies are logged.",
+    rightsCorrection: "People may ask the office to correct data that is wrong or out of date. The office checks the request against supporting documents, makes the correction where it is allowed, and records the change. Where a record can only be changed through a legal process, the office tells the person how to apply.",
+    rightsErasure: "Requests to erase or block data go to the DPO and the Legal Office, because some records must be kept under law or records rules. The office tells the person what it can and cannot remove, and why.",
+    rightsComplaints: "Complaints about how personal data is handled go to the DPO. The DPO records the complaint, looks into it, and replies to the person. The reply also tells the person they may bring the complaint to the National Privacy Commission.",
+    secOrg: "Only staff who need the data for their work are given access. Staff sign a confidentiality undertaking and attend data privacy orientation. The DPO keeps a list of who has access and reviews it when staff change roles or leave.",
+    secPhysical: "Paper records are kept in locked cabinets in a room with controlled entry. Visitors are logged and accompanied. Computers that hold personal data are not left unattended and unlocked.",
+    secTechnical: "Each user has their own account and password. Systems that hold personal data are kept up to date, protected by antivirus, and backed up. Laptops, phones and removable drives that hold personal data are encrypted. Access to the system is logged.",
+    retentionNotes: "Records are kept only for the period set in the applicable records disposition schedule, and disposed of only as that schedule allows.",
+    reviewTriggers: "Review this PIA when the process, the system, the data collected, or the law changes."
+  };
+
+  // Process presets. Each pre-fills the data inventory, flows and suggested controls. No preset names a specific law.
+  var PRESETS = {
+    civil: {
+      label: "Civil Registry",
+      desc: "Registering births, marriages and deaths, and issuing certified copies.",
+      common: true,
+      defaults: {
+        description: "The office receives and records life events of residents, such as births, marriages and deaths, and issues certified copies of the records on request.",
+        purpose: "To keep an accurate, lasting record of civil status events and to issue certified copies to the people entitled to them.",
+        catPI: "Full name; sex; date and place of birth, marriage or death; names and addresses of parents and spouses; home address; contact number; signature; name and relationship of the informant or requester.",
+        catSPI: "Age and civil status; information on the parentage or legitimacy of a child; cause of death and other health information on certificates; government ID numbers shown in supporting documents. Confirm the exact list with your DPO.",
+        subjects: "Persons named in civil registry records (the child, parents, spouses, the deceased); informants and witnesses; people who request copies; authorized representatives.",
+        sources: "The person or informant who files the document; hospitals, clinics and midwives that report births and deaths; courts and other agencies that send decrees or orders; other civil registry offices.",
+        collection: "Staff receive the report or application in person, or on approved forms sent by hospitals and courts. Staff check the supporting documents, enter the details in the register, and issue a receipt.",
+        use: "Details are used to register the event, issue certified copies, process corrections, and send reports to other offices as the law requires.",
+        storage: "Paper registers and supporting documents are kept in the records room. Electronic copies are kept in the office system and on office-managed backup storage.",
+        access: "Registry staff handle entries and issue copies. The office head and the DPO can view records for supervision. Requesters receive only the copy they are entitled to.",
+        sharing: "Reports and copies go to other offices as the law requires. Add each recipient, what is sent, and how it is sent."
+      }
+    },
+    welfare: {
+      label: "Social Welfare",
+      desc: "Assessing requests for social assistance and keeping case records.",
+      common: true,
+      defaults: {
+        description: "The office receives requests for social assistance, assesses the applicant's needs, approves or declines assistance, and keeps case records for follow-up and reporting.",
+        purpose: "To identify residents who need social assistance, deliver the assistance fairly, and keep a record of what was given and why.",
+        catPI: "Full name; home address; contact number; birth date; household members and their relationship to the applicant; occupation and income; ID numbers presented; photos taken during interviews or home visits; signature.",
+        catSPI: "Age and civil status; health condition, disability and medical certificates; information about minors; information on abuse, violence or family crisis in case notes; government ID numbers. Confirm the exact list with your DPO.",
+        subjects: "Applicants and their household members; children and other minors; senior citizens, persons with disabilities, solo parents and other program beneficiaries; people who refer cases.",
+        sources: "The applicant and household members; barangay officials; hospitals and clinics; schools; partner agencies and programs; social worker interviews and home visits.",
+        collection: "Social workers interview applicants, fill in intake forms, and collect supporting documents. Some information comes from referrals by the barangay or partner agencies.",
+        use: "Details are used to assess need, decide on assistance, schedule follow-up, and report on the number of people served.",
+        storage: "Case folders are kept in locked cabinets. Electronic lists of beneficiaries are kept on office computers or in a program database.",
+        access: "Assigned social workers and the office head see case files. Finance and records staff see only what they need to release assistance.",
+        sharing: "Case information may be shared with partner agencies, hospitals, schools or barangay officials when needed to deliver help. Add each recipient, what is shared, and how."
+      }
+    },
+    hr: {
+      label: "HR and Payroll",
+      desc: "Employee records, hiring, attendance, leave, payroll and benefits.",
+      common: true,
+      defaults: {
+        description: "The office keeps employee records and processes hiring, attendance, leave, payroll, benefits and retirement.",
+        purpose: "To hire and manage staff, pay salaries and benefits correctly, and meet reporting duties to oversight and benefit agencies.",
+        catPI: "Full name; home address; contact number; birth date; employee number; position and salary grade; attendance and leave records; bank account number; performance ratings; emergency contact; photo; resume and work history.",
+        catSPI: "Government-issued numbers (for example tax, social security, health insurance and housing fund numbers); age and civil status; health information in medical certificates and leave requests; education records; records of administrative or disciplinary cases. Confirm the exact list with your DPO.",
+        subjects: "Employees (regular, casual, contractual, job order); job applicants; dependents and beneficiaries; retired and former employees.",
+        sources: "Employees and applicants; previous employers; schools; medical providers; benefit and oversight agencies.",
+        collection: "HR staff collect application documents and personal data sheets at hiring. Time records, leave requests and payroll inputs are submitted by employees and supervisors.",
+        use: "Details are used to hire, assign and evaluate staff, compute and release pay and benefits, and prepare required reports.",
+        storage: "201 files are kept in locked cabinets. Payroll and attendance data are kept in office systems, spreadsheets and bank files.",
+        access: "HR and payroll staff handle records. Supervisors see their own team's attendance. Finance staff see only the data they need to release pay.",
+        sharing: "Payroll and benefit details go to the bank, benefit agencies and oversight bodies as required. Add each recipient, what is sent, and how."
+      }
+    },
+    custom: {
+      label: "Other / Custom",
+      desc: "Any other process that uses personal data. Nothing is pre-filled.",
+      common: false,
+      defaults: {}
+    }
+  };
+
+  // Gap rules. `field` + `bad` reads an answer; `when` is a custom test. Add a row to add a rule.
+  // l = default likelihood (1 to 5), i = default impact (1 to 5).
+  var RULES = [
+    { id: "no_owner", sec: "identity", when: function () { return blank("processOwner"); }, l: 3, i: 3,
+      risk: "No process owner is named, so no one is clearly accountable for the privacy risks of this process.",
+      control: "Name a process owner in writing and tell the DPO." },
+    { id: "no_mandate", sec: "process", when: function () { return blank("mandate"); }, l: 3, i: 4,
+      risk: "No legal mandate is stated for collecting this data, so the office cannot show what authorizes the collection.",
+      control: "Ask the Legal Office to identify the law, charter or ordinance that authorizes the collection, and record it in the process description." },
+    { id: "law_enf", sec: "process", field: "lawEnf", bad: ["yes"], l: 2, i: 3,
+      risk: "The process involves law enforcement, investigation or regulatory functions. This draft has not assessed whether any special rules apply.",
+      control: "Refer to the Legal Office / DPO. Do not assume any exemption applies.",
+      note: "Special treatment may apply under the Data Privacy Act. Refer to the Legal Office / DPO." },
+    { id: "no_basis", sec: "basis", when: function () { return !(state.v.basisPI || []).length || (hasSPI() && !(state.v.basisSPI || []).length); }, l: 3, i: 4,
+      risk: "No candidate lawful basis has been recorded for the personal data in this process.",
+      control: "Ask the Legal Office / DPO to review the process and record the basis it relies on." },
+    { id: "no_notice", sec: "basis", field: "privacyNotice", bad: ["no", "unsure"], l: 4, i: 3,
+      risk: "People may not be told, when their data is collected, how it will be used.",
+      control: "Prepare a privacy notice and give it wherever data is collected (form, counter, website)." },
+    { id: "purpose_unclear", sec: "basis", field: "purposeSpecified", bad: ["no", "unsure"], l: 3, i: 3,
+      risk: "The purpose is not specific, so data may be used for things people were not told about.",
+      control: "Write down a specific purpose and use the data only for it." },
+    { id: "over_collection", sec: "basis", field: "minimized", bad: ["no", "unsure"], l: 3, i: 3,
+      risk: "The office may collect more personal data than the purpose needs.",
+      control: "Go through each field on the form and remove what is not needed." },
+    { id: "personal_channels", sec: "security", field: "personalChannels", bad: ["yes", "unsure"], l: 4, i: 4,
+      risk: "Personal data may be shared through personal email or messaging apps, which the office cannot control or audit.",
+      control: "Use official, access-controlled channels to share personal data. Tell staff not to use personal email or chat apps for this." },
+    { id: "nap_unknown", sec: "lifecycle", when: function () { return !!state.v.napUnknown || blank("napSchedule"); }, l: 3, i: 3,
+      risk: "The records disposition schedule that applies is not known, so the retention period and disposal rules cannot be confirmed.",
+      control: "Ask the records officer to identify the applicable National Archives of the Philippines records disposition schedule." },
+    { id: "no_retention", sec: "lifecycle", when: function () { return blank("retentionPeriod") && !state.v.napUnknown && !blank("napSchedule"); }, l: 3, i: 3,
+      risk: "No retention period is recorded, so data may be kept longer than needed.",
+      control: "Take the retention period from the applicable records disposition schedule and record it." },
+    { id: "no_disposal", sec: "lifecycle", when: function () { return blank("disposal"); }, l: 3, i: 3,
+      risk: "No disposal method is stated, so old records may be thrown away unsafely or kept without limit.",
+      control: "State how paper and electronic records are destroyed once the retention period ends, and who approves it." },
+    { id: "no_dsa", sec: "lifecycle", when: function () { return state.threshold.q4 === "yes" && (state.v.dsa === "no" || state.v.dsa === "unsure"); }, l: 3, i: 4,
+      risk: "Data is shared with another agency or contractor without a data sharing agreement, so there is no written limit on how it is used or protected.",
+      control: "Sign a data sharing agreement or contract terms with each recipient before more data is shared. The Legal Office reviews the wording." },
+    { id: "shared_accounts", sec: "security", field: "sharedAccounts", bad: ["yes", "unsure"], l: 4, i: 4,
+      risk: "Staff share user accounts, so the office cannot tell who viewed or changed the data.",
+      control: "Give each user their own account and turn on access logs." },
+    { id: "unencrypted", sec: "security", field: "unencrypted", bad: ["yes", "unsure"], l: 4, i: 5,
+      risk: "Sensitive personal information may be stored on laptops or USB drives that are not encrypted, so a lost device exposes the data.",
+      control: "Encrypt laptops and removable drives that hold personal data, or stop storing the data on them." },
+    { id: "wide_access", sec: "security", field: "accessLimited", bad: ["no", "unsure"], l: 3, i: 4,
+      risk: "Access is not limited to staff who need the data, so more people can see it than should.",
+      control: "List who needs access and why, remove everyone else, and review the list when staff change roles." },
+    { id: "unlocked", sec: "security", field: "lockedStorage", bad: ["no", "unsure"], l: 3, i: 4,
+      risk: "Paper records are not kept locked, so they can be read, copied or taken without notice.",
+      control: "Keep paper records in locked cabinets and limit who holds the keys." },
+    { id: "no_breach", sec: "security", field: "breachProcedure", bad: ["no", "unsure"], l: 3, i: 5,
+      risk: "There is no written procedure for handling a data breach, so staff may respond late or inconsistently.",
+      control: "Prepare an incident response plan with the CIRP Intake Wizard (/cirpcreator/) and playbooks with the Incident Playbook Creator (/playbooks/)." },
+    { id: "no_rights", sec: "rights", field: "rightsChannel", bad: ["no", "unsure"], l: 3, i: 3,
+      risk: "There is no clear channel for people to ask for access, correction or erasure, or to complain.",
+      control: "Name the DPO or another contact for these requests, publish how to reach them, and keep a request log." },
+    { id: "sensitive_volume", sec: "threshold", when: function () { return state.threshold.q1 === "yes" && state.threshold.q2 === "yes"; }, l: 3, i: 5,
+      risk: "A large amount of sensitive personal information is held in one process, so a breach would harm many people.",
+      control: "Limit access, encrypt the data, and keep a log of who views it." },
+    { id: "new_system", sec: "threshold", when: function () { return state.threshold.q3 === "yes"; }, l: 3, i: 3,
+      risk: "The process or system is new or changing and may not have been checked for privacy and security before use.",
+      control: "Test and approve the change before going live, and update this PIA whenever the system changes." },
+    { id: "monitoring", sec: "threshold", when: function () { return state.threshold.q5 === "yes"; }, l: 3, i: 3,
+      risk: "Monitoring may collect more than needed or keep footage and records too long.",
+      control: "Post visible notices, limit who can view recordings, and set a retention period for them." },
+    { id: "automated", sec: "threshold", when: function () { return state.threshold.q6 === "yes"; }, l: 3, i: 4,
+      risk: "Automated decisions may affect people without a staff member checking them.",
+      control: "Add human review of automated decisions and tell people how to ask for a review." }
+  ];
+
+  // Sections. `short` marks the sections kept when the threshold result is a short record.
+  var SECTIONS = [
+    { id: "threshold", short: true, title: "Threshold check", rail: "Threshold check",
+      help: "Six quick questions decide whether this process needs a full PIA or only a short record." },
+    { id: "identity", short: true, title: "Identity and ownership", rail: "Identity & ownership",
+      help: "Who is responsible for this process and this assessment. Leave a name blank if you do not have it yet. The draft will mark it as unresolved." },
+    { id: "process", short: true, title: "Process description and purpose", rail: "Process & purpose",
+      help: "What the process does, why it needs personal data, and the law that allows it." },
+    { id: "inventory", short: true, title: "Personal data inventory", rail: "Personal data inventory",
+      help: "What data the process uses, whose data it is, how much, and where it comes from. Suggested text for your process type is pre-filled. Edit it to match your office." },
+    { id: "lifecycle", title: "Data lifecycle", rail: "Data lifecycle",
+      help: "Follow the data from collection to disposal: how it is collected, used, stored, accessed, shared, kept and destroyed." },
+    { id: "basis", short: true, title: "Lawful basis and principles", rail: "Lawful basis & principles",
+      help: "The candidate basis for processing, then three checks: transparency, legitimate purpose and proportionality." },
+    { id: "rights", title: "Data subject rights", rail: "Data subject rights",
+      help: "How people can see, correct and ask to remove their data, and how they can complain." },
+    { id: "security", title: "Security measures", rail: "Security measures",
+      help: "The organizational, physical and technical protections in place today. Your answers to the questions below feed the risk register." },
+    { id: "register", title: "Risk register", rail: "Risk register",
+      help: "Built from your answers. Each weak answer becomes a risk with a suggested rating and control. Change the ratings, treatment, owner and target date to fit your office." },
+    { id: "recs", title: "Recommendations and action plan", rail: "Recommendations & actions",
+      help: "The actions that come out of the risk register, listed by priority, plus any recommendations of your own." },
+    { id: "signoff", short: true, title: "Sign-off and review cycle", rail: "Sign-off & review",
+      help: "Who prepared, reviewed and approves this PIA, and when it will be reviewed again." }
+  ];
+
+  // Fields. `required` fields start blank (unless a preset suggests text) and are checked by the completeness gate.
+  // `grp` inserts a sub-heading. `blank` is the text printed when an optional field is empty.
+  var FIELDS = [
+    // Identity
+    { id: "office", sec: "identity", type: "text", required: true, label: "Name of office or agency", ph: "Enter the full official name" },
+    { id: "department", sec: "identity", type: "text", required: true, label: "Department or division running the process", ph: "e.g. the unit or section that owns the work" },
+    { id: "processName", sec: "identity", type: "text", required: true, label: "Process name", ph: "e.g. Issuance of certified copies" },
+    { id: "processOwner", sec: "identity", type: "text", required: true, label: "Process owner", hint: "The person accountable for how this process runs. Name and position." },
+    { id: "dpo", sec: "identity", type: "text", required: true, label: "Data Protection Officer (DPO)", hint: "Name and contact." },
+    { id: "approver", sec: "identity", type: "text", required: true, label: "Approving authority (department head)", hint: "Name and position." },
+    { id: "piaDate", sec: "identity", type: "date", label: "PIA date", hint: "Filled with today's date. Change it if needed." },
+    { id: "version", sec: "identity", type: "text", label: "Version", hint: "For example Draft 0.1, then 1.0 once approved." },
+
+    // Process
+    { id: "description", sec: "process", type: "textarea", required: true, rows: 4, label: "What the process does", hint: "In two or three sentences, in plain words." },
+    { id: "purpose", sec: "process", type: "textarea", required: true, rows: 3, label: "Purpose of collecting and using personal data", hint: "Why the office needs this data. Be specific." },
+    { id: "mandate", sec: "process", type: "textarea", rows: 3, label: "Legal mandate for the process",
+      hint: function () { var o = ot(); return "Name the law, charter, ordinance or order that authorizes this process" + (o ? ". For a " + o.noun + ", look first at " + o.mandate : "") + ". If you do not know it, leave this blank. The register will raise a flag."; } },
+    { id: "lawEnf", sec: "process", type: "radio", options: YN, label: "Does the process involve law enforcement, investigation or regulatory functions?",
+      hint: "For example, investigating complaints, enforcing ordinances, or inspecting and sanctioning." },
+
+    // Inventory
+    { id: "catPI", sec: "inventory", type: "textarea", required: true, rows: 4, label: "Personal information collected",
+      hint: "Details that identify a person, such as name, address, contact number, birth date." },
+    { id: "catSPI", sec: "inventory", type: "textarea", rows: 4, label: "Sensitive personal information collected",
+      hint: "RA 10173 lists what counts as sensitive. Examples include health, age, civil status, education and government-issued ID numbers. Confirm with your DPO.", blank: "None recorded." },
+    { id: "catPriv", sec: "inventory", type: "textarea", rows: 2, label: "Privileged information, if any",
+      hint: "Information covered by privileged communication under law. If unsure, ask the Legal Office.", blank: "None recorded." },
+    { id: "subjects", sec: "inventory", type: "textarea", required: true, rows: 3, label: "Data subjects (whose data it is)" },
+    { id: "volume", sec: "inventory", type: "text", label: "Estimated volume", hint: "People or records per year, or in total. A rough figure is fine.", ph: "e.g. about 5,000 records a year" },
+    { id: "sources", sec: "inventory", type: "textarea", rows: 3, label: "Sources of the data", hint: "Where the data comes from." },
+
+    // Lifecycle
+    { id: "collection", sec: "lifecycle", grp: "Collection", type: "textarea", required: true, rows: 3, label: "How data is collected" },
+    { id: "use", sec: "lifecycle", grp: "Use", type: "textarea", required: true, rows: 3, label: "How data is used" },
+    { id: "storage", sec: "lifecycle", grp: "Storage", type: "textarea", required: true, rows: 3, label: "Where and how data is stored", hint: "Paper, computers, servers, cloud services, backups." },
+    { id: "access", sec: "lifecycle", grp: "Access", type: "textarea", required: true, rows: 3, label: "Who can access the data" },
+    { id: "sharing", sec: "lifecycle", grp: "Sharing and transfers", type: "textarea", rows: 3, label: "Sharing with other agencies, contractors or third parties", hint: "Who receives data, what they receive, and how it is sent.", blank: "None recorded." },
+    { id: "dsa", sec: "lifecycle", type: "radio", options: YNUNA, label: "Is there a data sharing agreement or contract terms with each agency or contractor that receives the data?" },
+    { id: "napSchedule", sec: "lifecycle", grp: "Retention", type: "text", label: "Which National Archives of the Philippines records disposition schedule applies?", hint: "Give the schedule name or number. Your records officer can tell you. If you do not know, tick the box below. The register will flag it." },
+    { id: "napUnknown", sec: "lifecycle", type: "check", label: "We do not know yet which schedule applies" },
+    { id: "retentionPeriod", sec: "lifecycle", type: "text", label: "Retention period for these records", hint: "Copy it from the schedule. Do not guess.", ph: "As stated in the schedule" },
+    { id: "retentionNotes", sec: "lifecycle", type: "textarea", rows: 3, label: "Retention notes" },
+    { id: "disposal", sec: "lifecycle", grp: "Disposal", type: "textarea", rows: 3, label: "How records are disposed of once the retention period ends", hint: "For example shredding for paper, secure deletion for files, and who approves." },
+
+    // Basis and principles
+    { id: "basisPI", sec: "basis", type: "checks", options: BASIS_OPTIONS, review: true, label: "Candidate lawful basis for personal information (RA 10173 Sec. 12)",
+      hint: "Tick what may apply. This is a candidate list for the Legal Office / DPO to confirm. It is not a legal conclusion." },
+    { id: "basisSPI", sec: "basis", type: "checks", options: BASIS_OPTIONS, review: true, label: "Candidate lawful basis for sensitive personal information (RA 10173 Sec. 13)",
+      hint: "Needed only if the process uses sensitive personal information. Sensitive personal information has its own conditions in Sec. 13, which the Legal Office / DPO checks." },
+    { id: "basisNotes", sec: "basis", type: "textarea", rows: 3, label: "Notes for the Legal Office / DPO", hint: "The law or provision the office relies on, if known.", blank: "None recorded." },
+    { id: "privacyNotice", sec: "basis", grp: "Transparency, legitimate purpose and proportionality", type: "radio", options: YNU, label: "Transparency: are people given a privacy notice when their data is collected?" },
+    { id: "purposeSpecified", sec: "basis", type: "radio", options: YNU, label: "Legitimate purpose: is the purpose specific, and is the data used only for that purpose?" },
+    { id: "minimized", sec: "basis", type: "radio", options: YNU, label: "Proportionality: is only the data needed for the purpose collected?" },
+    { id: "principlesNotes", sec: "basis", type: "textarea", rows: 3, label: "Notes on the three checks", blank: "None recorded." },
+
+    // Rights
+    { id: "rightsAccess", sec: "rights", type: "textarea", rows: 4, label: "Requests for access (a copy of one's own data)" },
+    { id: "rightsCorrection", sec: "rights", type: "textarea", rows: 4, label: "Requests for correction" },
+    { id: "rightsErasure", sec: "rights", type: "textarea", rows: 4, label: "Requests for erasure or blocking" },
+    { id: "rightsComplaints", sec: "rights", type: "textarea", rows: 4, label: "Complaints" },
+    { id: "rightsChannel", sec: "rights", type: "radio", options: YNU, label: "Is there a named contact or channel (such as the DPO) where people can send these requests and complaints?" },
+
+    // Security
+    { id: "secOrg", sec: "security", grp: "Organizational measures", type: "textarea", rows: 4, label: "Organizational measures" },
+    { id: "secPhysical", sec: "security", grp: "Physical measures", type: "textarea", rows: 4, label: "Physical measures" },
+    { id: "secTechnical", sec: "security", grp: "Technical measures", type: "textarea", rows: 4, label: "Technical measures" },
+    { id: "accessLimited", sec: "security", grp: "Quick checks", type: "radio", options: YNU, label: "Is access limited to staff who need the data for their work?" },
+    { id: "lockedStorage", sec: "security", type: "radio", options: YNUNA, label: "Are paper records kept locked when not in use?" },
+    { id: "sharedAccounts", sec: "security", type: "radio", options: YNU, label: "Do staff share user accounts or passwords for any system that holds this data?" },
+    { id: "personalChannels", sec: "security", type: "radio", options: YNU, label: "Are personal email accounts or messaging apps used to share this data?" },
+    { id: "unencrypted", sec: "security", type: "radio", options: YNU, label: "Is sensitive personal information kept on laptops or USB drives that are not encrypted?" },
+    { id: "breachProcedure", sec: "security", type: "radio", options: YNU, label: "Is there a written procedure for handling a data breach?" },
+
+    // Recommendations
+    { id: "recsExtra", sec: "recs", type: "textarea", rows: 4, label: "Other recommendations", hint: "Anything the register does not cover, in your own words.", blank: "None recorded." },
+
+    // Sign-off
+    { id: "preparedBy", sec: "signoff", type: "text", required: true, label: "Prepared by", hint: "Name and position of the person who drafted this PIA." },
+    { id: "nextReview", sec: "signoff", type: "date", required: true, label: "Next review date" },
+    { id: "reviewTriggers", sec: "signoff", type: "textarea", rows: 3, label: "When this PIA will be reviewed again" }
+  ];
+
+  var FIELD_BY_ID = {};
+  FIELDS.forEach(function (f) { FIELD_BY_ID[f.id] = f; });
+
+  /* =====================================================================
+     STATE
+     ===================================================================== */
+
+  var state = defaultState();
+  var view = "office";   // office | picker | wizard
+  var stepIndex = 0;
+  var STEPS = [];
+
+  function defaultState() {
+    return {
+      officeType: "", otherRegs: "", preset: "",
+      threshold: { q1: "", q2: "", q3: "", q4: "", q5: "", q6: "" },
+      forceFull: false,
+      v: {},
+      risks: {},          // overrides keyed by rule id
+      customRisks: [],
+      visited: {}
+    };
+  }
+
+  function localDate() {
+    var t = new Date();
+    return t.getFullYear() + "-" + ("0" + (t.getMonth() + 1)).slice(-2) + "-" + ("0" + t.getDate()).slice(-2);
+  }
+
+  function initPreset(id) {
+    state.preset = id;
+    state.v = {};
+    state.risks = {};
+    state.customRisks = [];
+    state.visited = {};
+    FIELDS.forEach(function (f) {
+      var d = defaultFor(f.id);
+      if (f.type === "checks") state.v[f.id] = [];
+      else state.v[f.id] = d !== undefined ? d : "";
+    });
+  }
+
+  function defaultFor(fid) {
+    if (fid === "piaDate") return localDate();
+    if (fid === "version") return "Draft 0.1";
+    var p = PRESETS[state.preset];
+    if (!p) return undefined;
+    if (p.defaults.hasOwnProperty(fid)) return p.defaults[fid];
+    if (p.common && COMMON_DEFAULTS.hasOwnProperty(fid)) return COMMON_DEFAULTS[fid];
+    return undefined;
+  }
+
+  function sameText(a, b) { return String(a || "").replace(/\r\n/g, "\n").trim() === String(b || "").replace(/\r\n/g, "\n").trim(); }
+  function isDefault(fid) {
+    if (fid === "piaDate") return false;
+    var d = defaultFor(fid);
+    return d !== undefined && d !== "" && sameText(state.v[fid], d);
+  }
+  function blank(fid) { var t = state.v[fid]; return !(typeof t === "string" ? t.trim() : t); }
+  function ot() { for (var i = 0; i < OFFICE_TYPES.length; i++) if (OFFICE_TYPES[i].id === state.officeType) return OFFICE_TYPES[i]; return null; }
+  function hasSPI() { return state.threshold.q1 === "yes" || !blank("catSPI"); }
+
+  function thresholdResult() {
+    var yes = THRESHOLD_QUESTIONS.filter(function (q) { return state.threshold[q.id] === "yes"; });
+    var answered = THRESHOLD_QUESTIONS.every(function (q) { return !!state.threshold[q.id]; });
+    if (yes.length) return { status: "full", yes: yes, answered: answered };
+    if (answered) return { status: "short", yes: yes, answered: true };
+    return { status: "open", yes: yes, answered: false };
+  }
+  function isFull() { return thresholdResult().status !== "short" || state.forceFull; }
+
+  function buildSteps() {
+    var full = isFull();
+    var list = SECTIONS.filter(function (s) { return full || s.short; });
+    STEPS = list.map(function (s, i) {
+      return { id: s.id, num: i + 1, total: list.length, title: s.title, rail: s.rail, help: s.help,
+        eyebrow: "Section " + (i + 1) + " of " + list.length };
+    });
+    STEPS.push({ id: "review", num: 0, total: list.length, title: "Review & generate", rail: "Review & generate", eyebrow: "Review",
+      help: "Check the open items, then download your draft. Nothing is saved on this page, so download the draft, or use Save progress, before you leave." });
+    if (stepIndex > STEPS.length - 1) stepIndex = STEPS.length - 1;
+  }
+  function secNo(id) { for (var i = 0; i < STEPS.length; i++) if (STEPS[i].id === id) return STEPS[i].num; return 0; }
+  function secIncluded(id) { return STEPS.some(function (s) { return s.id === id; }); }
+
+  /* ---------- Risk register ---------- */
+
+  function bandFor(score) { for (var i = 0; i < BANDS.length; i++) if (score >= BANDS[i].min) return BANDS[i]; return BANDS[BANDS.length - 1]; }
+
+  function ruleFires(r) {
+    if (r.when) return !!r.when();
+    var a = state.v[r.field];
+    return r.bad.indexOf(a) !== -1;
+  }
+
+  function clamp15(n, d) { n = parseInt(n, 10); return n >= 1 && n <= 5 ? n : d; }
+
+  function registerRows() {
+    var rows = [];
+    RULES.forEach(function (r, idx) {
+      if (!ruleFires(r)) return;
+      var o = state.risks[r.id] || {};
+      var l = clamp15(o.l, r.l), i = clamp15(o.i, r.i);
+      var control = o.control !== undefined ? o.control : r.control;
+      rows.push({ id: r.id, rule: r, order: idx, risk: r.risk, control: control,
+        controlIsDefault: sameText(control, r.control),
+        l: l, i: i, score: l * i, treatment: o.treatment || "", owner: o.owner || "", date: o.date || "",
+        source: "Flagged from Section " + (secNo(r.sec) || "") + " answers" });
+    });
+    state.customRisks.forEach(function (c, idx) {
+      var l = clamp15(c.l, 3), i = clamp15(c.i, 3);
+      if (!String(c.risk || "").trim()) return;
+      rows.push({ id: c.id, custom: true, order: 1000 + idx, risk: c.risk, control: c.control || "", controlIsDefault: false,
+        l: l, i: i, score: l * i, treatment: c.treatment || "", owner: c.owner || "", date: c.date || "", source: "Added by the user" });
+    });
+    rows.sort(function (a, b) { return b.score - a.score || a.order - b.order; });
+    return rows;
+  }
+
+  function treatmentLabel(v) { for (var i = 0; i < TREATMENTS.length; i++) if (TREATMENTS[i].v === v) return TREATMENTS[i].l.replace(/ \(.*\)$/, ""); return ""; }
+
+  /* ---------- Completeness gate ---------- */
+
+  function fieldAnswered(f) {
+    var v = state.v[f.id];
+    if (f.type === "checks") return (v || []).length > 0;
+    if (f.type === "check") return true;
+    return !!(typeof v === "string" ? v.trim() : v);
+  }
+
+  function completenessChecks() {
+    var checks = [];
+    var th = thresholdResult();
+    checks.push({ ok: th.answered, label: "Section " + secNo("threshold") + ": answer all six threshold questions", field: "threshold" });
+    SECTIONS.forEach(function (s) {
+      if (!secIncluded(s.id)) return;
+      var n = secNo(s.id);
+      FIELDS.filter(function (f) { return f.sec === s.id && f.required; }).forEach(function (f) {
+        checks.push({ ok: fieldAnswered(f), label: "Section " + n + ": " + f.label, field: f.id });
+      });
+      var radios = FIELDS.filter(function (f) { return f.sec === s.id && f.type === "radio"; });
+      if (radios.length) {
+        var left = radios.filter(function (f) { return !state.v[f.id]; }).length;
+        checks.push({ ok: left === 0, label: "Section " + n + ": answer all yes/no questions" + (left ? " (" + left + " left)" : ""), field: "radios-" + s.id });
+      }
+    });
+    if (secIncluded("basis")) {
+      var okBasis = (state.v.basisPI || []).length > 0 && (!hasSPI() || (state.v.basisSPI || []).length > 0);
+      checks.push({ ok: okBasis, label: "Section " + secNo("basis") + ": record a candidate lawful basis for each kind of data (for the Legal Office / DPO to review)", field: "basis" });
+    }
+    if (secIncluded("register")) {
+      var weak = registerRows().filter(function (r) { return r.score >= 10 && (!r.treatment || !r.owner.trim()); });
+      checks.push({ ok: weak.length === 0, label: "Section " + secNo("register") + ": set a treatment and an owner for each High or Critical risk" + (weak.length ? " (" + weak.length + " left)" : ""), field: "register" });
+    }
+    // Unreviewed suggested defaults, grouped by section.
+    SECTIONS.forEach(function (s) {
+      if (!secIncluded(s.id)) return;
+      var names = FIELDS.filter(function (f) { return f.sec === s.id && isDefault(f.id); }).map(function (f) { return f.label; });
+      if (names.length) checks.push({ ok: false, label: "Section " + secNo(s.id) + ": review the suggested default text (" + names.length + (names.length === 1 ? " field" : " fields") + ")", field: "defaults-" + s.id });
+    });
+    return checks;
+  }
+  function unresolvedItems() { return completenessChecks().filter(function (c) { return !c.ok; }).map(function (c) { return c.label; }); }
+
+  function stepComplete(step) {
+    if (step.id === "review") return false;
+    if (step.id === "threshold") return thresholdResult().answered;
+    var fields = FIELDS.filter(function (f) { return f.sec === step.id; });
+    var needs = fields.filter(function (f) { return f.required || f.type === "radio"; });
+    var met = needs.every(fieldAnswered);
+    if (step.id === "basis") met = met && (state.v.basisPI || []).length > 0 && (!hasSPI() || (state.v.basisSPI || []).length > 0);
+    if (step.id === "register" || step.id === "recs") return !!state.visited[step.id];
+    return met && (needs.length > 0 || !!state.visited[step.id]);
+  }
+
+  /* =====================================================================
+     RENDER HELPERS
+     ===================================================================== */
+
+  function esc(s) { return String(s === undefined || s === null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function hintOf(f) { return typeof f.hint === "function" ? f.hint() : (f.hint || ""); }
+
+  function badgeHtml(id) {
+    return '<span class="default-badge" data-badge="' + id + '"' + (isDefault(id) ? "" : " hidden") + '>Suggested default, edit freely</span>';
+  }
+
+  function fieldHtml(f) {
+    var id = f.id, v = state.v[id], h = "", hint = hintOf(f);
+    var req = f.required ? '<span class="req" title="Required" aria-hidden="true">*</span><span class="sr-only"> (required)</span>' : "";
+    var tag = f.review ? '<span class="review-tag">For Legal Office / DPO review</span>' : "";
+    if (f.grp) h += '<h3 class="grp">' + esc(f.grp) + "</h3>";
+    h += '<div class="field" data-wrap="' + id + '"' + (f.required ? ' data-required="1"' : "") + ">";
+    if (f.type === "radio" || f.type === "checks") {
+      h += '<fieldset><legend class="flabel">' + esc(f.label) + req + tag + "</legend>";
+      if (hint) h += '<p class="fhint">' + esc(hint) + "</p>";
+      if (f.type === "radio") {
+        h += '<div class="radio-grid row">';
+        f.options.forEach(function (o) {
+          h += '<label class="radio-opt"><input type="radio" name="f-' + id + '" data-f="' + id + '" value="' + o.v + '"' + (v === o.v ? " checked" : "") + "> " + esc(o.l) + "</label>";
+        });
+        h += "</div>";
+      } else {
+        h += '<div class="radio-grid">';
+        f.options.forEach(function (o) {
+          h += '<label class="radio-opt"><input type="checkbox" data-multi="' + id + '" value="' + o.id + '"' + ((v || []).indexOf(o.id) !== -1 ? " checked" : "") + "> " + esc(o.label) + "</label>";
+        });
+        h += "</div>";
+      }
+      h += "</fieldset>";
+    } else if (f.type === "check") {
+      h += '<label class="radio-opt"><input type="checkbox" data-f="' + id + '" data-bool="1"' + (v ? " checked" : "") + "> " + esc(f.label) + "</label>";
+    } else {
+      h += '<label class="flabel" for="f-' + id + '">' + esc(f.label) + req + badgeHtml(id) + tag + "</label>";
+      if (hint) h += '<p class="fhint">' + esc(hint) + "</p>";
+      if (f.type === "textarea") h += '<textarea id="f-' + id + '" data-f="' + id + '" rows="' + (f.rows || 3) + '">' + esc(v) + "</textarea>";
+      else if (f.type === "date") h += '<input type="date" id="f-' + id + '" data-f="' + id + '" value="' + esc(v) + '">';
+      else h += '<input type="text" id="f-' + id + '" data-f="' + id + '" value="' + esc(v) + '"' + (f.ph ? ' placeholder="' + esc(f.ph) + '"' : "") + ">";
+    }
+    return h + "</div>";
+  }
+
+  function fieldsHtml(secId) { return FIELDS.filter(function (f) { return f.sec === secId; }).map(fieldHtml).join(""); }
+
+  function aboutHtml(open) {
+    return '<details class="about"' + (open ? " open" : "") + ">" +
+      "<summary>New here? What is a PIA?</summary>" +
+      "<p><strong>PIA</strong> stands for <strong>Privacy Impact Assessment</strong>. It is a written check of one office process that uses personal data, such as issuing civil registry copies or paying salaries. It asks: what data do we collect, why, where does it go, who can see it, how long do we keep it, and what could go wrong for the people it belongs to?</p>" +
+      "<ul>" +
+      "<li><strong>Why do one:</strong> to find weak spots before they become a leak, a complaint, or a wrong decision about a person, and to decide what to fix first.</li>" +
+      "<li><strong>What this tool does:</strong> it asks about one process at a time, pre-fills suggested text you can edit, turns weak answers into risks, and drafts a PIA you can download as a Word or Markdown file. Anything you leave blank is marked " + UNRESOLVED + " in the draft.</li>" +
+      "<li><strong>Who it is for:</strong> Philippine government offices. You do not need a technical or legal background. Your DPO and Legal Office review the draft.</li>" +
+      "<li><strong>Your privacy:</strong> what you type stays in your browser. Nothing is sent to a server. Use Save progress to keep your work as a file on your own computer.</li>" +
+      "</ul>" +
+      '<p class="about-ok"><strong>Not sure what to put yet? That is okay.</strong> One PIA covers one process. Leave blank anything you do not know yet. You can save your progress and come back to it.</p>' +
+      '<p class="about-note">This is a starting draft. Before it is used, your Data Protection Officer, Legal Office and ICT office should review it.</p>' +
+      "</details>";
+  }
+
+  function disclaimerHtml() {
+    return '<div class="disclaimer">' + DISCLAIMER.map(function (t) { return "<p>" + esc(t) + "</p>"; }).join("") + "</div>";
+  }
+
+  var toastTimer;
+  function showToast(msg) {
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2600);
+  }
+
+  /* =====================================================================
+     SCREENS
+     ===================================================================== */
+
+  function renderOfficeScreen() {
+    var o = ot();
+    var h = '<div class="setup-brand">Government &amp; LGU Privacy</div>';
+    h += '<div class="eyebrow">Start</div><h1 class="step-title">PIA Draft Creator</h1>';
+    h += '<p class="step-help">Draft a Privacy Impact Assessment for one process in a Philippine government office. First, tell us what kind of office this is.</p>';
+    h += aboutHtml(true);
+    h += '<div class="field"><fieldset><legend class="flabel">Type of office <span class="req" aria-hidden="true">*</span></legend><div class="radio-grid">';
+    OFFICE_TYPES.forEach(function (t) {
+      h += '<label class="radio-opt"><input type="radio" name="officeType" data-top="officeType" value="' + t.id + '"' + (state.officeType === t.id ? " checked" : "") + "> " + esc(t.label) + "</label>";
+    });
+    h += "</div></fieldset></div>";
+    h += '<p class="callout" id="mandate-hint"' + (o ? "" : " hidden") + ">" + mandateHintText() + "</p>";
+    h += '<div class="field"><label class="flabel" for="f-otherRegs">Other regulators that apply to this process (optional)</label>' +
+      '<p class="fhint">Examples: DOH, PhilHealth, BSP, CHED. Leave blank if none.</p>' +
+      '<input type="text" id="f-otherRegs" data-top="otherRegs" value="' + esc(state.otherRegs) + '"></div>';
+    h += '<div class="nav-row"><button type="button" class="btn-ghost" data-act="load">Load saved progress</button>' +
+      '<button type="button" class="btn-primary" id="btn-office-next" data-act="to-picker"' + (o ? "" : " disabled") + ">Continue</button></div>";
+    h += disclaimerHtml();
+    return h;
+  }
+
+  function mandateHintText() {
+    var o = ot();
+    return o ? "For a " + esc(o.noun) + ", the legal mandate for a process usually comes from " + esc(o.mandate) + ". This is used only for labels and hints." : "";
+  }
+
+  function renderPickerScreen() {
+    var h = '<div class="setup-brand">Government &amp; LGU Privacy</div>';
+    h += '<div class="eyebrow">Start</div><h1 class="step-title">What kind of process is this?</h1>';
+    h += '<p class="step-help">Pick the closest match. It pre-fills suggested text for the data inventory, data flows and controls. You can edit everything. Choose Other / Custom to start with blank fields.</p>';
+    h += '<div class="type-grid">';
+    Object.keys(PRESETS).forEach(function (id) {
+      var p = PRESETS[id];
+      h += '<button type="button" class="type-card" data-act="pick-preset" data-preset="' + id + '"><span class="tc-title">' + esc(p.label) + '</span><span class="tc-desc">' + esc(p.desc) + "</span></button>";
+    });
+    h += "</div>";
+    h += '<p class="ok-note">More process types, such as Health, may be added later.</p>';
+    h += '<div class="nav-row"><button type="button" class="btn-ghost" data-act="to-office">Back</button><span></span></div>';
+    return h;
+  }
+
+  function thresholdResultHtml() {
+    var r = thresholdResult();
+    var h = "";
+    if (r.status === "open") {
+      h = '<h3>Answer all six questions to see the result</h3>' + (r.yes.length ? "<p>A full PIA is already recommended, because:</p>" + reasonList(r.yes) : "<p>Your result will appear here.</p>");
+      return { cls: "", html: h };
+    }
+    if (r.status === "full") {
+      h = "<h3>Full PIA recommended</h3><p>You answered Yes to:</p>" + reasonList(r.yes) +
+        "<p>Any Yes answer points to a full PIA with a risk register. This is this tool's rule of thumb, not a legal test. Your DPO makes the final call.</p>";
+      return { cls: "full", html: h };
+    }
+    h = "<h3>Short record is enough for now</h3><p>You answered No to all six questions, so none of the checks points to a full PIA.</p>" +
+      "<p>A short record covers who owns the process, what data it uses, why, and the candidate lawful basis. It leaves out the data lifecycle, rights, security, risk register and action plan. This is this tool's rule of thumb, not a legal test. Your DPO makes the final call.</p>" +
+      '<label class="radio-opt"><input type="checkbox" data-top-bool="forceFull"' + (state.forceFull ? " checked" : "") + "> Do the full PIA anyway</label>";
+    return { cls: "short", html: h };
+  }
+  function reasonList(qs) { return "<ul>" + qs.map(function (q) { return "<li>" + esc(q.reason) + "</li>"; }).join("") + "</ul>"; }
+
+  function renderThreshold() {
+    var h = aboutHtml(false);
+    THRESHOLD_QUESTIONS.forEach(function (q) {
+      h += '<div class="th-q"><fieldset><legend class="th-text">' + esc(q.text) + "</legend><p class=\"fhint\">" + esc(q.hint) + '</p><div class="radio-grid row">';
+      YN.forEach(function (o) {
+        h += '<label class="radio-opt"><input type="radio" name="th-' + q.id + '" data-th="' + q.id + '" value="' + o.v + '"' + (state.threshold[q.id] === o.v ? " checked" : "") + "> " + o.l + "</label>";
+      });
+      h += "</div></fieldset></div>";
+    });
+    var res = thresholdResultHtml();
+    h += '<div class="th-result ' + res.cls + '" id="th-result" aria-live="polite">' + res.html + "</div>";
+    return h;
+  }
+
+  function renderIdentity() {
+    var o = ot();
+    var h = '<div class="field"><label class="flabel" for="f-officeType">Type of office</label>' +
+      '<select id="f-officeType" data-top="officeType">';
+    OFFICE_TYPES.forEach(function (t) { h += '<option value="' + t.id + '"' + (t.id === state.officeType ? " selected" : "") + ">" + esc(t.label) + "</option>"; });
+    h += "</select></div>";
+    h += fieldsHtml("identity");
+    return h;
+  }
+
+  function renderProcess() {
+    var h = fieldsHtml("process").replace('<div class="field" data-wrap="lawEnf">', '<div class="field" data-wrap="lawEnf">');
+    h += '<p class="callout" data-show="lawEnf:yes"' + (state.v.lawEnf === "yes" ? "" : " hidden") + ">" + esc(ruleById("law_enf").note) + "</p>";
+    return h;
+  }
+  function ruleById(id) { for (var i = 0; i < RULES.length; i++) if (RULES[i].id === id) return RULES[i]; return null; }
+
+  function renderSecurity() {
+    var h = fieldsHtml("security");
+    h += '<p class="callout link-row">For incident readiness and breach handling, use the <a href="../cirpcreator/">CIRP Intake Wizard</a> to draft an incident response plan and the <a href="../playbooks/">Incident Playbook Creator</a> to draft playbooks.</p>';
+    return h;
+  }
+
+  function scoreBadge(score) {
+    var b = bandFor(score);
+    return '<div class="score-badge ' + b.cls + '" data-score-badge><b>' + score + "</b>" + b.name + "</div>";
+  }
+  function numSelect(key, id, val) {
+    var s = '<select data-risk="' + id + '" data-k="' + key + '" aria-label="' + (key === "l" ? "Likelihood" : "Impact") + '">';
+    for (var n = 1; n <= 5; n++) s += '<option value="' + n + '"' + (n === val ? " selected" : "") + ">" + n + "</option>";
+    return s + "</select>";
+  }
+
+  function riskCardHtml(r) {
+    var h = '<div class="risk-card" data-card="' + r.id + '">';
+    h += '<div class="risk-head">';
+    if (r.custom) {
+      h += '<div class="risk-text" style="font-weight:400"><label class="small" for="rk-' + r.id + '">Risk statement</label><textarea id="rk-' + r.id + '" data-risk="' + r.id + '" data-k="risk" rows="2">' + esc(r.risk) + "</textarea></div>";
+    } else {
+      h += '<div class="risk-text">' + esc(r.risk) + '<span class="risk-src">' + esc(r.source) + "</span></div>";
+    }
+    h += scoreBadge(r.score) + "</div>";
+    if (!r.custom && r.rule.note) h += '<p class="risk-note">' + esc(r.rule.note) + "</p>";
+    h += '<label class="small" for="rc-' + r.id + '">Suggested control' + (r.controlIsDefault ? " (suggested default, edit freely)" : "") + "</label>";
+    h += '<textarea id="rc-' + r.id + '" data-risk="' + r.id + '" data-k="control" rows="2">' + esc(r.control) + "</textarea>";
+    h += '<div class="risk-grid three">' +
+      '<div><label>Likelihood (1 to 5)</label>' + numSelect("l", r.id, r.l) + "</div>" +
+      '<div><label>Impact (1 to 5)</label>' + numSelect("i", r.id, r.i) + "</div>" +
+      '<div><label>Treatment</label><select data-risk="' + r.id + '" data-k="treatment" aria-label="Treatment">' +
+      TREATMENTS.map(function (t) { return '<option value="' + t.v + '"' + (t.v === r.treatment ? " selected" : "") + ">" + esc(t.l) + "</option>"; }).join("") + "</select></div></div>";
+    h += '<div class="risk-grid"><div><label for="ro-' + r.id + '">Owner</label><input type="text" id="ro-' + r.id + '" data-risk="' + r.id + '" data-k="owner" value="' + esc(r.owner) + '"></div>' +
+      '<div><label for="rd-' + r.id + '">Target date</label><input type="date" id="rd-' + r.id + '" data-risk="' + r.id + '" data-k="date" value="' + esc(r.date) + '"></div></div>';
+    if (r.custom) h += '<div class="btn-row"><button type="button" class="btn-ghost" data-act="del-risk" data-id="' + r.id + '">Remove this risk</button></div>';
+    return h + "</div>";
+  }
+
+  function renderRegister() {
+    var rows = registerRows();
+    var h = '<p class="ok-note">Score = likelihood x impact (1 to 25). Bands: Low 1 to 4, Medium 5 to 9, High 10 to 16, Critical 20 to 25. These ratings are suggestions to start the discussion. Your office sets the final ratings.</p>';
+    if (!rows.length) h += '<p class="callout">No risks have been flagged yet. Answer the questions in the earlier sections, or add your own risk below.</p>';
+    rows.forEach(function (r) { h += riskCardHtml(r); });
+    h += '<div class="btn-row"><button type="button" class="btn-ghost" data-act="add-risk">Add a risk of your own</button></div>';
+    return h;
+  }
+
+  function actionTableHtml() {
+    var rows = registerRows().filter(function (r) { return String(r.control).trim(); });
+    if (!rows.length) return '<p class="callout">No actions yet. Actions come from the risk register.</p>';
+    var h = '<div class="table-wrap"><table class="action-table"><thead><tr><th>#</th><th>Action</th><th>Rating</th><th>Treatment</th><th>Owner</th><th>Target date</th></tr></thead><tbody>';
+    rows.forEach(function (r, i) {
+      var b = bandFor(r.score);
+      h += "<tr><td>" + (i + 1) + "</td><td>" + esc(r.control) + '</td><td><span class="score-badge ' + b.cls + '" style="display:inline-block;min-width:0;padding:3px 8px">' + b.name + " (" + r.score + ")</span></td><td>" +
+        esc(treatmentLabel(r.treatment) || "Not yet decided") + "</td><td>" + esc(r.owner || UNRESOLVED) + "</td><td>" + esc(r.date || UNRESOLVED) + "</td></tr>";
+    });
+    return h + "</tbody></table></div>";
+  }
+
+  function renderRecs() {
+    var h = '<h3 class="grp">Action plan from the risk register</h3>' + actionTableHtml();
+    h += '<div class="btn-row"><button type="button" class="btn-ghost" data-act="goto" data-step="register">Edit in the risk register</button></div>';
+    h += fieldsHtml("recs");
+    return h;
+  }
+
+  function renderSignoff() {
+    var h = fieldsHtml("signoff");
+    h += '<div class="callout"><strong>Reviewed by the DPO:</strong> ' + esc(state.v.dpo || UNRESOLVED) + "<br><strong>Approved by the department head:</strong> " + esc(state.v.approver || UNRESOLVED) +
+      '<br><span style="font-size:13px">Names come from Section ' + secNo("identity") + ". Signature and date lines are added to the Word file for signing.</span></div>";
+    return h;
+  }
+
+  function renderReview() {
+    var checks = completenessChecks();
+    var open = checks.filter(function (c) { return !c.ok; });
+    var th = thresholdResult();
+    var rows = isFull() ? registerRows() : [];
+    var h = '<div class="gate-summary">' + (open.length ? open.length + " open item" + (open.length === 1 ? "" : "s") + " to resolve before adoption" : "All checks complete") + "</div>";
+    h += '<ul class="gate-list" id="gate-list">';
+    checks.forEach(function (c) {
+      h += '<li class="gate-item ' + (c.ok ? "ok" : "bad") + '" data-gate="' + esc(c.field) + '"><span class="dot"></span><span>' + esc(c.label) + "</span></li>";
+    });
+    h += "</ul>";
+    h += '<p class="ok-note">Result: ' + (isFull() ? "full PIA" : "short record") + (rows.length ? " with " + rows.length + " risk" + (rows.length === 1 ? "" : "s") + " in the register" : "") +
+      (th.status === "open" ? ". The threshold check is not finished." : ".") + "</p>";
+    h += '<div class="btn-row">' +
+      '<button type="button" class="btn-gold" data-act="dl-docx">Download Word (.docx)</button>' +
+      '<button type="button" class="btn-primary" data-act="dl-md">Download Markdown</button>' +
+      '<button type="button" class="btn-ghost" data-act="copy">Copy to clipboard</button></div>';
+    h += '<div class="btn-row">' +
+      '<button type="button" class="btn-ghost" data-act="save">Save progress (.json)</button>' +
+      '<button type="button" class="btn-ghost" data-act="load">Load progress</button></div>';
+    h += '<p class="fhint">The Word file starts with a one-page summary for the department head, then the full draft. Save progress writes a small file to your computer. Nothing is sent anywhere.</p>';
+    h += '<div class="preview-pane"><pre id="preview"></pre></div>';
+    h += disclaimerHtml();
+    return h;
+  }
+
+  var RENDERERS = {
+    threshold: renderThreshold, identity: renderIdentity, process: renderProcess,
+    inventory: function () { return fieldsHtml("inventory"); },
+    lifecycle: function () { return fieldsHtml("lifecycle"); },
+    basis: function () { return fieldsHtml("basis"); },
+    rights: function () { return fieldsHtml("rights"); },
+    security: renderSecurity, register: renderRegister, recs: renderRecs, signoff: renderSignoff, review: renderReview
+  };
+
+  function renderRail() {
+    var rail = document.getElementById("rail");
+    var step = STEPS[stepIndex];
+    var label = step.id === "review" ? "Review & generate" : "Section " + step.num + " of " + step.total + " · " + step.rail;
+    var h = '<div class="rail-brand">Government &amp; LGU Privacy</div>';
+    h += '<h1 class="rail-title">PIA Draft Creator</h1>';
+    h += '<p class="rail-sub">Privacy Impact Assessment (PIA)</p>';
+    h += '<button type="button" class="rail-toggle" id="rail-toggle" aria-expanded="' + rail.classList.contains("open") + '"><span>' + esc(label) + '</span><span class="rail-toggle-caret" aria-hidden="true">▾</span></button>';
+    h += '<ul class="rail-steps">';
+    STEPS.forEach(function (s, i) {
+      var complete = stepComplete(s);
+      var cls = (i === stepIndex ? "active" : "") + (complete && i !== stepIndex ? " done" : "");
+      h += '<li class="rail-step ' + cls + '" data-goto="' + i + '" tabindex="0" role="button"' + (i === stepIndex ? ' aria-current="step"' : "") + '><span class="rail-num">' + (complete ? "✓" : (s.num || "→")) + '</span><span class="rail-step-label">' + esc(s.rail) + "</span></li>";
+    });
+    h += "</ul>";
+    var o = ot(), p = PRESETS[state.preset];
+    h += '<div class="rail-footer"><p>' + (o ? esc(o.label) : "") + (p ? " · " + esc(p.label) : "") + "</p>" +
+      '<p>Nothing you type here leaves your browser. Use Save progress to keep your work.</p>' +
+      '<p><button type="button" class="rail-link" data-act="save">Save progress</button> · <button type="button" class="rail-link" data-act="load">Load progress</button></p>' +
+      '<p><button type="button" class="rail-link" data-act="restart">Start over</button></p></div>';
+    rail.innerHTML = h;
+  }
+
+  function renderMain() {
+    var step = STEPS[stepIndex];
+    var main = document.getElementById("main");
+    var h = "";
+    if (step.eyebrow) h += '<div class="eyebrow">' + esc(step.eyebrow) + "</div>";
+    h += '<h2 class="step-title">' + esc(step.title) + "</h2>";
+    if (step.help) h += '<p class="step-help">' + esc(step.help) + "</p>";
+    if (stepIndex > 0 && step.id !== "review") h += '<p class="ok-note">Not sure yet? Leave it blank. The draft marks it as unresolved and you can fill it in later.</p>';
+    h += RENDERERS[step.id]();
+    h += '<div class="nav-row">' + (stepIndex > 0 ? '<button type="button" class="btn-ghost" data-act="back">Back</button>' : '<button type="button" class="btn-ghost" data-act="to-picker-back">Change process type</button>') +
+      (stepIndex < STEPS.length - 1 ? '<button type="button" class="btn-primary" data-act="next">Continue</button>' : "<span></span>") + "</div>";
+    if (step.id !== "review") h += disclaimerHtml();
+    main.innerHTML = h;
+    if (step.id === "review") document.getElementById("preview").textContent = generateMarkdown();
+  }
+
+  function render() {
+    var app = document.getElementById("app");
+    app.classList.toggle("no-rail", view !== "wizard");
+    if (view === "wizard") {
+      buildSteps();
+      renderRail();
+      renderMain();
+    } else {
+      document.getElementById("main").innerHTML = view === "office" ? renderOfficeScreen() : renderPickerScreen();
+    }
+  }
+
+  // Light refresh after an edit: no re-render of the form, so focus stays put.
+  function refresh() {
+    document.querySelectorAll("[data-badge]").forEach(function (b) { b.hidden = !isDefault(b.getAttribute("data-badge")); });
+    document.querySelectorAll("[data-show]").forEach(function (el) {
+      var p = el.getAttribute("data-show").split(":");
+      el.hidden = state.v[p[0]] !== p[1];
+    });
+    var res = document.getElementById("th-result");
+    if (res) {
+      var t = thresholdResultHtml();
+      var hadFocus = document.activeElement && res.contains(document.activeElement);
+      res.className = "th-result " + t.cls;
+      res.innerHTML = t.html;
+      if (hadFocus) { var cb = res.querySelector("input"); if (cb) cb.focus(); }
+    }
+    if (view === "wizard") {
+      var before = STEPS.map(function (s) { return s.id; }).join();
+      buildSteps();
+      if (STEPS.map(function (s) { return s.id; }).join() !== before) {
+        // The set of sections changed (threshold result). Keep the user on the same section.
+        stepIndex = 0;
+      }
+      renderRail();
+    }
+  }
+
+  /* =====================================================================
+     EVENTS
+     ===================================================================== */
+
+  function riskOverride(id) {
+    for (var i = 0; i < state.customRisks.length; i++) if (state.customRisks[i].id === id) return state.customRisks[i];
+    if (!state.risks[id]) state.risks[id] = {};
+    return state.risks[id];
+  }
+
+  function onEdit(e) {
+    var el = e.target;
+    if (!el || !el.getAttribute) return;
+    var f = el.getAttribute("data-f"), top = el.getAttribute("data-top"), th = el.getAttribute("data-th"),
+      multi = el.getAttribute("data-multi"), rk = el.getAttribute("data-risk"), tb = el.getAttribute("data-top-bool");
+    if (f) {
+      state.v[f] = el.getAttribute("data-bool") ? el.checked : el.value;
+    } else if (top) {
+      state[top] = el.value;
+      if (top === "officeType") {
+        var b = document.getElementById("btn-office-next");
+        if (b) b.disabled = !state.officeType;
+        var mh = document.getElementById("mandate-hint");
+        if (mh) { mh.innerHTML = mandateHintText(); mh.hidden = !state.officeType; }
+      }
+    } else if (th) {
+      state.threshold[th] = el.value;
+    } else if (tb) {
+      state[tb] = el.checked;
+    } else if (multi) {
+      state.v[multi] = Array.prototype.map.call(document.querySelectorAll('[data-multi="' + multi + '"]:checked'), function (c) { return c.value; });
+    } else if (rk) {
+      var k = el.getAttribute("data-k");
+      var o = riskOverride(rk);
+      o[k] = el.value;
+      if (k === "l" || k === "i") {
+        var row = registerRows().filter(function (r) { return r.id === rk; })[0];
+        var card = el.closest("[data-card]");
+        if (row && card) card.querySelector("[data-score-badge]").outerHTML = scoreBadge(row.score);
+      }
+    } else {
+      return;
+    }
+    refresh();
+  }
+
+  function goto(i) {
+    if (view === "wizard") state.visited[STEPS[stepIndex].id] = true;
+    stepIndex = i;
+    document.getElementById("rail").classList.remove("open");
+    render();
+    window.scrollTo(0, 0);
+  }
+
+  function onClick(e) {
+    var t = e.target.closest ? e.target.closest("[data-act],[data-goto]") : null;
+    if (!t) return;
+    if (t.hasAttribute("data-goto")) { goto(+t.getAttribute("data-goto")); return; }
+    var act = t.getAttribute("data-act");
+    switch (act) {
+      case "to-picker": if (state.officeType) { view = "picker"; render(); window.scrollTo(0, 0); } break;
+      case "to-office": view = "office"; render(); break;
+      case "to-picker-back": view = "picker"; render(); window.scrollTo(0, 0); break;
+      case "pick-preset": {
+        var id = t.getAttribute("data-preset");
+        if (state.preset && state.preset !== id && !window.confirm("Changing the process type replaces your answers with the suggested text for the new type. Continue?")) return;
+        if (state.preset !== id) initPreset(id);
+        view = "wizard"; stepIndex = 0; render(); window.scrollTo(0, 0);
+        break;
+      }
+      case "next": goto(stepIndex + 1); break;
+      case "back": goto(stepIndex - 1); break;
+      case "goto": {
+        var target = t.getAttribute("data-step");
+        for (var i = 0; i < STEPS.length; i++) if (STEPS[i].id === target) { goto(i); break; }
+        break;
+      }
+      case "add-risk":
+        state.customRisks.push({ id: "c" + Date.now().toString(36), risk: "", control: "", l: 3, i: 3, treatment: "", owner: "", date: "" });
+        render();
+        break;
+      case "del-risk":
+        state.customRisks = state.customRisks.filter(function (c) { return c.id !== t.getAttribute("data-id"); });
+        render();
+        break;
+      case "restart":
+        if (window.confirm("Start over? Your current answers will be cleared. Use Save progress first if you want to keep them.")) {
+          state = defaultState(); view = "office"; stepIndex = 0; render(); window.scrollTo(0, 0);
+        }
+        break;
+      case "dl-docx": downloadDocx(); break;
+      case "dl-md": downloadText(generateMarkdown(), fileBase() + ".md", "text/markdown"); showToast("Markdown downloaded."); break;
+      case "copy": copyText(generateMarkdown()); break;
+      case "save": saveProgress(); break;
+      case "load": document.getElementById("load-file").click(); break;
+    }
+  }
+
+  /* =====================================================================
+     SAVE / LOAD
+     ===================================================================== */
+
+  function saveProgress() {
+    var data = { app: SAVE_APP, version: SAVE_VERSION, savedAt: new Date().toISOString(), officeType: state.officeType, preset: state.preset, state: state };
+    downloadText(JSON.stringify(data, null, 2), fileBase() + "-progress.json", "application/json");
+    showToast("Progress saved to a file on your computer.");
+  }
+
+  function str(x) { return typeof x === "string" ? x : ""; }
+
+  function loadFromObject(data) {
+    if (!data || data.app !== SAVE_APP || typeof data.state !== "object" || !data.state) throw new Error("This is not a PIA Draft Creator progress file.");
+    if (data.version > SAVE_VERSION) throw new Error("This file was saved by a newer version of the tool.");
+    var s = data.state, ns = defaultState();
+    ns.officeType = OFFICE_TYPES.some(function (t) { return t.id === s.officeType; }) ? s.officeType : "";
+    ns.preset = PRESETS[s.preset] ? s.preset : "";
+    if (!ns.officeType || !ns.preset) throw new Error("The file is missing the office type or process type.");
+    ns.otherRegs = str(s.otherRegs);
+    ns.forceFull = !!s.forceFull;
+    THRESHOLD_QUESTIONS.forEach(function (q) { var a = s.threshold && s.threshold[q.id]; ns.threshold[q.id] = a === "yes" || a === "no" ? a : ""; });
+    FIELDS.forEach(function (f) {
+      var x = s.v && s.v[f.id];
+      if (f.type === "checks") {
+        ns.v[f.id] = Array.isArray(x) ? x.filter(function (id) { return f.options.some(function (o) { return o.id === id; }); }) : [];
+      } else if (f.type === "check") {
+        ns.v[f.id] = !!x;
+      } else if (f.type === "radio") {
+        ns.v[f.id] = f.options.some(function (o) { return o.v === x; }) ? x : "";
+      } else {
+        ns.v[f.id] = str(x);
+      }
+    });
+    function cleanRisk(o, custom) {
+      var r = { l: clamp15(o.l, custom ? 3 : undefined), i: clamp15(o.i, custom ? 3 : undefined), treatment: TREATMENTS.some(function (t) { return t.v === o.treatment; }) ? o.treatment : "",
+        owner: str(o.owner), date: str(o.date), control: o.control === undefined ? undefined : str(o.control) };
+      if (custom) { r.id = str(o.id) || ("c" + Math.random().toString(36).slice(2, 8)); r.risk = str(o.risk); }
+      Object.keys(r).forEach(function (k) { if (r[k] === undefined) delete r[k]; });
+      return r;
+    }
+    RULES.forEach(function (r) { if (s.risks && s.risks[r.id] && typeof s.risks[r.id] === "object") ns.risks[r.id] = cleanRisk(s.risks[r.id], false); });
+    if (Array.isArray(s.customRisks)) ns.customRisks = s.customRisks.filter(function (c) { return c && typeof c === "object"; }).slice(0, 100).map(function (c) { return cleanRisk(c, true); });
+    if (s.visited && typeof s.visited === "object") Object.keys(s.visited).forEach(function (k) { if (s.visited[k] === true && SECTIONS.some(function (x) { return x.id === k; })) ns.visited[k] = true; });
+    state = ns;
+    view = "wizard";
+    stepIndex = 0;
+  }
+
+  function onLoadFile(e) {
+    var file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 2000000) { showToast("That file is too large to be a progress file."); return; }
+    var fr = new FileReader();
+    fr.onload = function () {
+      try {
+        loadFromObject(JSON.parse(String(fr.result)));
+        render();
+        window.scrollTo(0, 0);
+        showToast("Progress loaded.");
+      } catch (err) {
+        showToast(err instanceof SyntaxError ? "That file is not valid JSON." : (err && err.message ? err.message : "Could not read that file."));
+      }
+    };
+    fr.onerror = function () { showToast("Could not read that file."); };
+    fr.readAsText(file);
+  }
+
+  /* =====================================================================
+     DOCUMENT MODEL: one list of blocks feeds Markdown and Word.
+     ===================================================================== */
+
+  function fileBase() {
+    var n = String(state.v.processName || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+    return "PIA-Draft" + (n ? "-" + n : "");
+  }
+
+  function textOut(f) {
+    var t = state.v[f.id];
+    t = typeof t === "string" ? t.trim() : "";
+    if (!t) return f.blank || UNRESOLVED;
+    return isDefault(f.id) ? t + " " + DEFAULT_NOTE : t;
+  }
+
+  function valueOut(f) {
+    var v = state.v[f.id];
+    if (f.type === "radio") {
+      var lab = null;
+      f.options.forEach(function (o) { if (o.v === v) lab = o.l; });
+      return lab || UNRESOLVED;
+    }
+    if (f.type === "checks") {
+      var labs = f.options.filter(function (o) { return (v || []).indexOf(o.id) !== -1; }).map(function (o) { return o.label; });
+      return labs.length ? labs.join("; ") : UNRESOLVED;
+    }
+    if (f.type === "check") return v ? "Yes" : "No";
+    return textOut(f);
+  }
+
+  function dateOut(id) { var t = String(state.v[id] || "").trim(); return t || UNRESOLVED; }
+  function gap(t) { t = String(t || "").trim(); return t || UNRESOLVED; }
+
+  function fieldBlocks(secId, skip) {
+    var out = [], rows = [];
+    function flush() { if (rows.length) { out.push({ t: "kv", rows: rows }); rows = []; } }
+    FIELDS.filter(function (f) { return f.sec === secId && (!skip || skip.indexOf(f.id) === -1); }).forEach(function (f) {
+      if (f.grp) { flush(); out.push({ t: "h3", text: f.grp }); }
+      rows.push([f.label, valueOut(f)]);
+    });
+    flush();
+    return out;
+  }
+
+  function summaryBlocks(rows) {
+    var o = ot(), p = PRESETS[state.preset], b = [];
+    var full = isFull();
+    b.push({ t: "title", text: "Privacy Impact Assessment" });
+    b.push({ t: "subtitle", text: (o ? o.label : UNRESOLVED) + ": " + gap(state.v.office) });
+    b.push({ t: "subtitle", text: "Process: " + gap(state.v.processName) });
+    b.push({ t: "h2", text: "Summary for the department head" });
+    b.push({ t: "kv", compact: true, rows: [
+      ["Department or division", gap(state.v.department)],
+      ["Process owner", gap(state.v.processOwner)],
+      ["Data Protection Officer", gap(state.v.dpo)],
+      ["PIA date and version", dateOut("piaDate") + ", " + gap(state.v.version) + (isDefault("version") ? " " + DEFAULT_NOTE : "")],
+      ["Process type and result", (p ? p.label : UNRESOLVED) + ". " + (full ? "Full PIA recommended." : "Short record.")]
+    ] });
+    if (full) {
+      var top = rows.slice(0, 5);
+      b.push({ t: "h3", text: "Top risks and priority actions" });
+      if (top.length) {
+        b.push({ t: "table", head: ["Risk", "Rating", "Action", "Owner", "Target date"], widths: [0.28, 0.1, 0.3, 0.16, 0.16], small: true, compact: true,
+          rows: top.map(function (r) { var bd = bandFor(r.score); return [r.risk, { text: bd.name + " (" + r.score + ")", fill: bd.fill, bold: true }, gap(r.control), gap(r.owner), gap(r.date)]; }) });
+        if (top.some(function (r) { return r.controlIsDefault || !r.treatment; })) b.push({ t: "p", em: true, text: "Ratings and actions are suggested defaults until the organization edits and reviews them." });
+      } else {
+        b.push({ t: "p", text: "No risks were flagged from the answers given." });
+      }
+    } else {
+      b.push({ t: "p", text: "The threshold check found no trigger for a full PIA, so this is a short record. It has no risk register." });
+    }
+    var open = unresolvedItems();
+    b.push({ t: "p", text: open.length + " item" + (open.length === 1 ? " is" : "s are") + " still open. The list is at the start of the full draft." });
+    b.push({ t: "h3", text: "Sign-off" });
+    b.push({ t: "table", head: ["Role", "Name", "Signature", "Date"], widths: [0.25, 0.3, 0.28, 0.17],
+      rows: [["Prepared by", gap(state.v.preparedBy), "", ""], ["Reviewed by the DPO", gap(state.v.dpo), "", ""], ["Approved by the department head", gap(state.v.approver), "", ""]], tall: true, compact: true });
+    return b;
+  }
+
+  function buildBlocks() {
+    var o = ot(), p = PRESETS[state.preset], full = isFull();
+    var rows = full ? registerRows() : [];
+    var b = summaryBlocks(rows);
+    b.push({ t: "pagebreak" });
+    b.push({ t: "title", text: "Privacy Impact Assessment (Draft)" });
+    b.push({ t: "subtitle", text: "Type of office: " + (o ? o.label : UNRESOLVED) });
+    b.push({ t: "subtitle", text: "Office: " + gap(state.v.office) });
+    b.push({ t: "subtitle", text: "Process: " + gap(state.v.processName) });
+
+    var open = unresolvedItems();
+    b.push({ t: "h2", text: "Open items" });
+    if (open.length) {
+      b.push({ t: "p", text: "These items must be resolved before this draft is adopted." });
+      b.push({ t: "ul", items: open });
+    } else {
+      b.push({ t: "p", text: "No open items." });
+    }
+
+    // Threshold
+    var th = thresholdResult();
+    b.push({ t: "h2", text: "Section " + secNo("threshold") + ". Threshold check" });
+    b.push({ t: "table", head: ["Question", "Answer"], widths: [0.8, 0.2],
+      rows: THRESHOLD_QUESTIONS.map(function (q) { var a = state.threshold[q.id]; return [q.text, a === "yes" ? "Yes" : a === "no" ? "No" : UNRESOLVED]; }) });
+    if (th.status === "short") {
+      b.push({ t: "p", text: (state.forceFull ? "Result: the answers point to a short record, but the office chose to complete the full PIA." : "Result: short record. All six answers are No, so none of the checks points to a full PIA.") });
+    } else if (th.status === "full") {
+      b.push({ t: "p", text: "Result: full PIA recommended. Reasons:" });
+      b.push({ t: "ul", items: th.yes.map(function (q) { return q.reason; }) });
+    } else {
+      b.push({ t: "p", text: "Result: " + UNRESOLVED + " (not all questions are answered)." });
+    }
+    b.push({ t: "p", em: true, text: "This result follows a simple rule used by this tool: any Yes answer points to a full PIA. It is not a legal test. The DPO makes the final decision." });
+
+    // Identity
+    b.push({ t: "h2", text: "Section " + secNo("identity") + ". Identity and ownership" });
+    var idRows = [["Type of office", o ? o.label : UNRESOLVED], ["Process type", p ? p.label : UNRESOLVED]];
+    FIELDS.filter(function (f) { return f.sec === "identity"; }).forEach(function (f) { idRows.push([f.label, f.type === "date" ? dateOut(f.id) : valueOut(f)]); });
+    b.push({ t: "kv", rows: idRows });
+
+    // Process
+    b.push({ t: "h2", text: "Section " + secNo("process") + ". Process description and purpose" });
+    b.push({ t: "kv", rows: [
+      ["What the process does", textOut(FIELD_BY_ID.description)],
+      ["Purpose", textOut(FIELD_BY_ID.purpose)],
+      ["Legal mandate", textOut(FIELD_BY_ID.mandate)],
+      ["Other regulators that apply to this process", gap(state.otherRegs) === UNRESOLVED ? "None recorded." : state.otherRegs.trim()],
+      [FIELD_BY_ID.lawEnf.label, valueOut(FIELD_BY_ID.lawEnf)]
+    ] });
+    if (state.v.lawEnf === "yes") b.push({ t: "callout", text: ruleById("law_enf").note });
+
+    // Inventory
+    b.push({ t: "h2", text: "Section " + secNo("inventory") + ". Personal data inventory" });
+    b.push({ t: "kv", rows: [
+      ["Personal information", textOut(FIELD_BY_ID.catPI)],
+      ["Sensitive personal information", textOut(FIELD_BY_ID.catSPI)],
+      ["Privileged information", textOut(FIELD_BY_ID.catPriv)],
+      ["Data subjects", textOut(FIELD_BY_ID.subjects)],
+      ["Estimated volume", textOut(FIELD_BY_ID.volume)],
+      ["Sources of the data", textOut(FIELD_BY_ID.sources)]
+    ] });
+
+    // Lifecycle
+    if (full) {
+      b.push({ t: "h2", text: "Section " + secNo("lifecycle") + ". Data lifecycle" });
+      fieldBlocks("lifecycle").forEach(function (x) { b.push(x); });
+    }
+
+    // Basis
+    b.push({ t: "h2", text: "Section " + secNo("basis") + ". Lawful basis and principles" });
+    b.push({ t: "callout", text: "For Legal Office / DPO review. The options below are candidates only. This draft does not state a legal conclusion." });
+    fieldBlocks("basis").forEach(function (x) { b.push(x); });
+
+    // Rights, security
+    if (full) {
+      b.push({ t: "h2", text: "Section " + secNo("rights") + ". Data subject rights" });
+      fieldBlocks("rights").forEach(function (x) { b.push(x); });
+      b.push({ t: "h2", text: "Section " + secNo("security") + ". Security measures" });
+      fieldBlocks("security").forEach(function (x) { b.push(x); });
+      b.push({ t: "p", text: "Incident readiness and breach handling: draft an incident response plan with the CIRP Intake Wizard (/cirpcreator/) and playbooks with the Incident Playbook Creator (/playbooks/)." });
+
+      // Register
+      b.push({ t: "h2", text: "Section " + secNo("register") + ". Risk register" });
+      b.push({ t: "p", text: "Score = likelihood x impact (1 to 25). Bands: Low 1 to 4, Medium 5 to 9, High 10 to 16, Critical 20 to 25. Ratings and controls come from this tool's suggested rules until the organization edits them." });
+      if (rows.length) {
+        b.push({ t: "table", head: ["#", "Risk and control", "L", "I", "Score", "Treatment", "Owner", "Target date"], widths: [0.04, 0.34, 0.04, 0.04, 0.12, 0.12, 0.15, 0.15], small: true,
+          rows: rows.map(function (r, i) {
+            var bd = bandFor(r.score);
+            return [String(i + 1),
+              { lines: [{ text: r.risk, bold: true }, { text: "Control: " + (String(r.control).trim() ? r.control + (r.controlIsDefault ? " " + DEFAULT_NOTE : "") : UNRESOLVED) }] },
+              String(r.l), String(r.i), { text: String(r.score) + " " + bd.name, fill: bd.fill, bold: true },
+              treatmentLabel(r.treatment) || UNRESOLVED, gap(r.owner), gap(r.date)];
+          }) });
+        var special = rows.filter(function (r) { return r.rule && r.rule.note; });
+        special.forEach(function (r) { b.push({ t: "callout", text: r.rule.note }); });
+      } else {
+        b.push({ t: "p", text: "No risks were flagged from the answers given." });
+      }
+
+      // Recs
+      b.push({ t: "h2", text: "Section " + secNo("recs") + ". Recommendations and action plan" });
+      var acts = rows.filter(function (r) { return String(r.control).trim(); });
+      if (acts.length) {
+        b.push({ t: "table", head: ["#", "Action", "Rating", "Owner", "Target date"], widths: [0.05, 0.5, 0.15, 0.15, 0.15], small: true,
+          rows: acts.map(function (r, i) { var bd = bandFor(r.score); return [String(i + 1), r.control + (r.controlIsDefault ? " " + DEFAULT_NOTE : ""), { text: bd.name, fill: bd.fill, bold: true }, gap(r.owner), gap(r.date)]; }) });
+      } else {
+        b.push({ t: "p", text: "No actions yet." });
+      }
+      b.push({ t: "kv", rows: [[FIELD_BY_ID.recsExtra.label, textOut(FIELD_BY_ID.recsExtra)]] });
+    }
+
+    // Sign-off
+    b.push({ t: "h2", text: "Section " + secNo("signoff") + ". Sign-off and review cycle" });
+    b.push({ t: "kv", rows: [
+      ["Prepared by", gap(state.v.preparedBy)],
+      ["Reviewed by the DPO", gap(state.v.dpo)],
+      ["Approved by the department head", gap(state.v.approver)],
+      ["Next review date", dateOut("nextReview")],
+      ["When this PIA will be reviewed again", textOut(FIELD_BY_ID.reviewTriggers)]
+    ] });
+    b.push({ t: "table", head: ["Role", "Name", "Signature", "Date"], widths: [0.25, 0.3, 0.28, 0.17], tall: true,
+      rows: [["Prepared by", gap(state.v.preparedBy), "", ""], ["Reviewed by the DPO", gap(state.v.dpo), "", ""], ["Approved by the department head", gap(state.v.approver), "", ""]] });
+
+    b.push({ t: "h2", text: "Disclaimer" });
+    DISCLAIMER.forEach(function (t) { b.push({ t: "p", em: true, text: t }); });
+    return b;
+  }
+
+  /* ---------- Markdown (plain text: no HTML escaping) ---------- */
+
+  function mdCell(c) {
+    var t = typeof c === "string" ? c : (c.lines ? c.lines.map(function (l) { return l.text; }).join(" ") : c.text);
+    return String(t).replace(/\|/g, "\\|").replace(/\s*\n\s*/g, " ");
+  }
+
+  function generateMarkdown() {
+    var out = [];
+    buildBlocks().forEach(function (b) {
+      switch (b.t) {
+        case "title": out.push("# " + b.text); break;
+        case "subtitle": out.push("**" + b.text + "**"); break;
+        case "h2": out.push("## " + b.text); break;
+        case "h3": out.push("### " + b.text); break;
+        case "p": out.push(b.em ? "*" + b.text + "*" : b.text); break;
+        case "ul": out.push(b.items.map(function (i) { return "- " + i; }).join("\n")); break;
+        case "callout": out.push("> " + b.text); break;
+        case "pagebreak": out.push("---"); break;
+        case "kv": out.push(b.rows.map(function (r) { return "**" + r[0] + ":** " + r[1].replace(/\n/g, "\n"); }).join("\n\n")); break;
+        case "table": {
+          var lines = ["| " + b.head.join(" | ") + " |", "| " + b.head.map(function () { return "---"; }).join(" | ") + " |"];
+          b.rows.forEach(function (r) { lines.push("| " + r.map(mdCell).join(" | ") + " |"); });
+          out.push(lines.join("\n"));
+          break;
+        }
+      }
+    });
+    return out.join("\n\n") + "\n";
+  }
+
+  /* ---------- Word (.docx), built with the shared docx library ---------- */
+
+  var docxLoading = null;
+  function ensureDocx() {
+    if (window.docx) return Promise.resolve(window.docx);
+    if (docxLoading) return docxLoading;
+    docxLoading = new Promise(function (resolve, reject) {
+      var existing = document.querySelector('script[src="' + DOCX_SRC + '"]');
+      var s = existing || document.createElement("script");
+      s.addEventListener("load", function () { window.docx ? resolve(window.docx) : reject(new Error("The Word library did not load.")); });
+      s.addEventListener("error", function () { docxLoading = null; reject(new Error("The Word library did not load.")); });
+      if (!existing) { s.src = DOCX_SRC; document.head.appendChild(s); }
+      else if (window.docx) resolve(window.docx);
+    });
+    return docxLoading;
+  }
+
+  function buildDocx(D, blocks) {
+    var NAVY = "1F3A5F", GOLD = "B8860B", INK = "16233A", SOFT = "4B5768", LINE = "C9D1DC";
+    var W = 9638;
+    var children = [];
+    var nextPageBreak = false;
+
+    function run(text, o) {
+      o = o || {};
+      return new D.TextRun({ text: text, bold: !!o.bold, italics: !!o.em, size: o.size || 21, color: o.color || INK, font: o.font || "Calibri" });
+    }
+    function paraLines(text, o) {
+      return String(text).split(/\n+/).map(function (ln) {
+        return new D.Paragraph({ spacing: { after: 80 }, children: [run(ln, o)] });
+      });
+    }
+    function cellChildren(c, o) {
+      if (c && c.lines) {
+        return c.lines.map(function (l) { return new D.Paragraph({ spacing: { after: 60 }, children: [run(l.text, { bold: l.bold, size: o.size, color: INK })] }); });
+      }
+      var text = typeof c === "string" ? c : c.text;
+      var bold = typeof c === "object" && c.bold;
+      return paraLines(text === "" ? " " : text, { bold: bold || o.bold, size: o.size, color: o.color });
+    }
+    function cell(c, width, o) {
+      o = o || {};
+      var fill = o.fill || (c && c.fill);
+      return new D.TableCell({
+        width: { size: width, type: D.WidthType.DXA },
+        margins: { top: o.tall ? 120 : (o.compact ? 40 : 70), bottom: o.tall ? 120 : (o.compact ? 40 : 70), left: 80, right: 80 },
+        shading: fill ? { type: D.ShadingType.CLEAR, fill: fill, color: "auto" } : undefined,
+        children: cellChildren(c, o)
+      });
+    }
+    var border = { style: D.BorderStyle.SINGLE, size: 4, color: LINE };
+    var borders = { top: border, bottom: border, left: border, right: border, insideHorizontal: border, insideVertical: border };
+
+    function makeTable(widths, headRow, bodyRows, o) {
+      var rows = [];
+      if (headRow) rows.push(new D.TableRow({ tableHeader: true, children: headRow.map(function (h, i) { return cell(h, widths[i], { fill: NAVY, bold: true, color: "FFFFFF", size: o.size }); }) }));
+      bodyRows.forEach(function (r) {
+        rows.push(new D.TableRow({ cantSplit: true, children: r.map(function (c, i) { return cell(c, widths[i], { size: o.size, tall: o.tall, compact: o.compact, fill: o.labelCol && i === 0 ? "F1F4F8" : undefined, bold: o.labelCol && i === 0 }); }) }));
+      });
+      return new D.Table({ width: { size: W, type: D.WidthType.DXA }, columnWidths: widths, borders: borders, rows: rows });
+    }
+    function spacer() { return new D.Paragraph({ spacing: { after: 120 }, children: [] }); }
+
+    function heading(text, level) {
+      var isH2 = level === 2;
+      return new D.Paragraph({
+        heading: isH2 ? D.HeadingLevel.HEADING_1 : D.HeadingLevel.HEADING_2,
+        pageBreakBefore: nextPageBreak && (nextPageBreak = false, true),
+        spacing: { before: isH2 ? 320 : 220, after: 120 },
+        border: isH2 ? { bottom: { style: D.BorderStyle.SINGLE, size: 8, color: GOLD, space: 2 } } : undefined,
+        keepNext: true,
+        children: [new D.TextRun({ text: text, bold: true, font: "Georgia", size: isH2 ? 28 : 24, color: NAVY })]
+      });
+    }
+
+    blocks.forEach(function (b, bi) {
+      var beforeBreak = blocks[bi + 1] && blocks[bi + 1].t === "pagebreak";
+      switch (b.t) {
+        case "pagebreak": nextPageBreak = true; break;
+        case "title":
+          children.push(new D.Paragraph({ pageBreakBefore: nextPageBreak && (nextPageBreak = false, true), spacing: { after: 100 }, children: [new D.TextRun({ text: b.text, bold: true, font: "Georgia", size: 40, color: NAVY })] }));
+          break;
+        case "subtitle":
+          children.push(new D.Paragraph({ spacing: { after: 40 }, children: [run(b.text, { size: 24, bold: true, color: SOFT })] }));
+          break;
+        case "h2": children.push(heading(b.text, 2)); break;
+        case "h3": children.push(heading(b.text, 3)); break;
+        case "p": children = children.concat(paraLines(b.text, { em: b.em, color: b.em ? SOFT : INK })); break;
+        case "ul":
+          b.items.forEach(function (it) { children.push(new D.Paragraph({ bullet: { level: 0 }, spacing: { after: 60 }, children: [run(it)] })); });
+          break;
+        case "callout":
+          children.push(new D.Paragraph({
+            spacing: { before: 80, after: 160 },
+            shading: { type: D.ShadingType.CLEAR, fill: "FFF4D6", color: "auto" },
+            border: { left: { style: D.BorderStyle.SINGLE, size: 24, color: GOLD, space: 6 } },
+            children: [run(b.text, { bold: true })]
+          }));
+          break;
+        case "kv":
+          children.push(makeTable([2900, W - 2900], null, b.rows, { labelCol: true, compact: b.compact, size: b.compact ? 19 : undefined }));
+          children.push(spacer());
+          break;
+        case "table": {
+          var widths = b.widths.map(function (f) { return Math.round(f * W); });
+          widths[widths.length - 1] += W - widths.reduce(function (a, c) { return a + c; }, 0);
+          children.push(makeTable(widths, b.head, b.rows, { size: b.small ? 18 : 20, tall: b.tall, compact: b.compact }));
+          if (!beforeBreak) children.push(spacer());
+          break;
+        }
+      }
+    });
+
+    return new D.Document({
+      creator: "PIA Draft Creator",
+      title: "Privacy Impact Assessment (Draft)",
+      styles: { default: { document: { run: { font: "Calibri", size: 21 } } } },
+      sections: [{
+        properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 900, bottom: 900, left: 1134, right: 1134 } } },
+        footers: { default: new D.Footer({ children: [new D.Paragraph({ alignment: D.AlignmentType.CENTER, children: [
+          new D.TextRun({ text: "Draft for review by the DPO, Legal Office, and ICT office. Page ", size: 16, color: SOFT, font: "Calibri" }),
+          new D.TextRun({ children: [D.PageNumber.CURRENT], size: 16, color: SOFT, font: "Calibri" }),
+          new D.TextRun({ text: " of ", size: 16, color: SOFT, font: "Calibri" }),
+          new D.TextRun({ children: [D.PageNumber.TOTAL_PAGES], size: 16, color: SOFT, font: "Calibri" })
+        ] })] }) },
+        children: children
+      }]
+    });
+  }
+
+  function downloadDocx() {
+    showToast("Building the Word file...");
+    ensureDocx().then(function (D) {
+      return D.Packer.toBlob(buildDocx(D, buildBlocks()));
+    }).then(function (blob) {
+      downloadBlob(blob, fileBase() + ".docx");
+      showToast("Word file downloaded.");
+    }).catch(function (err) {
+      showToast("Could not build the Word file: " + (err && err.message ? err.message : "unknown error"));
+    });
+  }
+
+  /* ---------- Download and clipboard helpers ---------- */
+
+  function downloadBlob(blob, name) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+  function downloadText(text, name, type) { downloadBlob(new Blob([text], { type: type + ";charset=utf-8" }), name); }
+
+  function copyText(text) {
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); showToast("Copied to clipboard."); } catch (e) { showToast("Copy failed. Select the text in the preview and copy it."); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { showToast("Copied to clipboard."); }, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  /* =====================================================================
+     START
+     ===================================================================== */
+
+  var mainEl = document.getElementById("main");
+  mainEl.addEventListener("input", onEdit);
+  mainEl.addEventListener("change", onEdit);
+  document.getElementById("app").addEventListener("click", onClick);
+  document.getElementById("rail").addEventListener("keydown", function (e) {
+    if ((e.key === "Enter" || e.key === " ") && e.target.hasAttribute && e.target.hasAttribute("data-goto")) { e.preventDefault(); goto(+e.target.getAttribute("data-goto")); }
+  });
+  document.getElementById("rail").addEventListener("click", function (e) {
+    if (e.target.closest && e.target.closest("#rail-toggle")) {
+      var rail = document.getElementById("rail");
+      var open = rail.classList.toggle("open");
+      document.getElementById("rail-toggle").setAttribute("aria-expanded", open);
+    }
+  });
+  document.getElementById("load-file").addEventListener("change", onLoadFile);
+
+  render();
+})();
+</script>
+</body>
+</html>
