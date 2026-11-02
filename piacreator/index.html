@@ -461,7 +461,7 @@
     { v: "", l: "Not yet decided" },
     { v: "reduce", l: "Reduce (add a control)" },
     { v: "accept", l: "Accept" },
-    { v: "transfer", l: "Transfer (for example to a contractor; the office stays accountable)" },
+    { v: "transfer", l: "Transfer (for example to a contractor; the office stays accountable)", out: "Transfer (office stays accountable)" },
     { v: "avoid", l: "Avoid (stop the activity)" }
   ];
 
@@ -910,7 +910,7 @@
   }
 
   function riskText(r) { return (r.unsure ? "Verify first: " : "") + r.risk; }
-  function treatmentLabel(v) { for (var i = 0; i < TREATMENTS.length; i++) if (TREATMENTS[i].v === v) return TREATMENTS[i].l.replace(/ \(.*\)$/, ""); return ""; }
+  function treatmentLabel(v) { for (var i = 0; i < TREATMENTS.length; i++) if (TREATMENTS[i].v === v) return TREATMENTS[i].out || TREATMENTS[i].l.replace(/ \(.*\)$/, ""); return ""; }
 
   /* ---------- Completeness gate ---------- */
 
