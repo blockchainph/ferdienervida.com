@@ -800,7 +800,7 @@
 
   // The card is built as a real .docx (not wrapped HTML), so it looks the same in Word, LibreOffice and Google Docs
   // and stays on one page. The library is the one already bundled for /threatmodel/, loaded only when needed.
-  var DOCX_SRC = "../threatmodel/vendor/docx.iife.js";
+  var DOCX_SRC = "../vendor/docx/docx.iife.js";
   var docxLibPromise = null;
   function ensureDocx() {
     if (window.docx) return Promise.resolve();
